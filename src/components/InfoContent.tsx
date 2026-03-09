@@ -86,7 +86,7 @@ function VeBetterTab() {
       <Section title="Is My Money Safe?">
         <Text textStyle="sm" color="text.subtle">
           {
-            "Your tokens never leave your wallet. This is the key difference from older solutions like veDelegate, where you actually hand over your voting power. Here, relayers can only do two things: cast your vote with YOUR preferences, and send YOUR rewards to YOUR wallet. That\u2019s it."
+            "Your tokens never leave your wallet. Unlike delegation-based approaches where you transfer your voting power to someone else, auto-voting keeps full custody with you. Relayers can only do two things: cast your vote with YOUR preferences, and send YOUR rewards to YOUR wallet. That\u2019s it."
           }
         </Text>
       </Section>
@@ -233,12 +233,12 @@ function RelayersTab() {
       <Section title="Why Would an App Want to Be a Relayer?">
         <Text textStyle="sm" color="text.subtle">
           {
-            "If you\u2019re an app on VeBetterDAO, this is a no-brainer. Instead of paying veDelegate to get votes directed your way, you become a relayer yourself. Your users set you as a preference, you execute their votes (which go to your app), and you earn relayer fees on top."
+            "Running your own relayer is a strong economic and security opportunity for apps on VeBetterDAO. Your users set you as a preference, you execute their votes (directed to your app), and you earn relayer fees \u2014 all without anyone needing to transfer funds or give up custody of their tokens."
           }
         </Text>
         <Text textStyle="sm" color="text.subtle">
           {
-            "You go from paying for votes to getting paid to handle them. Important: don\u2019t be shady about it. Add your app to the user\u2019s preference list \u2014 don\u2019t replace their other choices."
+            "Important: be transparent about it. Add your app to the user\u2019s preference list \u2014 don\u2019t replace their other choices."
           }
         </Text>
       </Section>
