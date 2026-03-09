@@ -1,9 +1,17 @@
 "use client"
 
 import { VStack } from "@chakra-ui/react"
+import dynamic from "next/dynamic"
 
-import { RelayersOverviewCards } from "@/components/Relayers"
-import { RelayersList } from "@/components/Relayers"
+const RelayersOverviewCards = dynamic(
+  () => import("@/components/Relayers").then(m => m.RelayersOverviewCards),
+  { ssr: false },
+)
+
+const RelayersList = dynamic(
+  () => import("@/components/Relayers").then(m => m.RelayersList),
+  { ssr: false },
+)
 
 export default function RelayersPage() {
   return (

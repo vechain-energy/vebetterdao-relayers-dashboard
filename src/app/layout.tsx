@@ -1,23 +1,26 @@
-import type { Metadata } from "next"
-import dynamic from "next/dynamic"
+import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 
-import { basePath } from "@/config/basePath"
+import { basePath } from "@/config/basePath";
 
-const ClientApp = dynamic(() => import("./ClientApp").then(mod => mod.ClientApp), {
-  ssr: false,
-  loading: () => (
-    <div
-      className="loading-container"
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: "16px",
-        background: "#F9F9FA",
-      }}>
-      <style>{`
+const ClientApp = dynamic(
+  () => import("./ClientApp").then((mod) => mod.ClientApp),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="loading-container"
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "16px",
+          background: "#F9F9FA",
+        }}
+      >
+        <style>{`
         @media (prefers-color-scheme: dark) {
           .loading-container { background: #0F0F0F !important; }
           .loading-dot { background: #525860 !important; }
@@ -27,24 +30,25 @@ const ClientApp = dynamic(() => import("./ClientApp").then(mod => mod.ClientApp)
           40% { transform: scale(1); opacity: 1; }
         }
       `}</style>
-      <div style={{ display: "flex", gap: "8px" }}>
-        {[0, 1, 2].map(i => (
-          <div
-            key={i}
-            className="loading-dot"
-            style={{
-              width: "10px",
-              height: "10px",
-              borderRadius: "50%",
-              background: "#AAAFB6",
-              animation: `loading-bounce 1.4s ease-in-out ${i * 0.16}s infinite`,
-            }}
-          />
-        ))}
+        <div style={{ display: "flex", gap: "8px" }}>
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="loading-dot"
+              style={{
+                width: "10px",
+                height: "10px",
+                borderRadius: "50%",
+                background: "#AAAFB6",
+                animation: `loading-bounce 1.4s ease-in-out ${i * 0.16}s infinite`,
+              }}
+            />
+          ))}
+        </div>
       </div>
-    </div>
-  ),
-})
+    ),
+  },
+);
 
 export const metadata: Metadata = {
   title: "VeBetter Relayers | VeBetterDAO Auto-Voting",
@@ -53,14 +57,18 @@ export const metadata: Metadata = {
     icon: `${basePath}/assets/favicon/web-app-manifest-192x192.png`,
     apple: `${basePath}/assets/favicon/web-app-manifest-192x192.png`,
   },
-}
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body style={{ padding: "0" }}>
         <ClientApp>{children}</ClientApp>
       </body>
     </html>
-  )
+  );
 }

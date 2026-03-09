@@ -3,12 +3,82 @@
 import { Badge, Box, Button, Card, Grid, HStack, SimpleGrid, Text, VStack } from "@chakra-ui/react"
 import type { ReactNode } from "react"
 import { useState } from "react"
-import { LuChevronDown, LuCoins, LuFlame, LuTarget } from "react-icons/lu"
+import { LuChevronDown, LuCoins, LuFlame, LuHand, LuTarget, LuTrophy, LuZap } from "react-icons/lu"
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate"
 import { formatNumber, formatToken } from "@/lib/format"
-import type { RelayerAnalytics } from "@/lib/types"
+import type { RelayerAnalytics, RelayerRoundBreakdown } from "@/lib/types"
 import { computeRelayerROI, computeRelayerRoundB3tr, computeRelayerSummary } from "@/lib/relayer-utils"
+
+interface ActivityItem {
+  type: "vote" | "claim"
+  roundId: number
+  count: number
+  vthoRaw: string
+}
+
+function buildActivityItems(rounds: RelayerRoundBreakdown[]): ActivityItem[] {
+  const items: ActivityItem[] = []
+  for (const rd of rounds) {
+    if (rd.votedForCount > 0) {
+      items.push({ type: "vote", roundId: rd.roundId, count: rd.votedForCount, vthoRaw: rd.vthoSpentOnVotingRaw })
+    }
+    if (rd.rewardsClaimedCount > 0) {
+      items.push({ type: "claim", roundId: rd.roundId, count: rd.rewardsClaimedCount, vthoRaw: rd.vthoSpentOnClaimingRaw })
+    }
+  }
+  // Sort by round descending, claims after votes within same round
+  items.sort((a, b) => b.roundId - a.roundId || (a.type === "vote" ? -1 : 1))
+  return items
+}
+
+function ActivityRow({ item, isCurrentRound }: { item: ActivityItem; isCurrentRound: boolean }) {
+  const isVote = item.type === "vote"
+  return (
+    <HStack gap="3" px="3" py="2.5" rounded="lg" _odd={{ bg: "bg.tertiary" }}>
+      <Box
+        flexShrink={0}
+        w="32px"
+        h="32px"
+        rounded="full"
+        bg={isVote ? "blue.subtle" : "green.subtle"}
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        color={isVote ? "blue.fg" : "green.fg"}
+      >
+        {isVote ? <LuHand size={14} /> : <LuTrophy size={14} />}
+      </Box>
+      <VStack gap="0" align="start" flex="1" minW="0">
+        <HStack gap="1.5">
+          <Text textStyle="sm" fontWeight="semibold" lineClamp={1}>
+            {isVote ? `Voted for ${formatNumber(item.count)} users` : `Claimed rewards for ${formatNumber(item.count)} users`}
+          </Text>
+          {isCurrentRound && (
+            <Badge size="sm" variant="solid" colorPalette="green">
+              {"Live"}
+            </Badge>
+          )}
+        </HStack>
+        <HStack gap="1" color="text.subtle">
+          <Text textStyle="xxs">
+            {"Round #"}
+            {item.roundId}
+          </Text>
+          {BigInt(item.vthoRaw) > BigInt(0) && (
+            <>
+              <Text textStyle="xxs">{"·"}</Text>
+              <Text textStyle="xxs">
+                {formatToken(item.vthoRaw)}
+                {" VTHO"}
+              </Text>
+            </>
+          )}
+        </HStack>
+      </VStack>
+    </HStack>
+  )
+}
 
 function SectionHeader({ title, icon }: { title: string; icon?: ReactNode }) {
   return (
@@ -112,6 +182,7 @@ function RoundRow({
 }
 
 const ROUNDS_PAGE_SIZE = 3
+const ACTIVITY_PAGE_SIZE = 5
 
 interface RelayerDetailContentProps {
   relayer: RelayerAnalytics
@@ -124,10 +195,15 @@ export function RelayerDetailContent({ relayer, currentRound, roundCtx }: Relaye
   const summary = computeRelayerSummary(relayer, roundCtx)
   const roi = computeRelayerROI(summary.totalB3trEarnedRaw, summary.totalVthoSpentRaw, b3trToVtho)
   const [visibleCount, setVisibleCount] = useState(ROUNDS_PAGE_SIZE)
+  const [visibleActivityCount, setVisibleActivityCount] = useState(ACTIVITY_PAGE_SIZE)
 
   const roundsDesc = [...relayer.rounds].sort((a, b) => b.roundId - a.roundId)
   const visibleRounds = roundsDesc.slice(0, visibleCount)
   const hasMore = visibleCount < roundsDesc.length
+
+  const activityItems = buildActivityItems(relayer.rounds)
+  const visibleActivity = activityItems.slice(0, visibleActivityCount)
+  const hasMoreActivity = visibleActivityCount < activityItems.length
 
   return (
     <VStack gap="6" align="stretch">
@@ -182,6 +258,33 @@ export function RelayerDetailContent({ relayer, currentRound, roundCtx }: Relaye
           </Card.Body>
         </Card.Root>
       </Grid>
+
+      <Card.Root variant="primary">
+        <Card.Body>
+          <VStack gap="3" align="stretch">
+            <SectionHeader title="Latest Activity" icon={<LuZap />} />
+            {activityItems.length === 0 ? (
+              <Text textStyle="sm" color="text.subtle">{"No activity yet."}</Text>
+            ) : (
+              <VStack gap="1" align="stretch">
+                {visibleActivity.map((item, i) => (
+                  <ActivityRow key={`${item.roundId}-${item.type}-${i}`} item={item} isCurrentRound={item.roundId === currentRound} />
+                ))}
+                {hasMoreActivity && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    w="full"
+                    onClick={() => setVisibleActivityCount(prev => prev + ACTIVITY_PAGE_SIZE)}>
+                    <LuChevronDown />
+                    {"Load more"}
+                  </Button>
+                )}
+              </VStack>
+            )}
+          </VStack>
+        </Card.Body>
+      </Card.Root>
 
       <Card.Root variant="primary">
         <Card.Body>
