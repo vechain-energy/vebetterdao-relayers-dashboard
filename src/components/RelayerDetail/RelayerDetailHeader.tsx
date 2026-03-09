@@ -20,9 +20,18 @@ import {
 } from "@vechain/vechain-kit";
 import NextLink from "next/link";
 import { useState } from "react";
-import { LuArrowLeft, LuCheck, LuClipboard, LuExternalLink, LuHeart } from "react-icons/lu";
+import {
+  LuArrowLeft,
+  LuCheck,
+  LuClipboard,
+  LuExternalLink,
+  LuHeart,
+  LuShare2,
+} from "react-icons/lu";
 
 import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
+
+import { ShareRelayerModal } from "@/components/SetupGuide/ShareRelayerModal";
 
 import { ChooseRelayerModal } from "./ChooseRelayerModal";
 
@@ -42,6 +51,7 @@ export function RelayerDetailHeader({
   const { account } = useWallet();
   const { open: openConnect } = useConnectModal();
   const [showModal, setShowModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const displayName = domain?.domain ?? "Unknown";
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
@@ -113,11 +123,6 @@ export function RelayerDetailHeader({
                     >
                       {isActive ? "Active" : "Inactive"}
                     </Badge>
-                    {isRegistered && (
-                      <Badge size="sm" variant="outline" colorPalette="blue">
-                        {"Registered"}
-                      </Badge>
-                    )}
                   </HStack>
 
                   <HStack gap="2" color="text.subtle">
@@ -162,9 +167,18 @@ export function RelayerDetailHeader({
                 </VStack>
               </HStack>
 
-              {/* Right: action button */}
-              {isRegistered && (
-                <Box flexShrink={0}>
+              {/* Right: action buttons */}
+              <HStack flexShrink={0} gap={2}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  rounded="full"
+                  onClick={() => setShowShareModal(true)}
+                >
+                  <LuShare2 />
+                  {"Share"}
+                </Button>
+                {isRegistered && (
                   <Button
                     variant="primary"
                     size="sm"
@@ -172,10 +186,10 @@ export function RelayerDetailHeader({
                     onClick={handleChooseRelayer}
                   >
                     <LuHeart />
-                    {"Choose as relayer"}
+                    {"Set as default relayer"}
                   </Button>
-                </Box>
-              )}
+                )}
+              </HStack>
             </HStack>
           </Card.Body>
         </Card.Root>
@@ -186,6 +200,12 @@ export function RelayerDetailHeader({
         onClose={() => setShowModal(false)}
         relayerAddress={address}
         relayerName={displayName}
+      />
+
+      <ShareRelayerModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        relayerAddress={address}
       />
     </>
   );

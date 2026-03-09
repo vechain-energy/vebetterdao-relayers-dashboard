@@ -3,6 +3,7 @@
 import {
   Badge,
   Box,
+  Button,
   Card,
   Clipboard,
   Code,
@@ -17,6 +18,7 @@ import {
   LuContainer,
   LuGlobe,
   LuPackage,
+  LuPlay,
   LuSmartphone,
 } from "react-icons/lu"
 
@@ -40,14 +42,7 @@ export function RunOptions({ onRunInBrowser }: Props) {
   return (
     <VStack gap={4} w="full">
       <SimpleGrid columns={{ base: 1, md: 2 }} gap={4} w="full">
-        <Card.Root
-          borderWidth="2px"
-          borderColor="actions.primary.default"
-          cursor="pointer"
-          onClick={onRunInBrowser}
-          _hover={{ borderColor: "actions.primary.hover" }}
-          transition="border-color 0.2s"
-        >
+        <Card.Root borderWidth="2px" borderColor="actions.primary.default">
           <Card.Body gap={4}>
             <HStack gap={3}>
               <Box p={2} borderRadius="lg" bg="bg.tertiary">
@@ -62,6 +57,10 @@ export function RunOptions({ onRunInBrowser }: Props) {
                 </Text>
               </VStack>
             </HStack>
+            <Button onClick={onRunInBrowser} variant="solid" rounded="full" size="sm" gap={2}>
+              <LuPlay size={14} />
+              {"Run Node"}
+            </Button>
           </Card.Body>
         </Card.Root>
 

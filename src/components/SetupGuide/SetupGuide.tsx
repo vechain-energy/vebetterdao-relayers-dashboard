@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import {
   Grid,
   Button,
@@ -100,6 +101,7 @@ function Step({
 export function SetupGuide() {
   const { account } = useWallet();
   const { open: openConnectModal } = useConnectModal();
+  const router = useRouter();
 
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
@@ -124,8 +126,8 @@ export function SetupGuide() {
 
   const handleRunInBrowser = useCallback(() => {
     completeStep(3);
-    window.location.href = "/run";
-  }, [completeStep]);
+    router.push("/run");
+  }, [completeStep, router]);
 
   return (
     <VStack align="start" gap="6" w="full">
