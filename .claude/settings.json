@@ -1,0 +1,9 @@
+{
+  "enabledPlugins": {
+    "auto-voting-relayers@vechain-ai": true,
+    "grill-me@vechain-ai": true,
+    "vechain-kit@vechain-ai": true,
+    "vebetterdao@vechain-ai": true,
+    "vechain-dev@vechain-ai": true
+  }
+}
