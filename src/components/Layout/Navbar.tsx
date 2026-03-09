@@ -15,11 +15,11 @@ import {
   useMediaQuery,
   VStack,
 } from "@chakra-ui/react"
-import { useWallet, WalletButton } from "@vechain/vechain-kit"
+import { useAccountModal, useConnectModal, useWallet, WalletButton } from "@vechain/vechain-kit"
 import Image from "next/image"
 import NextLink from "next/link"
 import { usePathname } from "next/navigation"
-import { LuHouse, LuInfo, LuMenu, LuPlay, LuRadar, LuUsers } from "react-icons/lu"
+import { LuHouse, LuInfo, LuLogIn, LuMenu, LuPlay, LuRadar, LuUsers } from "react-icons/lu"
 
 import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode"
 import { basePath } from "@/config/basePath"
@@ -42,7 +42,9 @@ export function Navbar() {
   const [isDesktop] = useMediaQuery(["(min-width: 1200px)"])
   const { open, onClose, onOpen } = useDisclosure()
   const pathname = usePathname()
-  const { account } = useWallet()
+  const { account, connection } = useWallet()
+  const { open: openConnectModal } = useConnectModal()
+  const { open: openAccountModal } = useAccountModal()
   const { data: isRegistered } = useRelayerRegistration(account?.address)
 
   const routes: NavRoute[] = isRegistered
@@ -151,18 +153,32 @@ export function Navbar() {
 
                 <Drawer.Body px={5} display="flex" flexDirection="column" justifyContent="space-between">
                   <VStack gap={0} w="full" align="stretch">
-                    <Box py={3} onClick={onClose}>
-                      <WalletButton
-                        buttonStyle={{
-                          variant: "outline",
-                          size: "md",
-                          borderRadius: "full",
-                          width: "100%",
-                          textColor: walletTextColor,
-                          _hover: { bg: walletHoverBg },
-                        }}
-                        connectionVariant="popover"
-                      />
+                    <Box py={3}>
+                      <Button
+                        variant="outline"
+                        size="md"
+                        borderRadius="full"
+                        width="100%"
+                        textColor={walletTextColor}
+                        _hover={{ bg: walletHoverBg }}
+                        loading={connection.isLoading}
+                        onClick={() => {
+                          onClose()
+                          if (connection.isConnected && account) {
+                            openAccountModal()
+                          } else {
+                            openConnectModal()
+                          }
+                        }}>
+                        {connection.isConnected && account ? (
+                          account.domain || `${account.address.slice(0, 6)}...${account.address.slice(-4)}`
+                        ) : (
+                          <>
+                            <LuLogIn />
+                            {"Login"}
+                          </>
+                        )}
+                      </Button>
                     </Box>
                     <Separator my={2} />
                     {routes.map(route => (
