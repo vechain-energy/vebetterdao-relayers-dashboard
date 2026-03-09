@@ -12,7 +12,7 @@
   resolved "https://registry.yarnpkg.com/@adraffy/ens-normalize/-/ens-normalize-1.11.1.tgz#6c2d657d4b2dfb37f8ea811dcb3e60843d4ac24a"
   integrity sha512-nhCBV3quEgesuf7c7KYfperqSS14T8bYuvJ8PcLJp6znkZpFc0AuW4qBtr8eKVyPPe/8RSr7sglCWPU5eaxwKQ==
 
-"@ark-ui/react@^5.34.1":
+"@ark-ui/react@^5.29.1":
   version "5.34.1"
   resolved "https://registry.yarnpkg.com/@ark-ui/react/-/react-5.34.1.tgz#458c46e4189bdaecc48a13f94e026f7cfca7a1ea"
   integrity sha512-RJlXCvsHzbK9LVxUVtaSD5pyF1PL8IUR1rHHkf0H0Sa397l6kOFE4EH7MCSj3pDumj2NsmKDVeVgfkfG0KCuEw==
@@ -382,6 +382,19 @@
     copy-to-clipboard "3.3.3"
     framesync "6.1.2"
 
+"@chakra-ui/react@3.30.0":
+  version "3.30.0"
+  resolved "https://registry.yarnpkg.com/@chakra-ui/react/-/react-3.30.0.tgz#87c598ff4c510c6c49c62c3b8beab9993511d638"
+  integrity sha512-eIRRAilqY4f2zN8GWRnjcciBYsvy3GZDOmzGD9xk596LBxCTNCJaivdBiHCcgNlqA3y1wMyM1jepy2b2vQC4QA==
+  dependencies:
+    "@ark-ui/react" "^5.29.1"
+    "@emotion/is-prop-valid" "^1.4.0"
+    "@emotion/serialize" "^1.3.3"
+    "@emotion/use-insertion-effect-with-fallbacks" "^1.2.0"
+    "@emotion/utils" "^1.4.2"
+    "@pandacss/is-valid-prop" "^1.4.2"
+    csstype "^3.2.3"
+
 "@chakra-ui/react@^2.8.2":
   version "2.10.9"
   resolved "https://registry.yarnpkg.com/@chakra-ui/react/-/react-2.10.9.tgz#f268c83c435df09c96a8eafb066e76641057c24b"
@@ -397,19 +410,6 @@
     react-fast-compare "3.2.2"
     react-focus-lock "^2.9.6"
     react-remove-scroll "^2.5.7"
-
-"@chakra-ui/react@^3.26.0":
-  version "3.34.0"
-  resolved "https://registry.yarnpkg.com/@chakra-ui/react/-/react-3.34.0.tgz#1a68f898350ef8919c45f4dee0ab6ccc7a6a626b"
-  integrity sha512-VLhpVwv5IVxhwajO10KnS1VQT4hDqQMQP/A796Ya+uVu8AdoSX+5HHyTLTkYIeXIDMe0xLqJfov04OBKbBchJA==
-  dependencies:
-    "@ark-ui/react" "^5.34.1"
-    "@emotion/is-prop-valid" "^1.4.0"
-    "@emotion/serialize" "^1.3.3"
-    "@emotion/use-insertion-effect-with-fallbacks" "^1.2.0"
-    "@emotion/utils" "^1.4.2"
-    "@pandacss/is-valid-prop" "^1.4.2"
-    csstype "^3.2.3"
 
 "@chakra-ui/styled-system@2.12.4":
   version "2.12.4"

@@ -16,7 +16,7 @@
     "analyze-auto-voting": "ts-node scripts/analyzeAutoVotingRounds.ts"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.26.0",
+    "@chakra-ui/react": "3.30.0",
     "@emotion/react": "^11.14.0",
     "@iconscout/react-unicons": "^2.0.2",
     "@tanstack/query-sync-storage-persister": "^5.28.12",
