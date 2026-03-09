@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Badge,
   Box,
   Card,
   Grid,
@@ -16,17 +17,22 @@ import {
   useCurrentCurrency,
   useGetTokenUsdPrice,
 } from "@vechain/vechain-kit";
-import type { ReactNode } from "react";
-import { LuWallet, LuUsers } from "react-icons/lu";
+import { type ReactNode, useState } from "react";
+import { LuInfo, LuWallet, LuUsers } from "react-icons/lu";
 import { formatEther } from "viem";
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
 import { formatNumber, formatToken } from "@/lib/format";
 import { computeROI } from "@/lib/roi";
-import { computeRoundCompletion, getRoundPhaseLabel } from "@/lib/round-utils";
+import {
+  computeRoundCompletion,
+  getRoundPhaseLabel,
+  parseRoundStatus,
+} from "@/lib/round-utils";
 import type { RoundAnalytics } from "@/lib/types";
 
 import { AppsAsRelayersCard } from "../AppsAsRelayers";
+import { StatusLegendModal } from "./StatusLegendModal";
 
 function pct(numerator: number, denominator: number): string {
   if (denominator === 0) return "\u2014";
@@ -245,12 +251,8 @@ export function RoundDetailContent({
   const roi = computeROI(roiRewardsRaw, round.vthoSpentTotalRaw, b3trToVtho);
   const roiLabel = round.isRoundEnded ? "ROI" : "Expected ROI";
 
-  const statusColor =
-    round.allActionsOk || round.actionStatus.startsWith("\u2713")
-      ? "status.positive.primary"
-      : round.actionStatus.startsWith("\u26A0")
-        ? "status.warning.primary"
-        : undefined;
+  const status = parseRoundStatus(round);
+  const [isStatusModalOpen, setStatusModalOpen] = useState(false);
 
   return (
     <VStack gap="14" align="stretch">
@@ -266,11 +268,28 @@ export function RoundDetailContent({
               <VStack gap="4" align="stretch">
                 <SectionHeader title="Round Summary" />
                 <VStack gap="2" align="stretch">
-                  <SummaryRow
-                    label="Current Status"
-                    value={round.actionStatus}
-                    valueColor={statusColor}
-                  />
+                  <HStack justify="space-between" w="full">
+                    <Text textStyle="sm" color="text.subtle">
+                      {"Current Status"}
+                    </Text>
+                    <HStack
+                      gap="1"
+                      cursor="pointer"
+                      onClick={() => setStatusModalOpen(true)}
+                      _hover={{ opacity: 0.8 }}
+                    >
+                      <Badge
+                        size="sm"
+                        variant="solid"
+                        colorPalette={status.colorPalette}
+                      >
+                        {status.label}
+                      </Badge>
+                      <Box as="span" color="text.subtle" fontSize="14px">
+                        <LuInfo />
+                      </Box>
+                    </HStack>
+                  </HStack>
                   <SummaryRow label="Phase" value={phaseLabel} />
                   <SummaryRow
                     label="Total Users"
@@ -456,6 +475,11 @@ export function RoundDetailContent({
       <SimpleGrid columns={{ base: 1, md: 1 }} gap="4">
         <AppsAsRelayersCard forceBanner={true} />
       </SimpleGrid>
+
+      <StatusLegendModal
+        isOpen={isStatusModalOpen}
+        onClose={() => setStatusModalOpen(false)}
+      />
     </VStack>
   );
 }

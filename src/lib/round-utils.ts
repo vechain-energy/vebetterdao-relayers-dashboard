@@ -22,6 +22,14 @@ export function computeRoundCompletion(round: RoundAnalytics): number {
   return Math.min(100, Math.round((round.votedForCount / eligible) * 100))
 }
 
+export function parseRoundStatus(round: RoundAnalytics): { label: string; colorPalette: string } {
+  if (round.actionStatus === "N/A") return { label: "N/A", colorPalette: "gray" }
+  if (round.allActionsOk || round.actionStatus.startsWith("\u2713"))
+    return { label: "All voted", colorPalette: "green" }
+  if (round.actionStatus.startsWith("\u26A0")) return { label: "Missed votes", colorPalette: "orange" }
+  return { label: round.actionStatus, colorPalette: "gray" }
+}
+
 export function getRoundPhaseLabel(round: RoundAnalytics): string {
   if (round.isRoundEnded) return "Round ended"
   if (round.autoVotingUsersCount === 0) return "No users"

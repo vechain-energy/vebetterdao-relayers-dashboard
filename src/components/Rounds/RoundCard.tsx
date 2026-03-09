@@ -5,6 +5,7 @@ import NextLink from "next/link"
 import { FaAngleRight } from "react-icons/fa6"
 
 import { formatNumber, formatToken } from "@/lib/format"
+import { parseRoundStatus } from "@/lib/round-utils"
 import type { RoundAnalytics } from "@/lib/types"
 
 interface RoundCardProps {
@@ -45,16 +46,11 @@ function StatPill({
   )
 }
 
-function statusColor(round: RoundAnalytics): string | undefined {
-  if (round.allActionsOk || round.actionStatus.startsWith("\u2713")) return "status.positive.primary"
-  if (round.actionStatus.startsWith("\u26A0")) return "status.warning.primary"
-  return undefined
-}
-
 export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
   const isActive = !round.isRoundEnded
   const displayRoi = isActive ? expectedRoi : roi
   const roiLabel = isActive ? "Expected ROI" : "ROI"
+  const status = parseRoundStatus(round)
 
   const roundLabel = (
     <HStack gap="2">
@@ -98,7 +94,14 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
               <SimpleGrid columns={7} gap="4" w="full" alignItems="center">
                 <Box>{roundLabel}</Box>
                 {stats}
-                <StatPill label="Status" value={round.actionStatus} valueColor={statusColor(round)} />
+                <VStack gap="0" align="start" minW="0" justifyContent="center">
+                  <Text textStyle="xxs" color="text.subtle" lineClamp={1}>
+                    {"Status"}
+                  </Text>
+                  <Badge size="sm" variant="solid" colorPalette={status.colorPalette}>
+                    {status.label}
+                  </Badge>
+                </VStack>
               </SimpleGrid>
               <IconButton aria-label="Go to round" variant="ghost" size="sm">
                 <FaAngleRight />

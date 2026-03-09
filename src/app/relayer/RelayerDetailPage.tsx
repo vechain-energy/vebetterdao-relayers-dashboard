@@ -94,7 +94,7 @@ export default function RelayerDetailPage() {
 
   return (
     <VStack w="full" align="stretch" gap="6">
-      <RelayerDetailHeader address={resolvedAddress} isActive={active} />
+      <RelayerDetailHeader address={resolvedAddress} isActive={active} isOwnRelayer={isOwnRelayer} />
       <RelayerDetailContent
         relayer={relayerData}
         currentRound={currentRound}

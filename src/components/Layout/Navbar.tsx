@@ -38,7 +38,7 @@ import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
 import { basePath } from "@/config/basePath";
 import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
 
-type NavPage = "home" | "relayers" | "relayer" | "run" | "learn";
+type NavPage = "home" | "relayers" | "learn";
 
 type NavRoute = {
   value: NavPage;
@@ -50,16 +50,8 @@ type NavRoute = {
 const BASE_ROUTES: NavRoute[] = [
   { value: "home", label: "Home", href: "/", icon: LuHouse },
   { value: "relayers", label: "Relayers", href: "/relayers", icon: LuUsers },
-  { value: "run", label: "Run", href: "/run", icon: LuPlay },
   { value: "learn", label: "Learn", href: "/learn", icon: LuInfo },
 ];
-
-const MY_RELAYER_ROUTE: NavRoute = {
-  value: "relayer",
-  label: "My Relayer",
-  href: "/relayer",
-  icon: LuRadar,
-};
 
 export function Navbar() {
   const [isDesktop] = useMediaQuery(["(min-width: 1200px)"]);
@@ -70,14 +62,7 @@ export function Navbar() {
   const { open: openAccountModal } = useAccountModal();
   const { data: isRegistered } = useRelayerRegistration(account?.address);
 
-  const routes: NavRoute[] = isRegistered
-    ? [
-        BASE_ROUTES[0]!,
-        BASE_ROUTES[1]!,
-        MY_RELAYER_ROUTE,
-        ...BASE_ROUTES.slice(2),
-      ]
-    : BASE_ROUTES;
+  const routes: NavRoute[] = BASE_ROUTES;
   const logoFilter = useColorModeValue("none", "brightness(0) invert(1)");
   const walletTextColor = useColorModeValue("#1A1A1A", "#E4E4E4");
   const walletHoverBg = useColorModeValue("#f8f8f8", "#2D2D2F");
@@ -146,14 +131,14 @@ export function Navbar() {
         )}
 
         <HStack flex="1" gap={2} justifyContent="end" alignItems="center">
-          <NextLink href="/run">
+          <NextLink href={isRegistered ? "/relayer" : "/run"}>
             <Button
               variant="primary"
               size={isDesktop ? "md" : "sm"}
               rounded="full"
             >
-              <LuPlay />
-              {"Run"}
+              {isRegistered ? <LuRadar /> : <LuPlay />}
+              {isRegistered ? "Manage" : "Run"}
             </Button>
           </NextLink>
 

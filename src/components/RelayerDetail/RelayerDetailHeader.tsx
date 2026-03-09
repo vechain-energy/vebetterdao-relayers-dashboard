@@ -21,13 +21,14 @@ import {
 import NextLink from "next/link";
 import { useState } from "react";
 import {
-  LuArrowLeft,
-  LuCheck,
-  LuClipboard,
-  LuExternalLink,
-  LuHeart,
-  LuShare2,
-} from "react-icons/lu";
+    LuArrowLeft,
+    LuCheck,
+    LuClipboard,
+    LuExternalLink,
+    LuHeart,
+    LuPlay,
+    LuShare2,
+  } from "react-icons/lu";
 
 import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
 
@@ -38,11 +39,13 @@ import { ChooseRelayerModal } from "./ChooseRelayerModal";
 interface RelayerDetailHeaderProps {
   address: string;
   isActive: boolean;
+  isOwnRelayer?: boolean;
 }
 
 export function RelayerDetailHeader({
   address,
   isActive,
+  isOwnRelayer,
 }: RelayerDetailHeaderProps) {
   const { data: domain } = useVechainDomain(address);
   const { data: avatarSrc } = useGetAvatarOfAddress(address);
@@ -178,16 +181,25 @@ export function RelayerDetailHeader({
                   <LuShare2 />
                   {"Share"}
                 </Button>
-                {isRegistered && (
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    rounded="full"
-                    onClick={handleChooseRelayer}
-                  >
-                    <LuHeart />
-                    {"Set as default relayer"}
-                  </Button>
+                {isOwnRelayer ? (
+                  <NextLink href="/run">
+                    <Button variant="primary" size="sm" rounded="full">
+                      <LuPlay />
+                      {"Run"}
+                    </Button>
+                  </NextLink>
+                ) : (
+                  isRegistered && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      rounded="full"
+                      onClick={handleChooseRelayer}
+                    >
+                      <LuHeart />
+                      {"Set as default relayer"}
+                    </Button>
+                  )
                 )}
               </HStack>
             </HStack>
