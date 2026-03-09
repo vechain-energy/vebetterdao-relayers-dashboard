@@ -8,11 +8,16 @@ import { useDismissedBanner } from "@/hooks/useDismissedBanners"
 
 import { RelayerInfoModal } from "./RelayerInfoModal"
 
-export function BecomeRelayerCard() {
+interface BecomeRelayerCardProps {
+  forceBanner?: boolean
+  mt?: Card.RootProps["mt"]
+}
+
+export function BecomeRelayerCard({ forceBanner = false, mt }: BecomeRelayerCardProps) {
   const { open, onOpen, onClose } = useDisclosure()
   const { isDismissed, dismiss } = useDismissedBanner("become-relayer")
 
-  if (isDismissed) return null
+  if (!forceBanner && isDismissed) return null
 
   return (
     <>
@@ -22,17 +27,20 @@ export function BecomeRelayerCard() {
         border="none"
         overflow="hidden"
         position="relative"
-        w="full">
-        <CloseButton
-          position="absolute"
-          top="3"
-          right="3"
-          size="sm"
-          color="whiteAlpha.700"
-          _hover={{ color: "white", bg: "whiteAlpha.200" }}
-          zIndex={2}
-          onClick={dismiss}
-        />
+        w="full"
+        mt={mt}>
+        {!forceBanner && (
+          <CloseButton
+            position="absolute"
+            top="3"
+            right="3"
+            size="sm"
+            color="whiteAlpha.700"
+            _hover={{ color: "white", bg: "whiteAlpha.200" }}
+            zIndex={2}
+            onClick={dismiss}
+          />
+        )}
         <VStack align="start" gap="3" position="relative" zIndex={1}>
           <Text textStyle={{ base: "lg", md: "xl" }} fontWeight="bold" color="white">
             {"Become a relayer"}

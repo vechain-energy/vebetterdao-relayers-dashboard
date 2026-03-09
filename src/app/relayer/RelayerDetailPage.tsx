@@ -1,29 +1,41 @@
-"use client"
+"use client";
 
-import { Text, VStack } from "@chakra-ui/react"
-import { useVechainDomain } from "@vechain/vechain-kit"
-import { useSearchParams } from "next/navigation"
+import { Text, VStack } from "@chakra-ui/react";
+import { useVechainDomain, useWallet } from "@vechain/vechain-kit";
+import { useSearchParams } from "next/navigation";
 
-import { RelayerDetailContent, RelayerDetailHeader, RelayerDetailSkeleton } from "@/components/RelayerDetail"
-import { useReportData } from "@/hooks/useReportData"
-import { buildRoundRewardsContext, computeRelayerSummary, isRelayerActive } from "@/lib/relayer-utils"
+import {
+  RelayerDetailContent,
+  RelayerDetailHeader,
+  RelayerDetailSkeleton,
+} from "@/components/RelayerDetail";
+import { useReportData } from "@/hooks/useReportData";
+import {
+  buildRoundRewardsContext,
+  computeRelayerSummary,
+  isRelayerActive,
+} from "@/lib/relayer-utils";
+import { BecomeRelayerCard } from "@/components/RelayerInfo";
 
 function isAddress(value: string): boolean {
-  return /^0x[a-fA-F0-9]{40}$/.test(value)
+  return /^0x[a-fA-F0-9]{40}$/.test(value);
 }
 
 export default function RelayerDetailPage() {
-  const searchParams = useSearchParams()
-  const addressOrDomain = searchParams.get("address") ?? ""
+  const searchParams = useSearchParams();
+  const { account } = useWallet();
+  const addressOrDomain = searchParams.get("address") ?? "";
 
-  const isDomain = addressOrDomain.length > 0 && !isAddress(addressOrDomain)
+  const isDomain = addressOrDomain.length > 0 && !isAddress(addressOrDomain);
   const { data: domainData, isLoading: domainLoading } = useVechainDomain(
     isDomain ? addressOrDomain : undefined,
-  )
+  );
 
-  const resolvedAddress = isDomain ? domainData?.address?.toLowerCase() : addressOrDomain.toLowerCase()
+  const resolvedAddress = isDomain
+    ? domainData?.address?.toLowerCase()
+    : addressOrDomain.toLowerCase();
 
-  const { data: report, isLoading: reportLoading } = useReportData()
+  const { data: report, isLoading: reportLoading } = useReportData();
 
   if (!addressOrDomain) {
     return (
@@ -32,11 +44,11 @@ export default function RelayerDetailPage() {
           {"No relayer address provided."}
         </Text>
       </VStack>
-    )
+    );
   }
 
   if (reportLoading || (isDomain && domainLoading)) {
-    return <RelayerDetailSkeleton />
+    return <RelayerDetailSkeleton />;
   }
 
   if (isDomain && !resolvedAddress) {
@@ -47,7 +59,7 @@ export default function RelayerDetailPage() {
           {addressOrDomain}
         </Text>
       </VStack>
-    )
+    );
   }
 
   if (!resolvedAddress) {
@@ -57,22 +69,30 @@ export default function RelayerDetailPage() {
           {"Invalid address or domain."}
         </Text>
       </VStack>
-    )
+    );
   }
 
-  const relayer = report?.relayers?.find(r => r.address.toLowerCase() === resolvedAddress)
-  const currentRound = report?.currentRound ?? 0
+  const relayer = report?.relayers?.find(
+    (r) => r.address.toLowerCase() === resolvedAddress,
+  );
+  const currentRound = report?.currentRound ?? 0;
 
   // Build a minimal relayer object if not found in report (newly registered, no activity yet)
-  const relayerData = relayer ?? { address: resolvedAddress, rounds: [] }
-  const roundCtx = report ? buildRoundRewardsContext(report) : undefined
-  const summary = computeRelayerSummary(relayerData, roundCtx)
-  const active = isRelayerActive(summary, currentRound)
+  const relayerData = relayer ?? { address: resolvedAddress, rounds: [] };
+  const roundCtx = report ? buildRoundRewardsContext(report) : undefined;
+  const summary = computeRelayerSummary(relayerData, roundCtx);
+  const active = isRelayerActive(summary, currentRound);
+  const isOwnRelayer = account?.address?.toLowerCase() === resolvedAddress;
 
   return (
     <VStack w="full" align="stretch" gap="6">
       <RelayerDetailHeader address={resolvedAddress} isActive={active} />
-      <RelayerDetailContent relayer={relayerData} currentRound={currentRound} roundCtx={roundCtx} />
+      <RelayerDetailContent
+        relayer={relayerData}
+        currentRound={currentRound}
+        roundCtx={roundCtx}
+      />
+      {!isOwnRelayer && <BecomeRelayerCard mt={8} forceBanner />}
     </VStack>
-  )
+  );
 }

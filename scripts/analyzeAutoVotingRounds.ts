@@ -85,6 +85,7 @@ interface RelayerRoundBreakdown {
   weightedActions: number
   actions: number
   claimableRewardsRaw: string
+  relayerRewardsClaimedRaw: string
   vthoSpentOnVotingRaw: string
   vthoSpentOnClaimingRaw: string
 }
@@ -965,6 +966,66 @@ async function getPerRelayerClaimableRewards(
   return rewardsMap
 }
 
+/**
+ * Get per-relayer rewards actually claimed from RelayerRewardsPool via RelayerRewardsClaimed events.
+ * Returns a map: relayerAddress -> total amount claimed for the given roundId.
+ */
+async function getRelayerRewardsClaimed(
+  thor: ThorClient,
+  contractAddress: string,
+  roundId: number,
+  fromBlock: number,
+  toBlock?: number,
+): Promise<Map<string, bigint>> {
+  const relayerPoolContract = ABIContract.ofAbi(RelayerRewardsPool__factory.abi)
+  const claimEvent = relayerPoolContract.getEvent("RelayerRewardsClaimed") as any
+  const roundIdHex = "0x" + roundId.toString(16).padStart(64, "0")
+
+  const claimedMap = new Map<string, bigint>()
+  let offset = 0
+  const MAX_EVENTS_PER_REQUEST = 1000
+
+  while (true) {
+    const logs = await thor.logs.filterEventLogs({
+      range: {
+        unit: "block" as const,
+        from: fromBlock,
+        to: toBlock,
+      },
+      options: {
+        offset,
+        limit: MAX_EVENTS_PER_REQUEST,
+      },
+      order: "asc",
+      criteriaSet: [
+        {
+          criteria: {
+            address: contractAddress,
+            topic0: claimEvent.encodeFilterTopicsNoNull({})[0],
+            topic2: roundIdHex,
+          },
+          eventAbi: claimEvent,
+        },
+      ],
+    })
+
+    for (const log of logs) {
+      const decoded = claimEvent.decodeEventLog({
+        topics: log.topics.map((t: string) => Hex.of(t)),
+        data: Hex.of(log.data),
+      })
+      const relayer = (decoded.args.relayer as string).toLowerCase()
+      const amount = BigInt(decoded.args.amount ?? 0)
+      claimedMap.set(relayer, (claimedMap.get(relayer) ?? BigInt(0)) + amount)
+    }
+
+    if (logs.length < MAX_EVENTS_PER_REQUEST) break
+    offset += MAX_EVENTS_PER_REQUEST
+  }
+
+  return claimedMap
+}
+
 // ============ Formatting Helpers ============
 
 /**
@@ -1445,6 +1506,15 @@ async function main(): Promise<void> {
       roundId,
     )
 
+    // Get per-relayer rewards actually claimed from the pool
+    const relayerRewardsClaimed = await getRelayerRewardsClaimed(
+      thor,
+      CONFIG.relayerRewardsPoolContractAddress,
+      roundId,
+      roundSnapshot,
+      undefined,
+    )
+
     // Merge into relayer map
     for (const addr of allRelayersForRound) {
       if (!checkpointRelayerMap.has(addr)) {
@@ -1460,6 +1530,7 @@ async function main(): Promise<void> {
         weightedActions: actions?.weightedActions ?? 0,
         actions: actions?.actions ?? 0,
         claimableRewardsRaw: (claimableRewards.get(addr) ?? BigInt(0)).toString(),
+        relayerRewardsClaimedRaw: (relayerRewardsClaimed.get(addr) ?? BigInt(0)).toString(),
         vthoSpentOnVotingRaw: (votingVtho.get(addr) ?? BigInt(0)).toString(),
         vthoSpentOnClaimingRaw: (claimingVtho.get(addr) ?? BigInt(0)).toString(),
       })
@@ -1471,7 +1542,7 @@ async function main(): Promise<void> {
   const relayers: RelayerAnalytics[] = Array.from(allKnownRelayers).map(addr => ({
     address: addr,
     rounds: Array.from(checkpointRelayerMap.get(addr)?.values() ?? [])
-      .filter(rd => rd.actions > 0 || rd.weightedActions > 0 || BigInt(rd.claimableRewardsRaw) > BigInt(0))
+      .filter(rd => rd.actions > 0 || rd.weightedActions > 0 || BigInt(rd.claimableRewardsRaw) > BigInt(0) || BigInt(rd.relayerRewardsClaimedRaw) > BigInt(0))
       .sort((a, b) => a.roundId - b.roundId),
   }))
 

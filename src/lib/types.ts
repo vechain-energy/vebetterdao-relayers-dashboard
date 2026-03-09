@@ -30,6 +30,7 @@ export interface RelayerRoundBreakdown {
   weightedActions: number
   actions: number
   claimableRewardsRaw: string
+  relayerRewardsClaimedRaw: string
   vthoSpentOnVotingRaw: string
   vthoSpentOnClaimingRaw: string
 }
