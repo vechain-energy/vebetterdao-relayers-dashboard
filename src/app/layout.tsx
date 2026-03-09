@@ -66,7 +66,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body style={{ padding: "0" }}>
+      <body style={{ margin: "0", padding: "0" }}>
         <ClientApp>{children}</ClientApp>
       </body>
     </html>
