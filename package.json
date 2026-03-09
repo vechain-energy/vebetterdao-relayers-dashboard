@@ -5,13 +5,12 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "chakra:typegen": "chakra typegen src/app/theme/theme.ts",
-    "prebuild": "yarn chakra:typegen",
-    "dev": "NEXT_PUBLIC_APP_ENV=mainnet next dev --turbo -p 3001",
+"dev": "NEXT_PUBLIC_APP_ENV=mainnet next dev --turbo -p 3001",
     "dev:staging": "NEXT_PUBLIC_APP_ENV=testnet-staging next dev --turbo -p 3001",
     "dev:mainnet": "NEXT_PUBLIC_APP_ENV=mainnet next dev --turbo -p 3001",
-    "build": "next build",
-    "build:staging": "NEXT_PUBLIC_APP_ENV=testnet-staging next build",
-    "build:mainnet": "NEXT_PUBLIC_APP_ENV=mainnet next build",
+    "build": "yarn chakra:typegen && next build",
+    "build:staging": "NEXT_PUBLIC_APP_ENV=testnet-staging yarn build",
+    "build:mainnet": "NEXT_PUBLIC_APP_ENV=mainnet yarn build",
     "start": "next start",
     "lint": "next lint",
     "analyze-auto-voting": "ts-node scripts/analyzeAutoVotingRounds.ts"
