@@ -22,6 +22,7 @@ import { usePathname } from "next/navigation"
 import { LuHouse, LuInfo, LuMenu, LuPlay, LuRadar } from "react-icons/lu"
 
 import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode"
+import { basePath } from "@/config/basePath"
 
 type NavPage = "home" | "relayer" | "run" | "learn"
 
@@ -50,7 +51,7 @@ export function Navbar() {
           <Link asChild>
             <NextLink href={"/"}>
               <HStack gap={2} align="flex-start" w="full">
-                <Image src="/assets/vb.svg" alt="VeBetterDAO" width={28} height={28} style={{ filter: logoFilter }} />
+                <Image src={`${basePath}/assets/vb.svg`} alt="VeBetterDAO" width={28} height={28} style={{ filter: logoFilter }} />
                 <Heading size="lg" fontWeight="bold">
                   {"Relayers"}
                 </Heading>
