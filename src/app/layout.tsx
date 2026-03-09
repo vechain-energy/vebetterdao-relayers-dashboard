@@ -7,6 +7,7 @@ const ClientApp = dynamic(() => import("./ClientApp").then(mod => mod.ClientApp)
   ssr: false,
   loading: () => (
     <div
+      className="loading-container"
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -26,7 +27,7 @@ const ClientApp = dynamic(() => import("./ClientApp").then(mod => mod.ClientApp)
           40% { transform: scale(1); opacity: 1; }
         }
       `}</style>
-      <div className="loading-container" style={{ display: "flex", gap: "8px" }}>
+      <div style={{ display: "flex", gap: "8px" }}>
         {[0, 1, 2].map(i => (
           <div
             key={i}
