@@ -1,8 +1,8 @@
 "use client"
 
-import { Box, Button, Card, Heading, HStack, Separator, SimpleGrid, Text, VStack } from "@chakra-ui/react"
+import { Box, Button, Card, Heading, SimpleGrid, Text, VStack } from "@chakra-ui/react"
 import NextLink from "next/link"
-import { LuExternalLink, LuLayoutGrid, LuShieldCheck, LuUsers } from "react-icons/lu"
+import { LuLayoutGrid, LuUsers } from "react-icons/lu"
 
 import { BaseModal } from "../Base/BaseModal"
 
@@ -28,13 +28,12 @@ export function AppsAsRelayersModal({ isOpen, onClose }: AppsAsRelayersModalProp
               <Text fontWeight="semibold">{"For X2Earn Apps"}</Text>
               <Text textStyle="sm" color="text.subtle">
                 {
-                  "If you're an app on VeBetterDAO, instead of paying veDelegate to get votes directed your way, become a relayer yourself. Your users set you as a preference, you execute their votes (which go to your app), and you earn relayer fees on top."
+                  "As an app on VeBetterDAO, running your own relayer is a powerful economic opportunity. Your users set you as a preference, you execute their votes (directed to your app), and you earn relayer fees \u2014 all without anyone transferring funds or giving up custody of their tokens."
                 }
               </Text>
 
-              <Button variant="solid" size="sm" rounded="full">
-                {"Documentation"}
-                <LuExternalLink />
+              <Button variant="solid" size="sm" rounded="full" disabled>
+                {"SDK Coming Soon"}
               </Button>
             </VStack>
           </Card.Root>
@@ -44,10 +43,10 @@ export function AppsAsRelayersModal({ isOpen, onClose }: AppsAsRelayersModalProp
               <Box as="span" color="blue.solid" fontSize="24px" lineHeight="1">
                 <LuUsers />
               </Box>
-              <Text fontWeight="semibold">{"For Community Navigators"}</Text>
+              <Text fontWeight="semibold">{"For Community Navigators \uD83C\uDF1F"}</Text>
               <Text textStyle="sm" color="text.subtle">
                 {
-                  "Respected community members who want to contribute to the DAO and be rewarded for it. Run a relayer node, help decentralize the voting process, and earn B3TR for the work you do."
+                  "This is your chance to make an impact! \uD83D\uDE80 As a respected community member, run a relayer node to help decentralize the voting process and earn B3TR rewards for every vote you handle. Be the backbone of VeBetterDAO \uD83D\uDCAA"
                 }
               </Text>
 
@@ -59,22 +58,6 @@ export function AppsAsRelayersModal({ isOpen, onClose }: AppsAsRelayersModalProp
             </VStack>
           </Card.Root>
         </SimpleGrid>
-
-        <Separator />
-
-        <VStack align="start" gap={3}>
-          <HStack gap={2}>
-            <Box as="span" color="blue.solid" fontSize="20px" lineHeight="1">
-              <LuShieldCheck />
-            </Box>
-            <Text fontWeight="semibold">{"Why Would an App Want to Do This?"}</Text>
-          </HStack>
-          <Text textStyle="sm" color="text.subtle">
-            {
-              "This is a no-brainer for apps on VeBetterDAO. You go from paying for votes to getting paid to handle them. Your users set you as a preference, you execute their votes (which go to your app), and you earn relayer fees on top."
-            }
-          </Text>
-        </VStack>
 
         {/* <HStack gap={2} align="start" bg="banner.yellow" p={3} borderRadius="lg">
           <Icon color="text.default" mt={0.5} flexShrink={0}>
