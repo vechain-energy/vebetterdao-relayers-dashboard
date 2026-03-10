@@ -349,10 +349,6 @@ export function RelayerDetailContent({
               <SectionHeader title="Performance Overview" icon={<LuTarget />} />
               <SimpleGrid columns={2} gap="4">
                 <MetricCell
-                  label="Total actions"
-                  value={formatNumber(summary.totalActions)}
-                />
-                <MetricCell
                   label="Users voted for"
                   value={formatNumber(summary.totalVotedFor)}
                 />
@@ -394,13 +390,13 @@ export function RelayerDetailContent({
                   }
                 />
                 <MetricCell
-                  label="VTHO / action"
+                  label="Avg VTHO / user"
                   value={
-                    summary.totalActions > 0
+                    summary.totalVotedFor > 0
                       ? formatToken(
                           (
                             BigInt(summary.totalVthoSpentRaw) /
-                            BigInt(summary.totalActions)
+                            BigInt(summary.totalVotedFor)
                           ).toString(),
                         )
                       : "\u2014"

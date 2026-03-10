@@ -29,7 +29,7 @@ interface StatItemProps {
 
 function StatItem({ label, value, sublabel, icon, isLoading }: StatItemProps) {
   return (
-    <Card.Root p={{ base: "4", md: "6" }} variant="action">
+    <Card.Root p={{ base: "4", md: "6" }} variant="outline">
       <VStack flex={1} alignItems="start" gap="1">
         <HStack w="full" justifyContent="space-between" alignItems="center">
           <Text

@@ -74,7 +74,7 @@ function ActiveRelayerRow({ relayer }: { relayer: ActiveRelayer }) {
           {/* Desktop */}
           <Box hideBelow="md">
             <HStack justify="space-between" w="full" gap="2">
-              <SimpleGrid columns={6} gap="4" w="full" alignItems="center">
+              <SimpleGrid columns={5} gap="4" w="full" alignItems="center">
                 <HStack gridColumn="span 2" gap="3" minW="0">
                   {avatarSrc && (
                     <Box flexShrink={0}>
@@ -107,7 +107,6 @@ function ActiveRelayerRow({ relayer }: { relayer: ActiveRelayer }) {
                   label="Claimed for"
                   value={formatNumber(rd.rewardsClaimedCount)}
                 />
-                <StatPill label="Actions" value={formatNumber(rd.actions)} />
                 <StatPill
                   label="VTHO spent"
                   value={formatToken(vthoSpentRaw)}
@@ -161,7 +160,6 @@ function ActiveRelayerRow({ relayer }: { relayer: ActiveRelayer }) {
                   label="Claimed for"
                   value={formatNumber(rd.rewardsClaimedCount)}
                 />
-                <StatPill label="Actions" value={formatNumber(rd.actions)} />
                 <StatPill
                   label="VTHO spent"
                   value={formatToken(vthoSpentRaw)}
@@ -188,13 +186,15 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
     const result: ActiveRelayer[] = [];
     for (const relayer of report.relayers) {
       const rd = relayer.rounds.find(
-        (r) => r.roundId === roundId && r.actions > 0,
+        (r) => r.roundId === roundId && r.votedForCount > 0,
       );
       if (rd) {
         result.push({ address: relayer.address, breakdown: rd });
       }
     }
-    return result.sort((a, b) => b.breakdown.actions - a.breakdown.actions);
+    return result.sort(
+      (a, b) => b.breakdown.votedForCount - a.breakdown.votedForCount,
+    );
   }, [report, roundId]);
 
   if (activeRelayers.length === 0) return null;
@@ -222,7 +222,7 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
       {/* Desktop column headers */}
       <Box hideBelow="md" px="5">
         <HStack w="full" gap="2">
-          <SimpleGrid columns={6} gap="4" w="full" alignItems="center">
+          <SimpleGrid columns={5} gap="4" w="full" alignItems="center">
             <Box gridColumn="span 2">
               <Text textStyle="xxs" color="text.subtle" fontWeight="medium">
                 {"Relayer"}
@@ -233,9 +233,6 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
             </Text>
             <Text textStyle="xxs" color="text.subtle" fontWeight="medium">
               {"Claimed for"}
-            </Text>
-            <Text textStyle="xxs" color="text.subtle" fontWeight="medium">
-              {"Actions"}
             </Text>
             <Text textStyle="xxs" color="text.subtle" fontWeight="medium">
               {"VTHO spent"}

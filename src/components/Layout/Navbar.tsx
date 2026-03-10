@@ -31,14 +31,13 @@ import {
   LuMenu,
   LuPlay,
   LuRadar,
-  LuUsers,
 } from "react-icons/lu";
 
 import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
 import { basePath } from "@/config/basePath";
 import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
 
-type NavPage = "home" | "relayers" | "learn";
+type NavPage = "home" | "learn";
 
 type NavRoute = {
   value: NavPage;
@@ -49,7 +48,6 @@ type NavRoute = {
 
 const BASE_ROUTES: NavRoute[] = [
   { value: "home", label: "Home", href: "/", icon: LuHouse },
-  { value: "relayers", label: "Relayers", href: "/relayers", icon: LuUsers },
   { value: "learn", label: "Learn", href: "/learn", icon: LuInfo },
 ];
 
@@ -69,8 +67,7 @@ export function Navbar() {
 
   const isActive = (route: NavRoute) =>
     pathname === route.href ||
-    (route.value === "home" && (pathname === "" || pathname === "/")) ||
-    (route.value === "relayers" && pathname.startsWith("/relayers"));
+    (route.value === "home" && (pathname === "" || pathname === "/"));
 
   return (
     <Box bg="bg.secondary" px={0} position="sticky" top={0} zIndex={3} w="full">

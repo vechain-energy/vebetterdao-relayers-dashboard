@@ -4,6 +4,7 @@ import { Box, Heading, SimpleGrid, VStack } from "@chakra-ui/react";
 
 import { AiSkillBanner, FeelLostBanner } from "@/components/Banners";
 import { BecomeRelayerCard } from "@/components/RelayerInfo";
+import { TopRelayers } from "@/components/Relayers";
 import { RoundsChart, RoundsList } from "@/components/Rounds";
 import { StatsCards } from "@/components/StatsCards";
 
@@ -22,7 +23,7 @@ export default function DashboardContent() {
           <RoundsChart />
         </SimpleGrid>
       </VStack>
-
+      <TopRelayers />
       <RoundsList />
 
       <SimpleGrid columns={{ base: 1, md: 3 }} gap="4">

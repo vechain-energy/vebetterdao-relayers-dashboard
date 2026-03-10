@@ -116,29 +116,25 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
   const stats = (
     <>
       <StatPill
-        label="Total actions"
-        value={formatNumber(summary.totalActions)}
+        label=""
+        value={
+          summary.lastActiveRound != null ? `#${summary.lastActiveRound}` : "-"
+        }
       />
       <StatPill
-        label="B3TR earned"
-        value={formatToken(summary.totalB3trEarnedRaw)}
-        unit="B3TR"
-      />
-      <StatPill
-        label="VTHO spent"
+        label=""
         value={formatToken(summary.totalVthoSpentRaw)}
         unit="VTHO"
       />
       <StatPill
-        label="ROI"
-        value={roi != null ? `${formatNumber(Math.round(roi))}%` : "-"}
-        valueColor={roi != null ? "status.positive.primary" : undefined}
+        label=""
+        value={formatToken(summary.totalB3trEarnedRaw)}
+        unit="B3TR"
       />
       <StatPill
-        label="Last active"
-        value={
-          summary.lastActiveRound != null ? `#${summary.lastActiveRound}` : "-"
-        }
+        label=""
+        value={roi != null ? `${formatNumber(Math.round(roi))}%` : "-"}
+        valueColor={roi != null ? "status.positive.primary" : undefined}
       />
     </>
   );
@@ -150,7 +146,7 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
           {/* Desktop */}
           <Box hideBelow="md">
             <HStack justify="space-between" w="full" gap="2">
-              <SimpleGrid columns={7} gap="4" w="full" alignItems="center">
+              <SimpleGrid columns={6} gap="4" w="full" alignItems="center">
                 <HStack gridColumn="span 2" gap="3" minW="0">
                   {avatarSection}
                   {identitySection}

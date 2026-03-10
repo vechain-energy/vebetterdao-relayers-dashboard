@@ -1,17 +1,44 @@
-"use client"
+"use client";
 
-import { Heading, HStack, Link, Separator, Tabs, Text, VStack } from "@chakra-ui/react"
-import { LuCode, LuRadar } from "react-icons/lu"
+import {
+  Box,
+  Card,
+  Grid,
+  Heading,
+  HStack,
+  Link,
+  Separator,
+  Tabs,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import NextLink from "next/link";
+import {
+  LuBookOpen,
+  LuCode,
+  LuExternalLink,
+  LuFileText,
+  LuGithub,
+  LuHouse,
+  LuPlay,
+  LuRadar,
+} from "react-icons/lu";
 
 function B3trIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 1578.5 1578.5" fill="currentColor" {...props}>
       <path d="M812.4,1299.5c-28.1,0-54.7-16.8-65.9-44.5-14.6-36.3,3-77.7,39.3-92.3,111.6-44.9,203.2-104.5,264.9-172.6,48.5-53.4,77-109.9,80.2-159.1,1.6-24.2-2.4-56.3-30.7-72.4-39.9-22.5-127.8-15-254.9,73.6-30.5,21.3-72.1,15.4-95.6-13.4-23.4-28.8-20.7-70.8,6.3-96.3,62.7-59.3,108.4-114,135.8-162.6,19-33.7,28.9-64.1,28.4-87.9-.4-17.1-6-30.5-16.7-39.9-20.3-17.7-64-14.4-93.5,7.2-32,23.3-56.6,64.4-75.2,125.4-37.2,121.8-132.8,434.8-132.8,434.8-9.5,31-38.4,53.2-70.9,51.6-32.2-1.5-58.9-23-65.6-54.5-3.2-10.2-34.9-101-207.1-377.2-20.7-33.3-10.6-77,22.7-97.7,33.3-20.7,77-10.6,97.7,22.7,62.9,100.9,108.3,179,141,238.7,28.3-92.7,61-199.6,79.4-259.8,27.9-91.5,69.6-156.4,127.3-198.6,37.7-27.5,84.3-43.7,131.2-45.7,53.1-2.2,102.5,14.2,139.3,46.2,40.9,35.7,64.1,86.9,65.3,144,.9,43.2-10.8,89.5-34.7,138,53.6-4.3,102.3,5.1,142.6,27.9,70,39.5,108.4,116.2,102.5,205.2-5.3,81-46.8,168.1-116.8,245.1-76.1,83.8-185.7,156-317,208.8-8.7,3.5-17.7,5.1-26.5,5.1h0c0,0,0,0,0,0Z" />
     </svg>
-  )
+  );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <VStack align="start" gap={2}>
       <Heading size="md" fontWeight="bold">
@@ -19,19 +46,19 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       </Heading>
       {children}
     </VStack>
-  )
+  );
 }
 
 function BulletList({ items }: { items: string[] }) {
   return (
     <VStack align="start" gap={1} pl={4}>
-      {items.map(item => (
+      {items.map((item) => (
         <Text key={item} textStyle="sm" color="text.subtle">
           {`\u2022 ${item}`}
         </Text>
       ))}
     </VStack>
-  )
+  );
 }
 
 function VeBetterTab() {
@@ -44,7 +71,9 @@ function VeBetterTab() {
           }
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {"The problem? You have to remember to vote every single week. Miss a week, miss your rewards."}
+          {
+            "The problem? You have to remember to vote every single week. Miss a week, miss your rewards."
+          }
         </Text>
         <Text textStyle="sm" color="text.subtle">
           {
@@ -103,7 +132,9 @@ function VeBetterTab() {
           ]}
         />
         <Text textStyle="sm" color="text.subtle">
-          {"Go to the allocations page, choose your apps, toggle auto-voting on. It kicks in next week."}
+          {
+            "Go to the allocations page, choose your apps, toggle auto-voting on. It kicks in next week."
+          }
         </Text>
       </Section>
 
@@ -137,11 +168,13 @@ function VeBetterTab() {
           ]}
         />
         <Text textStyle="sm" color="text.subtle">
-          {"You\u2019ll just go back to voting manually until you fix whatever triggered it."}
+          {
+            "You\u2019ll just go back to voting manually until you fix whatever triggered it."
+          }
         </Text>
       </Section>
     </VStack>
-  )
+  );
 }
 
 function RelayersTab() {
@@ -179,7 +212,9 @@ function RelayersTab() {
 
       <Section title="Weights">
         <Text textStyle="sm" color="text.subtle">
-          {"Weights determine how the reward pool is distributed among relayers:"}
+          {
+            "Weights determine how the reward pool is distributed among relayers:"
+          }
         </Text>
         <BulletList
           items={[
@@ -215,7 +250,9 @@ function RelayersTab() {
           {"Who claims the relayer payout?"}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {"Each relayer claims their own share after the round is fully complete."}
+          {
+            "Each relayer claims their own share after the round is fully complete."
+          }
         </Text>
 
         <Text textStyle="sm" color="text.subtle" fontWeight="semibold" mt={2}>
@@ -243,7 +280,7 @@ function RelayersTab() {
         </Text>
       </Section>
     </VStack>
-  )
+  );
 }
 
 function DevsTab() {
@@ -298,28 +335,32 @@ function DevsTab() {
             href="https://docs.vebetterdao.org/vebetter/automation"
             target="_blank"
             textStyle="sm"
-            colorPalette="blue">
+            colorPalette="blue"
+          >
             {"Docs: Auto-Voting Documentation"}
           </Link>
           <Link
             href="https://governance.vebetterdao.org/proposals/93450486232994296830196736391400835825360450263361422145364815974754963306849"
             target="_blank"
             textStyle="sm"
-            colorPalette="blue">
+            colorPalette="blue"
+          >
             {"Governance proposal (full spec)"}
           </Link>
           <Link
             href="https://vechain.discourse.group/t/vebetterdao-proposal-auto-voting-for-x-allocation-with-gasless-voting-and-relayer-rewards/559"
             target="_blank"
             textStyle="sm"
-            colorPalette="blue">
+            colorPalette="blue"
+          >
             {"Discourse proposal (design rationale)"}
           </Link>
           <Link
             href="https://github.com/vechain/vebetterdao-contracts"
             target="_blank"
             textStyle="sm"
-            colorPalette="blue">
+            colorPalette="blue"
+          >
             {"GitHub: Contract source code"}
           </Link>
         </VStack>
@@ -329,7 +370,9 @@ function DevsTab() {
 
       <Section title="NPM Package">
         <Text textStyle="sm" color="text.subtle">
-          {"Install @vechain/vebetterdao-contracts via npm/yarn for ABIs and typechain types."}
+          {
+            "Install @vechain/vebetterdao-contracts via npm/yarn for ABIs and typechain types."
+          }
         </Text>
         <Text textStyle="sm" color="text.subtle">
           {"Key imports used in this dashboard:"}
@@ -346,52 +389,242 @@ function DevsTab() {
 
       <Section title="Inspect On-Chain">
         <Text textStyle="sm" color="text.subtle">
-          {"Use VeChain Explorer (inspect.vechain.org) to inspect contracts on mainnet."}
+          {
+            "Use VeChain Explorer (inspect.vechain.org) to inspect contracts on mainnet."
+          }
         </Text>
       </Section>
     </VStack>
-  )
+  );
+}
+
+const QUICK_ACTIONS = [
+  {
+    label: "Dashboard",
+    href: "/",
+    icon: LuHouse,
+    description: "View live relayer stats",
+  },
+  {
+    label: "Run a Relayer",
+    href: "/run",
+    icon: LuPlay,
+    description: "Get started as a relayer",
+  },
+  {
+    label: "Browse Relayers",
+    href: "/relayers",
+    icon: LuRadar,
+    description: "See all registered relayers",
+  },
+];
+
+const RESOURCES = [
+  {
+    label: "Auto-Voting Docs",
+    href: "https://docs.vebetterdao.org/vebetter/automation",
+    icon: LuBookOpen,
+  },
+  {
+    label: "Governance Proposal",
+    href: "https://governance.vebetterdao.org/proposals/93450486232994296830196736391400835825360450263361422145364815974754963306849",
+    icon: LuFileText,
+  },
+  {
+    label: "Contract Source",
+    href: "https://github.com/vechain/vebetterdao-contracts",
+    icon: LuGithub,
+  },
+  {
+    label: "Relayer Node",
+    href: "https://github.com/vechain/vebetterdao-relayer-node",
+    icon: LuGithub,
+  },
+];
+
+function SidebarCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Card.Root variant="outline" size="sm">
+      <Card.Header pb={2}>
+        <Text
+          textStyle="xs"
+          fontWeight="bold"
+          textTransform="uppercase"
+          color="text.subtle"
+        >
+          {title}
+        </Text>
+      </Card.Header>
+      <Card.Body pt={0} gap={1}>
+        {children}
+      </Card.Body>
+    </Card.Root>
+  );
+}
+
+function Sidebar() {
+  return (
+    <VStack gap={4} align="stretch" w="full">
+      <SidebarCard title="Quick Actions">
+        <VStack gap={1} align="stretch">
+          {QUICK_ACTIONS.map((action) => (
+            <Link key={action.href} asChild _hover={{ textDecoration: "none" }}>
+              <NextLink href={action.href}>
+                <HStack
+                  gap={3}
+                  px={3}
+                  py={2}
+                  borderRadius="md"
+                  _hover={{ bg: "bg.subtle" }}
+                  transition="background 0.15s"
+                >
+                  <Box as="span" color="text.subtle" flexShrink={0}>
+                    <action.icon size={16} />
+                  </Box>
+                  <VStack gap={0} align="start">
+                    <Text textStyle="sm" fontWeight="medium">
+                      {action.label}
+                    </Text>
+                    <Text textStyle="xs" color="text.subtle">
+                      {action.description}
+                    </Text>
+                  </VStack>
+                </HStack>
+              </NextLink>
+            </Link>
+          ))}
+        </VStack>
+      </SidebarCard>
+
+      <SidebarCard title="Resources">
+        <VStack gap={0.5} align="stretch">
+          {RESOURCES.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              _hover={{ textDecoration: "none" }}
+            >
+              <HStack
+                gap={3}
+                px={3}
+                py={1.5}
+                borderRadius="md"
+                _hover={{ bg: "bg.subtle" }}
+                transition="background 0.15s"
+              >
+                <Box as="span" color="text.subtle" flexShrink={0}>
+                  <link.icon size={14} />
+                </Box>
+                <Text textStyle="xs" color="text.subtle" flex={1}>
+                  {link.label}
+                </Text>
+                <Box as="span" color="text.subtle" flexShrink={0}>
+                  <LuExternalLink size={12} />
+                </Box>
+              </HStack>
+            </Link>
+          ))}
+        </VStack>
+      </SidebarCard>
+
+      <SidebarCard title="Key Facts">
+        <VStack gap={2} align="start" px={3} pb={1}>
+          <VStack gap={0.5} align="start">
+            <Text textStyle="xs" fontWeight="semibold">
+              {"Fee"}
+            </Text>
+            <Text textStyle="xs" color="text.subtle">
+              {"10% of weekly rewards (max 100 B3TR)"}
+            </Text>
+          </VStack>
+          <VStack gap={0.5} align="start">
+            <Text textStyle="xs" fontWeight="semibold">
+              {"Vote Weight"}
+            </Text>
+            <Text textStyle="xs" color="text.subtle">
+              {"3 pts per vote, 1 pt per claim"}
+            </Text>
+          </VStack>
+          <VStack gap={0.5} align="start">
+            <Text textStyle="xs" fontWeight="semibold">
+              {"Min Requirement"}
+            </Text>
+            <Text textStyle="xs" color="text.subtle">
+              {"1 VOT3 + 3 sustainable actions"}
+            </Text>
+          </VStack>
+          <VStack gap={0.5} align="start">
+            <Text textStyle="xs" fontWeight="semibold">
+              {"Grace Period"}
+            </Text>
+            <Text textStyle="xs" color="text.subtle">
+              {"5 days post-round for manual claims"}
+            </Text>
+          </VStack>
+        </VStack>
+      </SidebarCard>
+    </VStack>
+  );
 }
 
 export function InfoContent() {
   return (
-    <VStack gap={6} align="stretch" maxW="breakpoint-md">
+    <VStack gap={6} align="stretch">
       <Heading size="xl" fontWeight="bold">
         {"Auto-Voting & Relayers"}
       </Heading>
 
-      <Tabs.Root defaultValue="vebetter" fitted>
-        <Tabs.List>
-          <Tabs.Trigger value="vebetter">
-            <HStack gap={1.5}>
-              <B3trIcon width={16} height={16} />
-              {"VeBetter"}
-            </HStack>
-          </Tabs.Trigger>
-          <Tabs.Trigger value="relayers">
-            <HStack gap={1.5}>
-              <LuRadar size={16} />
-              {"Relayers"}
-            </HStack>
-          </Tabs.Trigger>
-          <Tabs.Trigger value="devs">
-            <HStack gap={1.5}>
-              <LuCode size={16} />
-              {"Devs"}
-            </HStack>
-          </Tabs.Trigger>
-        </Tabs.List>
+      <Grid templateColumns={{ base: "1fr", md: "2fr 1fr" }} gap="4" w="full">
+        <Tabs.Root defaultValue="vebetter" fitted>
+          <Tabs.List>
+            <Tabs.Trigger value="vebetter">
+              <HStack gap={1.5}>
+                <B3trIcon width={16} height={16} />
+                {"VeBetter"}
+              </HStack>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="relayers">
+              <HStack gap={1.5}>
+                <LuRadar size={16} />
+                {"Relayers"}
+              </HStack>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="devs">
+              <HStack gap={1.5}>
+                <LuCode size={16} />
+                {"For Devs"}
+              </HStack>
+            </Tabs.Trigger>
+          </Tabs.List>
 
-        <Tabs.Content value="vebetter" pt={6}>
-          <VeBetterTab />
-        </Tabs.Content>
-        <Tabs.Content value="relayers" pt={6}>
-          <RelayersTab />
-        </Tabs.Content>
-        <Tabs.Content value="devs" pt={6}>
-          <DevsTab />
-        </Tabs.Content>
-      </Tabs.Root>
+          <Tabs.Content value="vebetter" pt={6}>
+            <VeBetterTab />
+          </Tabs.Content>
+          <Tabs.Content value="relayers" pt={6}>
+            <RelayersTab />
+          </Tabs.Content>
+          <Tabs.Content value="devs" pt={6}>
+            <DevsTab />
+          </Tabs.Content>
+        </Tabs.Root>
+
+        <Box
+          display={{ base: "none", md: "block" }}
+          position="sticky"
+          top="80px"
+          h="fit-content"
+        >
+          <Sidebar />
+        </Box>
+      </Grid>
     </VStack>
-  )
+  );
 }

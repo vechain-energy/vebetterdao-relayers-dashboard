@@ -895,7 +895,7 @@ async function getRelayerActionsForRound(
         actions: 0,
       };
 
-      existing.actions += actionCount;
+      existing.actions = Math.max(existing.actions, actionCount);
       existing.weightedActions += weight;
 
       // Vote actions have weight 3, claim actions have weight 1

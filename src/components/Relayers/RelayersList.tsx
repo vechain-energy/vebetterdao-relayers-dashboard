@@ -37,16 +37,15 @@ import { RelayerCard } from "./RelayerCard";
 
 const PAGE_SIZE = 10;
 
-type SortField = "actions" | "b3tr" | "vtho" | "roi" | "lastActive";
+type SortField = "rounds" | "b3tr" | "vtho" | "roi" | "lastActive";
 type SortDir = "asc" | "desc";
 type FilterStatus = "all" | "active" | "inactive";
 
 const SORT_COLUMNS: { field: SortField; label: string }[] = [
-  { field: "actions", label: "Actions" },
-  { field: "b3tr", label: "B3TR earned" },
-  { field: "vtho", label: "VTHO spent" },
-  { field: "roi", label: "ROI" },
   { field: "lastActive", label: "Last active" },
+  { field: "vtho", label: "VTHO spent" },
+  { field: "b3tr", label: "B3TR earned" },
+  { field: "roi", label: "ROI" },
 ];
 
 function getSortValue(
@@ -55,8 +54,8 @@ function getSortValue(
   b3trToVtho: number | undefined,
 ): number {
   switch (field) {
-    case "actions":
-      return s.totalActions;
+    case "rounds":
+      return s.activeRoundsCount;
     case "b3tr":
       return Number(BigInt(s.totalB3trEarnedRaw) / BigInt(10 ** 14)) / 10000;
     case "vtho":
@@ -118,7 +117,7 @@ export function RelayersList() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("all");
-  const [sortField, setSortField] = useState<SortField>("actions");
+  const [sortField, setSortField] = useState<SortField>("b3tr");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
   const resolvedSearchAddress = useSearchAddress(search.trim());
@@ -250,7 +249,7 @@ export function RelayersList() {
       {/* Desktop column headers — aligned with RelayerCard's 7-column grid */}
       <Box mt="4" hideBelow="md" px="5">
         <HStack w="full" gap="2">
-          <SimpleGrid columns={7} gap="4" w="full" alignItems="center">
+          <SimpleGrid columns={6} gap="4" w="full" alignItems="center">
             <Box gridColumn="span 2">
               <Text textStyle="xxs" color="text.subtle" fontWeight="medium">
                 {"Relayer"}
