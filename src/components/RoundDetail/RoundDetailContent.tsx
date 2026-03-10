@@ -22,6 +22,7 @@ import { LuInfo, LuWallet, LuUsers } from "react-icons/lu";
 import { formatEther } from "viem";
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
+import { useTotalVoters } from "@/hooks/useTotalVoters";
 import { formatNumber, formatToken } from "@/lib/format";
 import { computeROI } from "@/lib/roi";
 import {
@@ -32,6 +33,7 @@ import {
 import type { RoundAnalytics } from "@/lib/types";
 
 import { AppsAsRelayersCard } from "../AppsAsRelayers";
+import { RoundActiveRelayers } from "./RoundActiveRelayers";
 import { StatusLegendModal } from "./StatusLegendModal";
 
 function pct(numerator: number, denominator: number): string {
@@ -175,9 +177,11 @@ function FinancialCell({
 function MiniStatCard({
   label,
   value,
+  sublabel,
 }: {
   label: string;
   value: string | number;
+  sublabel?: string;
 }) {
   return (
     <Card.Root variant="primary" p="4">
@@ -191,9 +195,16 @@ function MiniStatCard({
         >
           {label}
         </Text>
-        <Text textStyle={{ base: "xl", md: "2xl" }} fontWeight="bold">
-          {typeof value === "number" ? formatNumber(value) : value}
-        </Text>
+        <HStack gap="1" align="baseline">
+          <Text textStyle={{ base: "xl", md: "2xl" }} fontWeight="bold">
+            {typeof value === "number" ? formatNumber(value) : value}
+          </Text>
+          {sublabel && (
+            <Text textStyle="xxs" color="text.subtle">
+              {sublabel}
+            </Text>
+          )}
+        </HStack>
       </VStack>
     </Card.Root>
   );
@@ -222,6 +233,7 @@ export function RoundDetailContent({
   generatedAt,
 }: RoundDetailContentProps) {
   const b3trToVtho = useB3trToVthoRate();
+  const { data: totalVoters } = useTotalVoters(round.roundId);
   const { data: b3trUsd } = useGetTokenUsdPrice("B3TR");
   const { data: vthoUsd } = useGetTokenUsdPrice("VTHO");
   const { data: eurRate } = useGetTokenUsdPrice("EUR");
@@ -292,7 +304,13 @@ export function RoundDetailContent({
                   </HStack>
                   <SummaryRow label="Phase" value={phaseLabel} />
                   <SummaryRow
-                    label="Total Users"
+                    label="Total Voters"
+                    value={
+                      totalVoters != null ? formatNumber(totalVoters) : "\u2014"
+                    }
+                  />
+                  <SummaryRow
+                    label="Users to Serve"
                     value={formatNumber(round.autoVotingUsersCount)}
                   />
                   <SummaryRow
@@ -343,54 +361,21 @@ export function RoundDetailContent({
           </Card.Root>
 
           <SimpleGrid columns={2} gap="4">
-            <MiniStatCard label="Voted for" value={round.votedForCount} />
-            <MiniStatCard label="Claims" value={round.rewardsClaimedCount} />
+            <MiniStatCard
+              label="Voted for"
+              value={round.votedForCount}
+              sublabel="users"
+            />
+            <MiniStatCard
+              label="Claimed for"
+              value={round.rewardsClaimedCount}
+              sublabel="users"
+            />
           </SimpleGrid>
         </VStack>
 
         {/* Right Column */}
         <VStack gap="4" align="stretch">
-          <Card.Root variant="primary">
-            <Card.Body>
-              <VStack gap="4" align="stretch">
-                <SectionHeader
-                  title="User Activity & Actions"
-                  icon={<LuUsers />}
-                />
-                <SimpleGrid columns={2} gap="4">
-                  <MetricCell
-                    label="Expected Actions"
-                    sublabel={
-                      round.isRoundEnded
-                        ? "Projected based on users"
-                        : "Includes claims (settled next round)"
-                    }
-                    value={formatNumber(round.expectedActions)}
-                  />
-                  <MetricCell
-                    label="Completed Actions"
-                    sublabel={
-                      round.isRoundEnded
-                        ? "Successfully executed"
-                        : "Voting actions completed"
-                    }
-                    value={formatNumber(round.completedActions)}
-                    valueColor="status.positive.primary"
-                  />
-                  <MetricCell
-                    label="Auto-vote Participation"
-                    value={participation}
-                  />
-                  <MetricCell
-                    label="Efficiency Rate"
-                    value={efficiency}
-                    valueColor="status.positive.primary"
-                  />
-                </SimpleGrid>
-              </VStack>
-            </Card.Body>
-          </Card.Root>
-
           <Card.Root variant="primary">
             <Card.Body>
               <VStack gap="3" align="stretch">
@@ -471,6 +456,8 @@ export function RoundDetailContent({
           </Card.Root>
         </VStack>
       </Grid>
+
+      <RoundActiveRelayers roundId={round.roundId} />
 
       <SimpleGrid columns={{ base: 1, md: 1 }} gap="4">
         <AppsAsRelayersCard forceBanner={true} />

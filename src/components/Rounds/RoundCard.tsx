@@ -1,17 +1,26 @@
-"use client"
+"use client";
 
-import { Badge, Box, Card, HStack, IconButton, SimpleGrid, Text, VStack } from "@chakra-ui/react"
-import NextLink from "next/link"
-import { FaAngleRight } from "react-icons/fa6"
+import {
+  Badge,
+  Box,
+  Card,
+  HStack,
+  IconButton,
+  SimpleGrid,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import NextLink from "next/link";
+import { FaAngleRight } from "react-icons/fa6";
 
-import { formatNumber, formatToken } from "@/lib/format"
-import { parseRoundStatus } from "@/lib/round-utils"
-import type { RoundAnalytics } from "@/lib/types"
+import { formatNumber, formatToken } from "@/lib/format";
+import { parseRoundStatus } from "@/lib/round-utils";
+import type { RoundAnalytics } from "@/lib/types";
 
 interface RoundCardProps {
-  round: RoundAnalytics
-  roi: number | null
-  expectedRoi: number | null
+  round: RoundAnalytics;
+  roi: number | null;
+  expectedRoi: number | null;
 }
 
 function StatPill({
@@ -20,10 +29,10 @@ function StatPill({
   unit,
   valueColor,
 }: {
-  label: string
-  value?: string | number
-  unit?: string
-  valueColor?: string
+  label: string;
+  value?: string | number;
+  unit?: string;
+  valueColor?: string;
 }) {
   return (
     <VStack gap="0" align="start" minW="0" justifyContent="center">
@@ -32,7 +41,12 @@ function StatPill({
       </Text>
       {value != null && (
         <HStack gap="1" align="baseline">
-          <Text textStyle="sm" fontWeight="semibold" lineClamp={1} color={valueColor}>
+          <Text
+            textStyle="sm"
+            fontWeight="semibold"
+            lineClamp={1}
+            color={valueColor}
+          >
             {value}
           </Text>
           {unit && (
@@ -43,14 +57,14 @@ function StatPill({
         </HStack>
       )}
     </VStack>
-  )
+  );
 }
 
 export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
-  const isActive = !round.isRoundEnded
-  const displayRoi = isActive ? expectedRoi : roi
-  const roiLabel = isActive ? "Expected ROI" : "ROI"
-  const status = parseRoundStatus(round)
+  const isActive = !round.isRoundEnded;
+  const displayRoi = isActive ? expectedRoi : roi;
+  const roiLabel = isActive ? "Expected ROI" : "ROI";
+  const status = parseRoundStatus(round);
 
   const roundLabel = (
     <HStack gap="2">
@@ -64,28 +78,44 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
         </Badge>
       )}
     </HStack>
-  )
+  );
 
   const stats = (
     <>
-      <StatPill label="Users" value={formatNumber(round.autoVotingUsersCount)} />
+      <StatPill
+        label="Users"
+        value={formatNumber(round.autoVotingUsersCount)}
+      />
       <StatPill label="Relayers" value={round.numRelayers} />
-      <StatPill label="VTHO spent" value={formatToken(round.vthoSpentTotalRaw)} unit="VTHO" />
+      <StatPill
+        label="VTHO spent"
+        value={formatToken(round.vthoSpentTotalRaw)}
+        unit="VTHO"
+      />
       <StatPill
         label={isActive ? "Projected Rewards" : "Rewards"}
-        value={formatToken(isActive ? round.estimatedRelayerRewardsRaw : round.totalRelayerRewardsRaw)}
+        value={formatToken(
+          isActive
+            ? round.estimatedRelayerRewardsRaw
+            : round.totalRelayerRewardsRaw,
+        )}
         unit="B3TR"
       />
       <StatPill
         label={roiLabel}
-        value={displayRoi != null ? `${formatNumber(Math.round(displayRoi))}%` : "-"}
+        value={
+          displayRoi != null ? `${formatNumber(Math.round(displayRoi))}%` : "-"
+        }
         valueColor={displayRoi != null ? "status.positive.primary" : undefined}
       />
     </>
-  )
+  );
 
   return (
-    <NextLink href={`/round?roundId=${round.roundId}`} style={{ textDecoration: "none", color: "inherit" }}>
+    <NextLink
+      href={`/round?roundId=${round.roundId}`}
+      style={{ textDecoration: "none", color: "inherit" }}
+    >
       <Card.Root variant="action">
         <Card.Body>
           {/* Desktop: single row */}
@@ -98,7 +128,11 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
                   <Text textStyle="xxs" color="text.subtle" lineClamp={1}>
                     {"Status"}
                   </Text>
-                  <Badge size="sm" variant="solid" colorPalette={status.colorPalette}>
+                  <Badge
+                    size="sm"
+                    variant="solid"
+                    colorPalette={status.colorPalette}
+                  >
                     {status.label}
                   </Badge>
                 </VStack>
@@ -126,5 +160,5 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
         </Card.Body>
       </Card.Root>
     </NextLink>
-  )
+  );
 }
