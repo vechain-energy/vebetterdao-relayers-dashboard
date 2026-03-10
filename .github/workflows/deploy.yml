@@ -30,6 +30,7 @@ jobs:
         run: yarn build:mainnet
         env:
           NEXT_PUBLIC_BASE_PATH: ""
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_GA_MEASUREMENT_ID }}
           NODE_OPTIONS: "--max-old-space-size=4096"
 
       - name: Upload Pages artifact
