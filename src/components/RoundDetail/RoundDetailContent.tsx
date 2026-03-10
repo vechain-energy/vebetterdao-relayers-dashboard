@@ -212,6 +212,7 @@ function MiniStatCard({
 
 interface RoundDetailContentProps {
   round: RoundAnalytics;
+  prevRound?: RoundAnalytics | null;
   generatedAt?: string;
 }
 
@@ -230,6 +231,7 @@ function rawToFiat(
 
 export function RoundDetailContent({
   round,
+  prevRound,
   generatedAt,
 }: RoundDetailContentProps) {
   const b3trToVtho = useB3trToVthoRate();
@@ -363,13 +365,17 @@ export function RoundDetailContent({
           <SimpleGrid columns={2} gap="4">
             <MiniStatCard
               label="Voted for"
-              value={round.votedForCount}
+              value={`${formatNumber(round.votedForCount)}/${formatNumber(round.autoVotingUsersCount - round.reducedUsersCount)}`}
               sublabel="users"
             />
             <MiniStatCard
               label="Claimed for"
-              value={round.rewardsClaimedCount}
-              sublabel="users"
+              value={
+                prevRound
+                  ? `${formatNumber(prevRound.rewardsClaimedCount)}/${formatNumber(prevRound.autoVotingUsersCount - prevRound.reducedUsersCount)}`
+                  : "\u2014"
+              }
+              sublabel={prevRound ? "users" : undefined}
             />
           </SimpleGrid>
         </VStack>

@@ -12,7 +12,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   LuChevronDown,
   LuCoins,
@@ -257,12 +257,14 @@ function RoundStat({
 
 function RoundRow({
   rd,
+  prevClaimedFor,
   b3trRaw,
   b3trToVtho,
   isActive,
   totalWeighted,
 }: {
   rd: RelayerAnalytics["rounds"][number];
+  prevClaimedFor: number;
   b3trRaw: string;
   b3trToVtho: number | undefined;
   isActive?: boolean;
@@ -302,7 +304,7 @@ function RoundRow({
         <RoundStat label="Voted for" value={rd.votedForCount} unit="users" />
         <RoundStat
           label="Claimed for"
-          value={rd.rewardsClaimedCount}
+          value={prevClaimedFor}
           unit="users"
         />
         <RoundStat
@@ -363,6 +365,14 @@ export function RelayerDetailContent({
   const roundsDesc = [...relayer.rounds].sort((a, b) => b.roundId - a.roundId);
   const visibleRounds = roundsDesc.slice(0, visibleCount);
   const hasMore = visibleCount < roundsDesc.length;
+
+  const prevClaimedMap = useMemo(() => {
+    const map = new Map<number, number>();
+    for (const rd of relayer.rounds) {
+      map.set(rd.roundId, rd.rewardsClaimedCount);
+    }
+    return map;
+  }, [relayer.rounds]);
 
   const activityItems = buildActivityItems(relayer.rounds);
   const visibleActivity = activityItems.slice(0, visibleActivityCount);
@@ -461,6 +471,7 @@ export function RelayerDetailContent({
                     <RoundRow
                       key={rd.roundId}
                       rd={rd}
+                      prevClaimedFor={prevClaimedMap.get(rd.roundId - 1) ?? 0}
                       isActive={isActiveRound}
                       b3trToVtho={b3trToVtho}
                       totalWeighted={ctx?.totalWeighted}

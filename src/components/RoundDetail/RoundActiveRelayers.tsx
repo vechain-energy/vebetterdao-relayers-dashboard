@@ -24,6 +24,7 @@ import type { RelayerRoundBreakdown } from "@/lib/types";
 interface ActiveRelayer {
   address: string;
   breakdown: RelayerRoundBreakdown;
+  prevBreakdown?: RelayerRoundBreakdown;
 }
 
 function StatPill({
@@ -68,7 +69,7 @@ function ActiveRelayerRow({
   const shortAddress = `${relayer.address.slice(0, 6)}...${relayer.address.slice(-4)}`;
   const href = `/relayer?address=${domain?.domain || relayer.address}`;
 
-  const { breakdown: rd } = relayer;
+  const { breakdown: rd, prevBreakdown } = relayer;
   const vthoSpentRaw = (
     BigInt(rd.vthoSpentOnVotingRaw) + BigInt(rd.vthoSpentOnClaimingRaw)
   ).toString();
@@ -115,7 +116,7 @@ function ActiveRelayerRow({
                 />
                 <StatPill
                   label="Claimed for"
-                  value={formatNumber(rd.rewardsClaimedCount)}
+                  value={formatNumber(prevBreakdown?.rewardsClaimedCount ?? 0)}
                 />
                 <StatPill
                   label="VTHO spent"
@@ -169,7 +170,7 @@ function ActiveRelayerRow({
                 />
                 <StatPill
                   label="Claimed for"
-                  value={formatNumber(rd.rewardsClaimedCount)}
+                  value={formatNumber(prevBreakdown?.rewardsClaimedCount ?? 0)}
                 />
                 <StatPill
                   label="VTHO spent"
@@ -196,14 +197,16 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
   const { activeRelayers, totalWeighted } = useMemo(() => {
     if (!report?.relayers)
       return { activeRelayers: [] as ActiveRelayer[], totalWeighted: 0 };
+    const prevRoundId = roundId - 1;
     const result: ActiveRelayer[] = [];
     let weighted = 0;
     for (const relayer of report.relayers) {
       const rd = relayer.rounds.find((r) => r.roundId === roundId);
+      const prevRd = relayer.rounds.find((r) => r.roundId === prevRoundId);
       if (rd) {
         weighted += rd.weightedActions;
-        if (rd.votedForCount > 0) {
-          result.push({ address: relayer.address, breakdown: rd });
+        if (rd.votedForCount > 0 || (prevRd && prevRd.rewardsClaimedCount > 0)) {
+          result.push({ address: relayer.address, breakdown: rd, prevBreakdown: prevRd });
         }
       }
     }
