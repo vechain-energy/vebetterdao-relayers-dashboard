@@ -131,9 +131,19 @@ export function RelayerDetailHeader({
                     <Badge
                       size="sm"
                       variant="solid"
-                      colorPalette={isActive ? "green" : "gray"}
+                      colorPalette={
+                        !isRegistered
+                          ? "red"
+                          : isActive
+                            ? "green"
+                            : "gray"
+                      }
                     >
-                      {isActive ? t("Active") : t("Inactive")}
+                      {!isRegistered
+                        ? t("Unregistered")
+                        : isActive
+                          ? t("Active")
+                          : t("Inactive")}
                     </Badge>
                   </HStack>
 

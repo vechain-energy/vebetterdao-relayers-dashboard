@@ -164,7 +164,7 @@ export function SetupGuide() {
             completed={isStepCompleted(1)}
           >
             <Text textStyle="sm" color="text.subtle">
-              {t("You need a VeChain wallet with some VTHO for gas fees. This wallet will be used to register as a relayer and run the node.")}
+              {t("You need a VeChain wallet with some VTHO for gas fees. We recommend creating a dedicated wallet for this purpose — its private key will be used to run the relayer node, so it's best to keep it separate from your main wallet.")}
             </Text>
             {!isStepCompleted(1) && (
               <Button

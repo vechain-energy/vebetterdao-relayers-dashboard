@@ -160,6 +160,7 @@
   "Total VTHO Spent": "VTHO 총 지출",
   "Try a different address or domain": "다른 주소 또는 도메인을 시도하세요",
   "Unknown": "알 수 없음",
+  "Unregistered": "미등록",
   "Updated": "업데이트됨",
   "User Eligibility (at snapshot time)": "사용자 자격(스냅샷 시점)",
   "Users": "사용자",
@@ -188,6 +189,6 @@
   "Who Actually Casts My Vote?": "실제로 투표하는 주체는?",
   "Who Can Be a Relayer?": "누가 Relayer가 될 수 있나요?",
   "Who claims the relayer payout?": "relayer 보상은 누가 청구하나요?",
-  "You need a VeChain wallet with some VTHO for gas fees. This wallet will be used to register as a relayer and run the node.": "가스 수수료용 VTHO가 있는 VeChain 지갑이 필요합니다. 이 지갑으로 relayer 등록 및 노드 실행을 합니다.",
+  "You need a VeChain wallet with some VTHO for gas fees. We recommend creating a dedicated wallet for this purpose — its private key will be used to run the relayer node, so it's best to keep it separate from your main wallet.": "가스 수수료용 VTHO가 있는 VeChain 지갑이 필요합니다. 전용 지갑을 새로 만드는 것을 권장합니다 — 해당 지갑의 개인 키가 relayer 노드 실행에 사용되므로 메인 지갑과 분리하는 것이 좋습니다.",
   "You run a relayer node that watches the blockchain. When a new round starts, it sees who has auto-voting enabled, submits their votes, and claims their rewards in batches.": "블록체인을 감시하는 Relayer 노드를 실행합니다. 새 라운드가 시작되면 자동 투표 사용자를 찾아 투표를 제출하고 보상을 일괄 청구합니다."
 }

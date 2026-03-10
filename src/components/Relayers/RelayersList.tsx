@@ -170,7 +170,16 @@ export function RelayersList() {
       }
     }
 
-    return reportSummaries;
+    // Hide unregistered relayers with no activity
+    const registeredSet = new Set(
+      (registeredRelayers ?? []).map((a) => a.toLowerCase()),
+    );
+    return reportSummaries.filter(
+      (s) =>
+        registeredSet.has(s.address.toLowerCase()) ||
+        s.totalB3trEarnedRaw !== "0" ||
+        s.totalVthoSpentRaw !== "0",
+    );
   }, [report, registeredRelayers]);
 
   const filtered = useMemo(() => {
