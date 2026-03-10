@@ -15,7 +15,7 @@ import { useGetAvatarOfAddress, useVechainDomain } from "@vechain/vechain-kit";
 import NextLink from "next/link";
 import { useMemo } from "react";
 import { FaAngleRight } from "react-icons/fa6";
-import { LuUsers } from "react-icons/lu";
+import { LuRadar } from "react-icons/lu";
 
 import { useReportData } from "@/hooks/useReportData";
 import { formatNumber, formatToken } from "@/lib/format";
@@ -205,8 +205,15 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
       const prevRd = relayer.rounds.find((r) => r.roundId === prevRoundId);
       if (rd) {
         weighted += rd.weightedActions;
-        if (rd.votedForCount > 0 || (prevRd && prevRd.rewardsClaimedCount > 0)) {
-          result.push({ address: relayer.address, breakdown: rd, prevBreakdown: prevRd });
+        if (
+          rd.votedForCount > 0 ||
+          (prevRd && prevRd.rewardsClaimedCount > 0)
+        ) {
+          result.push({
+            address: relayer.address,
+            breakdown: rd,
+            prevBreakdown: prevRd,
+          });
         }
       }
     }
@@ -222,7 +229,7 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
     <VStack gap="4" align="stretch">
       <HStack gap="2" align="center">
         <Box as="span" color="text.subtle" fontSize="20px" lineHeight="1">
-          <LuUsers />
+          <LuRadar />
         </Box>
         <Text
           textStyle="xs"

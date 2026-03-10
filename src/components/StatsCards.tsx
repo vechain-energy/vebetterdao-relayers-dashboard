@@ -16,7 +16,8 @@ import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
 import { useRegisteredRelayers } from "@/hooks/useRegisteredRelayers";
 import { useReportData } from "@/hooks/useReportData";
 import { formatNumber, formatToken } from "@/lib/format";
-import { computeROI } from "@/lib/roi";
+import { computeRelayersOverview } from "@/lib/relayer-utils";
+import { computeAverageROI } from "@/lib/roi";
 import { computeRoundCompletion, getRoundPhaseLabel } from "@/lib/round-utils";
 
 interface StatItemProps {
@@ -81,14 +82,13 @@ export function StatsCards() {
     (r) => r.roundId === report?.currentRound,
   );
 
-  const rewardsRaw = currentRoundData
-    ? currentRoundData.isRoundEnded
-      ? currentRoundData.totalRelayerRewardsRaw
-      : currentRoundData.estimatedRelayerRewardsRaw
-    : "0";
-  const expectedRoi = currentRoundData
-    ? computeROI(rewardsRaw, currentRoundData.vthoSpentTotalRaw, b3trToVtho)
-    : null;
+  const overview = report ? computeRelayersOverview(report) : null;
+
+  const concludedRounds = rounds.filter(
+    (r) => r.isRoundEnded && r.totalRelayerRewardsRaw !== "0",
+  );
+  const avgRoi = computeAverageROI(concludedRounds, b3trToVtho);
+
   const roundCompletion =
     currentRoundData != null ? computeRoundCompletion(currentRoundData) : null;
   const roundPhase =
@@ -123,43 +123,31 @@ export function StatsCards() {
         isLoading={relayersLoading}
       />
       <StatItem
-        label={
-          currentRoundData && !currentRoundData.isRoundEnded
-            ? "Projected rewards"
-            : "Round rewards"
-        }
+        label="B3TR distributed"
         value={
           isLoading
             ? "..."
-            : currentRoundData
-              ? `${formatToken(
-                  currentRoundData.isRoundEnded
-                    ? currentRoundData.totalRelayerRewardsRaw
-                    : currentRoundData.estimatedRelayerRewardsRaw,
-                )} B3TR`
+            : overview
+              ? `${formatToken(overview.totalB3trDistributedRaw)} B3TR`
               : "\u2014"
         }
-        sublabel={
-          currentRoundData ? `for round #${currentRoundData.roundId}` : ""
-        }
+        sublabel="to relayers"
         icon={LuCoins}
         isLoading={isLoading}
       />
       <StatItem
-        label={
-          currentRoundData && !currentRoundData.isRoundEnded
-            ? "Expected ROI"
-            : "ROI"
-        }
+        label="Average ROI"
         value={
           isLoading
             ? "..."
-            : expectedRoi != null
-              ? `${formatNumber(Math.round(expectedRoi))}%`
+            : avgRoi != null
+              ? `${formatNumber(Math.round(avgRoi))}%`
               : "\u2014"
         }
         sublabel={
-          currentRoundData ? `for round #${currentRoundData.roundId}` : ""
+          b3trToVtho != null
+            ? `rate: 1 B3TR = ${formatNumber(Math.round(b3trToVtho))} VTHO`
+            : "rate: 1 B3TR = \u2026 VTHO"
         }
         icon={LuChartLine}
         isLoading={isLoading}

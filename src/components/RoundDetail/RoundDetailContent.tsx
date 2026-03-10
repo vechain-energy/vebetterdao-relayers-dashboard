@@ -177,10 +177,12 @@ function FinancialCell({
 function MiniStatCard({
   label,
   value,
+  secondaryValue,
   sublabel,
 }: {
   label: string;
   value: string | number;
+  secondaryValue?: string;
   sublabel?: string;
 }) {
   return (
@@ -199,6 +201,11 @@ function MiniStatCard({
           <Text textStyle={{ base: "xl", md: "2xl" }} fontWeight="bold">
             {typeof value === "number" ? formatNumber(value) : value}
           </Text>
+          {secondaryValue && (
+            <Text textStyle={{ base: "sm", md: "md" }} fontWeight="semibold" color="text.subtle">
+              /{secondaryValue}
+            </Text>
+          )}
           {sublabel && (
             <Text textStyle="xxs" color="text.subtle">
               {sublabel}
@@ -365,15 +372,21 @@ export function RoundDetailContent({
           <SimpleGrid columns={2} gap="4">
             <MiniStatCard
               label="Voted for"
-              value={`${formatNumber(round.votedForCount)}/${formatNumber(round.autoVotingUsersCount - round.reducedUsersCount)}`}
+              value={formatNumber(round.votedForCount)}
+              secondaryValue={formatNumber(round.autoVotingUsersCount - round.reducedUsersCount)}
               sublabel="users"
             />
             <MiniStatCard
               label="Claimed for"
               value={
                 prevRound
-                  ? `${formatNumber(prevRound.rewardsClaimedCount)}/${formatNumber(prevRound.autoVotingUsersCount - prevRound.reducedUsersCount)}`
+                  ? formatNumber(prevRound.rewardsClaimedCount)
                   : "\u2014"
+              }
+              secondaryValue={
+                prevRound
+                  ? formatNumber(prevRound.autoVotingUsersCount - prevRound.reducedUsersCount)
+                  : undefined
               }
               sublabel={prevRound ? "users" : undefined}
             />
@@ -390,72 +403,85 @@ export function RoundDetailContent({
                   icon={<LuWallet />}
                 />
                 <SimpleGrid columns={{ base: 1, md: 2 }} gap="2">
-                  <FinancialCell
-                    label="VTHO (Voting)"
-                    value={formatToken(round.vthoSpentOnVotingRaw)}
-                    unit="VTHO"
-                    usdValue={rawToFiat(
-                      round.vthoSpentOnVotingRaw,
-                      vthoUsd,
-                      currencyRate,
-                      currencySymbol,
-                    )}
+                  <Box order={{ base: 1, md: 0 }}>
+                    <FinancialCell
+                      label="VTHO (Voting)"
+                      value={formatToken(round.vthoSpentOnVotingRaw)}
+                      unit="VTHO"
+                      usdValue={rawToFiat(
+                        round.vthoSpentOnVotingRaw,
+                        vthoUsd,
+                        currencyRate,
+                        currencySymbol,
+                      )}
+                    />
+                  </Box>
+                  <Box order={{ base: 4, md: 0 }}>
+                    <FinancialCell
+                      label={
+                        round.isRoundEnded
+                          ? "Accrued Rewards"
+                          : "Projected Rewards"
+                      }
+                      value={formatToken(
+                        round.isRoundEnded
+                          ? round.totalRelayerRewardsRaw
+                          : round.estimatedRelayerRewardsRaw,
+                      )}
+                      unit="B3TR"
+                      usdValue={rawToFiat(
+                        round.isRoundEnded
+                          ? round.totalRelayerRewardsRaw
+                          : round.estimatedRelayerRewardsRaw,
+                        b3trUsd,
+                        currencyRate,
+                        currencySymbol,
+                      )}
+                    />
+                  </Box>
+                  <Box order={{ base: 2, md: 0 }}>
+                    <FinancialCell
+                      label="VTHO (Claiming)"
+                      value={formatToken(round.vthoSpentOnClaimingRaw)}
+                      unit="VTHO"
+                      usdValue={rawToFiat(
+                        round.vthoSpentOnClaimingRaw,
+                        vthoUsd,
+                        currencyRate,
+                        currencySymbol,
+                      )}
+                    />
+                  </Box>
+                  <Box
+                    display={{ base: "none", md: "block" }}
+                    order={{ base: 6, md: 0 }}
                   />
-                  <FinancialCell
-                    label={
-                      round.isRoundEnded
-                        ? "Accrued Rewards"
-                        : "Projected Rewards"
-                    }
-                    value={formatToken(
-                      round.isRoundEnded
-                        ? round.totalRelayerRewardsRaw
-                        : round.estimatedRelayerRewardsRaw,
-                    )}
-                    unit="B3TR"
-                    usdValue={rawToFiat(
-                      round.isRoundEnded
-                        ? round.totalRelayerRewardsRaw
-                        : round.estimatedRelayerRewardsRaw,
-                      b3trUsd,
-                      currencyRate,
-                      currencySymbol,
-                    )}
-                  />
-                  <FinancialCell
-                    label="VTHO (Claiming)"
-                    value={formatToken(round.vthoSpentOnClaimingRaw)}
-                    unit="VTHO"
-                    usdValue={rawToFiat(
-                      round.vthoSpentOnClaimingRaw,
-                      vthoUsd,
-                      currencyRate,
-                      currencySymbol,
-                    )}
-                  />
-                  <Box />
-                  <FinancialCell
-                    label="Total VTHO Spent"
-                    value={formatToken(round.vthoSpentTotalRaw)}
-                    unit="VTHO"
-                    usdValue={rawToFiat(
-                      round.vthoSpentTotalRaw,
-                      vthoUsd,
-                      currencyRate,
-                      currencySymbol,
-                    )}
-                    highlighted
-                  />
-                  <FinancialCell
-                    label={roiLabel}
-                    value={
-                      roi != null
-                        ? `${formatNumber(Math.round(roi))}%`
-                        : "\u2014"
-                    }
-                    highlighted
-                    valueColor="status.positive.primary"
-                  />
+                  <Box order={{ base: 3, md: 0 }}>
+                    <FinancialCell
+                      label="Total VTHO Spent"
+                      value={formatToken(round.vthoSpentTotalRaw)}
+                      unit="VTHO"
+                      usdValue={rawToFiat(
+                        round.vthoSpentTotalRaw,
+                        vthoUsd,
+                        currencyRate,
+                        currencySymbol,
+                      )}
+                      highlighted
+                    />
+                  </Box>
+                  <Box order={{ base: 5, md: 0 }}>
+                    <FinancialCell
+                      label={roiLabel}
+                      value={
+                        roi != null
+                          ? `${formatNumber(Math.round(roi))}%`
+                          : "\u2014"
+                      }
+                      highlighted
+                      valueColor="status.positive.primary"
+                    />
+                  </Box>
                 </SimpleGrid>
               </VStack>
             </Card.Body>

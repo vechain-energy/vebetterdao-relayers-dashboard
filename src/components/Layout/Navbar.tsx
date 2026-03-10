@@ -59,7 +59,12 @@ export function Navbar() {
   const routes: NavRoute[] = isRegistered
     ? [
         ...BASE_ROUTES,
-        { value: "manage", label: "Manage", href: "/relayer", icon: LuRadar },
+        {
+          value: "manage",
+          label: "Manage Relayer",
+          href: "/relayer",
+          icon: LuRadar,
+        },
       ]
     : BASE_ROUTES;
   const logoFilter = useColorModeValue("none", "brightness(0) invert(1)");

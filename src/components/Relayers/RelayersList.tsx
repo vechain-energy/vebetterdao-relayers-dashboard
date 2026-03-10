@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Badge,
   Box,
   Button,
   Heading,
@@ -194,7 +195,12 @@ export function RelayersList() {
   return (
     <VStack gap="4" align="stretch">
       <HStack justify="space-between" flexWrap="wrap" gap="3">
-        <Heading size="lg">{"Relayers"}</Heading>
+        <HStack gap="2" align="center">
+          <Heading size="lg">{"Relayers"}</Heading>
+          <Badge size="sm" variant="subtle" colorPalette="gray">
+            {filtered.length}
+          </Badge>
+        </HStack>
         <NextLink href="/new-relayer">
           <Button variant="primary" size="sm" rounded="full">
             <LuPlus />

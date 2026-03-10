@@ -10,20 +10,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import type { IconType } from "react-icons";
-import {
-  LuActivity,
-  LuChartLine,
-  LuCoins,
-  LuFlame,
-  LuRadar,
-} from "react-icons/lu";
+import { LuActivity, LuFlame } from "react-icons/lu";
 
-import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
-import { useRegisteredRelayers } from "@/hooks/useRegisteredRelayers";
 import { useReportData } from "@/hooks/useReportData";
 import { formatNumber, formatToken } from "@/lib/format";
 import { computeRelayersOverview } from "@/lib/relayer-utils";
-import { computeAverageROI } from "@/lib/roi";
 
 function StatItem({
   label,
@@ -73,18 +64,11 @@ function StatItem({
 
 export function RelayersOverviewCards() {
   const { data: report, isLoading: reportLoading } = useReportData();
-  const { count: relayerCount, isLoading: relayersLoading } =
-    useRegisteredRelayers();
-  const b3trToVtho = useB3trToVthoRate();
 
   const overview = report ? computeRelayersOverview(report) : null;
-  const concludedRounds = (report?.rounds ?? []).filter(
-    (r) => r.isRoundEnded && r.totalRelayerRewardsRaw !== "0",
-  );
-  const avgRoi = computeAverageROI(concludedRounds, b3trToVtho);
 
   return (
-    <SimpleGrid w="full" columns={{ base: 2, md: 4 }} gap="4">
+    <SimpleGrid w="full" columns={{ base: 1, md: 2 }} gap="4">
       <StatItem
         label="Active relayers"
         value={
@@ -99,19 +83,6 @@ export function RelayersOverviewCards() {
         isLoading={reportLoading}
       />
       <StatItem
-        label="B3TR distributed"
-        value={
-          reportLoading
-            ? "..."
-            : overview
-              ? `${formatToken(overview.totalB3trDistributedRaw)} B3TR`
-              : "\u2014"
-        }
-        sublabel="to relayers"
-        icon={LuCoins}
-        isLoading={reportLoading}
-      />
-      <StatItem
         label="VTHO spent"
         value={
           reportLoading
@@ -122,23 +93,6 @@ export function RelayersOverviewCards() {
         }
         sublabel="for gas costs"
         icon={LuFlame}
-        isLoading={reportLoading}
-      />
-      <StatItem
-        label="Average ROI"
-        value={
-          reportLoading
-            ? "..."
-            : avgRoi != null
-              ? `${formatNumber(Math.round(avgRoi))}%`
-              : "\u2014"
-        }
-        sublabel={
-          b3trToVtho != null
-            ? `rate: 1 B3TR = ${formatNumber(Math.round(b3trToVtho))} VTHO`
-            : "rate: 1 B3TR = \u2026 VTHO"
-        }
-        icon={LuChartLine}
         isLoading={reportLoading}
       />
     </SimpleGrid>

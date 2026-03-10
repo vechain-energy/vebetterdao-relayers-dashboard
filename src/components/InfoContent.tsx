@@ -23,6 +23,7 @@ import {
   LuPlay,
   LuRadar,
 } from "react-icons/lu";
+import { AiSkillBanner } from "./Banners";
 
 function B3trIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -394,6 +395,10 @@ function DevsTab() {
           }
         </Text>
       </Section>
+
+      <Separator />
+
+      <AiSkillBanner />
     </VStack>
   );
 }
@@ -584,7 +589,7 @@ export function InfoContent() {
 
       <Grid templateColumns={{ base: "1fr", md: "2fr 1fr" }} gap="4" w="full">
         <Tabs.Root defaultValue="vebetter" fitted>
-          <Tabs.List>
+          <Tabs.List position="sticky" top="60px" zIndex="2" bg="bg" py={2}>
             <Tabs.Trigger value="vebetter">
               <HStack gap={1.5}>
                 <B3trIcon width={16} height={16} />
