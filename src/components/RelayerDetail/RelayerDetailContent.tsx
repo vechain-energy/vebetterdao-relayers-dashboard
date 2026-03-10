@@ -260,16 +260,23 @@ function RoundRow({
   b3trRaw,
   b3trToVtho,
   isActive,
+  totalWeighted,
 }: {
   rd: RelayerAnalytics["rounds"][number];
   b3trRaw: string;
   b3trToVtho: number | undefined;
   isActive?: boolean;
+  totalWeighted?: number;
 }) {
   const vthoSpentRaw = (
     BigInt(rd.vthoSpentOnVotingRaw) + BigInt(rd.vthoSpentOnClaimingRaw)
   ).toString();
   const roi = computeRelayerROI(b3trRaw, vthoSpentRaw, b3trToVtho);
+
+  const weightPct =
+    totalWeighted && totalWeighted > 0
+      ? (rd.weightedActions / totalWeighted) * 100
+      : null;
 
   return (
     <VStack
@@ -291,7 +298,7 @@ function RoundRow({
           </Badge>
         )}
       </HStack>
-      <SimpleGrid columns={{ base: 2, sm: 5 }} gap="3">
+      <SimpleGrid columns={{ base: 2, sm: 6 }} gap="3">
         <RoundStat label="Voted for" value={rd.votedForCount} unit="users" />
         <RoundStat
           label="Claimed for"
@@ -299,7 +306,15 @@ function RoundRow({
           unit="users"
         />
         <RoundStat
-          label="B3TR earned"
+          label="Weight"
+          value={
+            weightPct != null
+              ? `${formatNumber(parseFloat(weightPct.toFixed(2)))}%`
+              : "\u2014"
+          }
+        />
+        <RoundStat
+          label={isActive ? "Projected B3TR rewards" : "B3TR earned"}
           value={formatToken(b3trRaw)}
           unit="B3TR"
         />
@@ -309,7 +324,7 @@ function RoundRow({
           unit="VTHO"
         />
         <RoundStat
-          label="ROI"
+          label={isActive ? "Projected ROI" : "ROI"}
           value={roi != null ? `${formatNumber(Math.round(roi))}%` : "\u2014"}
         />
       </SimpleGrid>
@@ -323,7 +338,10 @@ const ACTIVITY_PAGE_SIZE = 5;
 interface RelayerDetailContentProps {
   relayer: RelayerAnalytics;
   currentRound: number;
-  roundCtx?: Map<number, { poolRaw: bigint; totalWeighted: number }>;
+  roundCtx?: Map<
+    number,
+    { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number }
+  >;
 }
 
 export function RelayerDetailContent({
@@ -429,22 +447,34 @@ export function RelayerDetailContent({
               </Text>
             ) : (
               <VStack gap="1" align="stretch">
-                {visibleRounds.map((rd) => (
-                  <RoundRow
-                    key={rd.roundId}
-                    rd={rd}
-                    isActive={rd.roundId === currentRound}
-                    b3trToVtho={b3trToVtho}
-                    b3trRaw={
-                      roundCtx
-                        ? computeRelayerRoundB3tr(
-                            rd.weightedActions,
-                            roundCtx.get(rd.roundId),
-                          ).toString()
-                        : rd.claimableRewardsRaw
-                    }
-                  />
-                ))}
+                {visibleRounds.map((rd) => {
+                  const ctx = roundCtx?.get(rd.roundId);
+                  const isActiveRound = rd.roundId === currentRound;
+                  const effectiveCtx =
+                    isActiveRound && ctx
+                      ? {
+                          poolRaw: ctx.estimatedPoolRaw,
+                          totalWeighted: ctx.totalWeighted,
+                        }
+                      : ctx;
+                  return (
+                    <RoundRow
+                      key={rd.roundId}
+                      rd={rd}
+                      isActive={isActiveRound}
+                      b3trToVtho={b3trToVtho}
+                      totalWeighted={ctx?.totalWeighted}
+                      b3trRaw={
+                        roundCtx
+                          ? computeRelayerRoundB3tr(
+                              rd.weightedActions,
+                              effectiveCtx,
+                            ).toString()
+                          : rd.claimableRewardsRaw
+                      }
+                    />
+                  );
+                })}
                 {hasMore && (
                   <Button
                     variant="ghost"

@@ -24,12 +24,13 @@ export default function RoundDetailPage() {
 
   const { data: report, isLoading, error } = useReportData();
 
-  const round =
-    report && roundId != null
-      ? report.rounds.find((r) => r.roundId === roundId)
-      : null;
   const firstRound = report?.firstRound ?? 1;
   const currentRound = report?.currentRound ?? 1;
+  const effectiveRoundId = roundId ?? currentRound;
+
+  const round = report
+    ? report.rounds.find((r) => r.roundId === effectiveRoundId) ?? null
+    : null;
 
   if (isLoading || !report) {
     return (
@@ -54,7 +55,6 @@ export default function RoundDetailPage() {
     );
   }
 
-  const effectiveRoundId = roundId ?? currentRound;
   const roundOutOfRange =
     effectiveRoundId < firstRound || effectiveRoundId > currentRound;
 

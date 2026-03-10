@@ -23,7 +23,9 @@ export default function DashboardContent() {
           <RoundsChart />
         </SimpleGrid>
       </VStack>
+
       <TopRelayers />
+
       <RoundsList />
 
       <SimpleGrid columns={{ base: 1, md: 3 }} gap="4">

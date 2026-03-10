@@ -54,7 +54,13 @@ function StatPill({
   );
 }
 
-function ActiveRelayerRow({ relayer }: { relayer: ActiveRelayer }) {
+function ActiveRelayerRow({
+  relayer,
+  totalWeighted,
+}: {
+  relayer: ActiveRelayer;
+  totalWeighted: number;
+}) {
   const { data: domain } = useVechainDomain(relayer.address);
   const { data: avatarSrc } = useGetAvatarOfAddress(relayer.address);
 
@@ -66,6 +72,10 @@ function ActiveRelayerRow({ relayer }: { relayer: ActiveRelayer }) {
   const vthoSpentRaw = (
     BigInt(rd.vthoSpentOnVotingRaw) + BigInt(rd.vthoSpentOnClaimingRaw)
   ).toString();
+  const weightPct =
+    totalWeighted > 0
+      ? `${formatNumber(parseFloat(((rd.weightedActions / totalWeighted) * 100).toFixed(2)))}%`
+      : "\u2014";
 
   return (
     <NextLink href={href} style={{ textDecoration: "none", color: "inherit" }}>
@@ -74,7 +84,7 @@ function ActiveRelayerRow({ relayer }: { relayer: ActiveRelayer }) {
           {/* Desktop */}
           <Box hideBelow="md">
             <HStack justify="space-between" w="full" gap="2">
-              <SimpleGrid columns={5} gap="4" w="full" alignItems="center">
+              <SimpleGrid columns={6} gap="4" w="full" alignItems="center">
                 <HStack gridColumn="span 2" gap="3" minW="0">
                   {avatarSrc && (
                     <Box flexShrink={0}>
@@ -112,6 +122,7 @@ function ActiveRelayerRow({ relayer }: { relayer: ActiveRelayer }) {
                   value={formatToken(vthoSpentRaw)}
                   unit="VTHO"
                 />
+                <StatPill label="Weight" value={weightPct} />
               </SimpleGrid>
               <IconButton aria-label="View relayer" variant="ghost" size="sm">
                 <FaAngleRight />
@@ -165,6 +176,7 @@ function ActiveRelayerRow({ relayer }: { relayer: ActiveRelayer }) {
                   value={formatToken(vthoSpentRaw)}
                   unit="VTHO"
                 />
+                <StatPill label="Weight" value={weightPct} />
               </SimpleGrid>
             </VStack>
           </Box>
@@ -181,20 +193,23 @@ interface RoundActiveRelayersProps {
 export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
   const { data: report } = useReportData();
 
-  const activeRelayers = useMemo<ActiveRelayer[]>(() => {
-    if (!report?.relayers) return [];
+  const { activeRelayers, totalWeighted } = useMemo(() => {
+    if (!report?.relayers) return { activeRelayers: [] as ActiveRelayer[], totalWeighted: 0 };
     const result: ActiveRelayer[] = [];
+    let weighted = 0;
     for (const relayer of report.relayers) {
-      const rd = relayer.rounds.find(
-        (r) => r.roundId === roundId && r.votedForCount > 0,
-      );
+      const rd = relayer.rounds.find((r) => r.roundId === roundId);
       if (rd) {
-        result.push({ address: relayer.address, breakdown: rd });
+        weighted += rd.weightedActions;
+        if (rd.votedForCount > 0) {
+          result.push({ address: relayer.address, breakdown: rd });
+        }
       }
     }
-    return result.sort(
+    result.sort(
       (a, b) => b.breakdown.votedForCount - a.breakdown.votedForCount,
     );
+    return { activeRelayers: result, totalWeighted: weighted };
   }, [report, roundId]);
 
   if (activeRelayers.length === 0) return null;
@@ -222,7 +237,7 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
       {/* Desktop column headers */}
       <Box hideBelow="md" px="5">
         <HStack w="full" gap="2">
-          <SimpleGrid columns={5} gap="4" w="full" alignItems="center">
+          <SimpleGrid columns={6} gap="4" w="full" alignItems="center">
             <Box gridColumn="span 2">
               <Text textStyle="xxs" color="text.subtle" fontWeight="medium">
                 {"Relayer"}
@@ -237,6 +252,9 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
             <Text textStyle="xxs" color="text.subtle" fontWeight="medium">
               {"VTHO spent"}
             </Text>
+            <Text textStyle="xxs" color="text.subtle" fontWeight="medium">
+              {"Weight"}
+            </Text>
           </SimpleGrid>
           <Box w="8" flexShrink={0} />
         </HStack>
@@ -244,7 +262,11 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
 
       <VStack gap="3" align="stretch">
         {activeRelayers.map((relayer) => (
-          <ActiveRelayerRow key={relayer.address} relayer={relayer} />
+          <ActiveRelayerRow
+            key={relayer.address}
+            relayer={relayer}
+            totalWeighted={totalWeighted}
+          />
         ))}
       </VStack>
     </VStack>

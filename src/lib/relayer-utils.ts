@@ -20,12 +20,15 @@ export interface RelayerSummary {
  * Build a context needed for proportional B3TR share calculation.
  * For each round: maps roundId -> { totalRelayerRewardsRaw, totalWeightedActions across all relayers }.
  */
-export function buildRoundRewardsContext(report: AnalyticsReport): Map<number, { poolRaw: bigint; totalWeighted: number }> {
-  const ctx = new Map<number, { poolRaw: bigint; totalWeighted: number }>()
+export function buildRoundRewardsContext(report: AnalyticsReport): Map<number, { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number }> {
+  const ctx = new Map<number, { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number }>()
 
-  // Round-level pool amounts
   for (const rd of report.rounds) {
-    ctx.set(rd.roundId, { poolRaw: BigInt(rd.totalRelayerRewardsRaw), totalWeighted: 0 })
+    ctx.set(rd.roundId, {
+      poolRaw: BigInt(rd.totalRelayerRewardsRaw),
+      estimatedPoolRaw: BigInt(rd.estimatedRelayerRewardsRaw),
+      totalWeighted: 0,
+    })
   }
 
   // Sum weighted actions across all relayers per round

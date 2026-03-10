@@ -116,23 +116,17 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
   const stats = (
     <>
       <StatPill
-        label=""
-        value={
-          summary.lastActiveRound != null ? `#${summary.lastActiveRound}` : "-"
-        }
-      />
-      <StatPill
-        label=""
+        label="Total spent"
         value={formatToken(summary.totalVthoSpentRaw)}
         unit="VTHO"
       />
       <StatPill
-        label=""
+        label="Total earned"
         value={formatToken(summary.totalB3trEarnedRaw)}
         unit="B3TR"
       />
       <StatPill
-        label=""
+        label="ROI"
         value={roi != null ? `${formatNumber(Math.round(roi))}%` : "-"}
         valueColor={roi != null ? "status.positive.primary" : undefined}
       />
@@ -146,7 +140,7 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
           {/* Desktop */}
           <Box hideBelow="md">
             <HStack justify="space-between" w="full" gap="2">
-              <SimpleGrid columns={6} gap="4" w="full" alignItems="center">
+              <SimpleGrid columns={5} gap="4" w="full" alignItems="center">
                 <HStack gridColumn="span 2" gap="3" minW="0">
                   {avatarSection}
                   {identitySection}

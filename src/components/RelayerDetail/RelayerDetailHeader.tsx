@@ -12,6 +12,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import {
+  useAccountCustomizationModal,
   useConnectModal,
   useGetAvatarOfAddress,
   useGetTextRecords,
@@ -21,11 +22,11 @@ import {
 import NextLink from "next/link";
 import { useState } from "react";
 import {
-  LuArrowLeft,
   LuCheck,
   LuClipboard,
   LuExternalLink,
   LuHeart,
+  LuPencil,
   LuPlay,
   LuShare2,
 } from "react-icons/lu";
@@ -53,6 +54,7 @@ export function RelayerDetailHeader({
   const { data: isRegistered } = useRelayerRegistration(address);
   const { account } = useWallet();
   const { open: openConnect } = useConnectModal();
+  const { open: openCustomization } = useAccountCustomizationModal();
   const [showModal, setShowModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
@@ -159,6 +161,18 @@ export function RelayerDetailHeader({
                     <Text textStyle="xs" color="text.subtle" lineClamp={2}>
                       {description}
                     </Text>
+                  )}
+
+                  {isOwnRelayer && (
+                    <Button
+                      variant="ghost"
+                      size="xs"
+                      rounded="full"
+                      onClick={() => openCustomization()}
+                    >
+                      <LuPencil />
+                      {"Customize"}
+                    </Button>
                   )}
                 </VStack>
               </HStack>
