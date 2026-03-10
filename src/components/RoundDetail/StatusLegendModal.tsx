@@ -12,6 +12,7 @@ interface StatusLegendModalProps {
 
 const statuses = [
   { labelKey: "All voted", descKey: "All voted desc", colorPalette: "green" },
+  { labelKey: "Claims missing", descKey: "Claims missing desc", colorPalette: "red" },
   { labelKey: "Missed votes", descKey: "Missed votes desc", colorPalette: "orange" },
   { labelKey: "N/A", descKey: "N/A desc", colorPalette: "gray" },
 ]

@@ -157,24 +157,23 @@ export function RelayerDetailHeader({
                         <LuExternalLink size={12} />
                       </Box>
                     </a>
+                    {isOwnRelayer && (
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        rounded="full"
+                        onClick={() => openCustomization()}
+                      >
+                        <LuPencil />
+                        {t("Customize")}
+                      </Button>
+                    )}
                   </HStack>
 
                   {description && (
                     <Text textStyle="xs" color="text.subtle" lineClamp={2}>
                       {description}
                     </Text>
-                  )}
-
-                  {isOwnRelayer && (
-                    <Button
-                      variant="ghost"
-                      size="xs"
-                      rounded="full"
-                      onClick={() => openCustomization()}
-                    >
-                      <LuPencil />
-                      {t("Customize")}
-                    </Button>
                   )}
                 </VStack>
               </HStack>
@@ -183,8 +182,7 @@ export function RelayerDetailHeader({
               <HStack
                 flexShrink={0}
                 gap={2}
-                flexDir={{ base: "column", sm: "row" }}
-                w={{ base: "full", sm: "auto" }}
+                flexDir={{ base: "row", sm: "row" }}
               >
                 <Button
                   variant="outline"
@@ -196,8 +194,13 @@ export function RelayerDetailHeader({
                   {t("Share")}
                 </Button>
                 {isOwnRelayer ? (
-                  <NextLink href="/run">
-                    <Button variant="primary" size="sm" rounded="full">
+                  <NextLink href="/run" style={{ width: "full" }}>
+                    <Button
+                      w={"full"}
+                      variant="primary"
+                      size="sm"
+                      rounded="full"
+                    >
                       <LuPlay />
                       {t("Run")}
                     </Button>
@@ -208,6 +211,7 @@ export function RelayerDetailHeader({
                       variant="primary"
                       size="sm"
                       rounded="full"
+                      w={"full"}
                       onClick={handleChooseRelayer}
                     >
                       <LuHeart />

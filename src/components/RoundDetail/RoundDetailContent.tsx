@@ -19,16 +19,18 @@ import {
 } from "@vechain/vechain-kit";
 import { type ReactNode, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { LuInfo, LuWallet, LuUsers } from "react-icons/lu";
+import { LuInfo, LuTriangleAlert, LuWallet, LuUsers } from "react-icons/lu";
 import { formatEther } from "viem";
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
+import { useRoundRewardStatus } from "@/hooks/useRoundRewardStatus";
 import { useTotalVoters } from "@/hooks/useTotalVoters";
 import { formatNumber, formatToken } from "@/lib/format";
 import { computeROI } from "@/lib/roi";
 import {
   computeRoundCompletion,
   getRoundPhaseLabel,
+  isRoundRewardsLocked,
   parseRoundStatus,
 } from "@/lib/round-utils";
 import type { RoundAnalytics } from "@/lib/types";
@@ -203,7 +205,11 @@ function MiniStatCard({
             {typeof value === "number" ? formatNumber(value) : value}
           </Text>
           {secondaryValue && (
-            <Text textStyle={{ base: "sm", md: "md" }} fontWeight="semibold" color="text.subtle">
+            <Text
+              textStyle={{ base: "sm", md: "md" }}
+              fontWeight="semibold"
+              color="text.subtle"
+            >
               /{secondaryValue}
             </Text>
           )}
@@ -277,8 +283,61 @@ export function RoundDetailContent({
   const status = parseRoundStatus(round);
   const [isStatusModalOpen, setStatusModalOpen] = useState(false);
 
+  const { claimable, totalRewardsFormatted } = useRoundRewardStatus(
+    round.isRoundEnded ? round.roundId : undefined,
+  );
+  const rewardsLocked = isRoundRewardsLocked(round) || (round.isRoundEnded && claimable === false);
+  const missedClaims =
+    round.isRoundEnded && round.expectedActions > 0
+      ? Math.max(0, round.expectedActions - round.completedActions)
+      : 0;
+
   return (
     <VStack gap="14" align="stretch">
+      {rewardsLocked && (
+        <Box
+          bg={{ base: "red.50", _dark: "red.950/60" }}
+          borderWidth="1px"
+          borderColor={{ base: "red.200", _dark: "red.800/50" }}
+          borderRadius="2xl"
+          p={{ base: 4, md: 5 }}
+        >
+          <HStack gap={3} align="start">
+            <Box
+              flexShrink={0}
+              w="42px"
+              h="42px"
+              rounded="full"
+              bg={{ base: "red.100", _dark: "red.500/15" }}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              color={{ base: "red.600", _dark: "red.400" }}
+            >
+              <LuTriangleAlert size={20} />
+            </Box>
+            <VStack align="start" gap={1}>
+              <Text
+                textStyle="sm"
+                fontWeight="bold"
+                color={{ base: "red.800", _dark: "red.200" }}
+              >
+                {t("Rewards Locked")}
+              </Text>
+              <Text
+                textStyle="xs"
+                color={{ base: "red.700/80", _dark: "red.400/70" }}
+              >
+                {t("rewardsLockedDescription", {
+                  missing: String(missedClaims),
+                  amount: totalRewardsFormatted ?? formatToken(round.totalRelayerRewardsRaw),
+                })}
+              </Text>
+            </VStack>
+          </HStack>
+        </Box>
+      )}
+
       <Grid
         templateColumns={{ base: "1fr", lg: "2fr 3fr" }}
         gap="4"
@@ -374,7 +433,9 @@ export function RoundDetailContent({
             <MiniStatCard
               label={t("Voted for")}
               value={formatNumber(round.votedForCount)}
-              secondaryValue={formatNumber(round.autoVotingUsersCount - round.reducedUsersCount)}
+              secondaryValue={formatNumber(
+                round.autoVotingUsersCount - round.reducedUsersCount,
+              )}
               sublabel={t("users")}
             />
             <MiniStatCard
@@ -386,7 +447,10 @@ export function RoundDetailContent({
               }
               secondaryValue={
                 prevRound
-                  ? formatNumber(prevRound.autoVotingUsersCount - prevRound.reducedUsersCount)
+                  ? formatNumber(
+                      prevRound.autoVotingUsersCount -
+                        prevRound.reducedUsersCount,
+                    )
                   : undefined
               }
               sublabel={prevRound ? t("users") : undefined}

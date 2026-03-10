@@ -140,6 +140,7 @@ export default function RelayerDetailPage() {
       <RelayerDetailContent
         relayer={relayerData}
         currentRound={currentRound}
+        reportRounds={report?.rounds}
         roundCtx={roundCtx}
       />
       {!isOwnRelayer && <BecomeRelayerCard mt={8} forceBanner />}

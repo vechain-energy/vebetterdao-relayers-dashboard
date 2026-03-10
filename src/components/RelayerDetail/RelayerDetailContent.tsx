@@ -19,6 +19,7 @@ import {
   LuCoins,
   LuFlame,
   LuHand,
+  LuLock,
   LuTarget,
   LuTrophy,
   LuZap,
@@ -26,7 +27,8 @@ import {
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
 import { formatNumber, formatToken } from "@/lib/format";
-import type { RelayerAnalytics, RelayerRoundBreakdown } from "@/lib/types";
+import type { RelayerAnalytics, RelayerRoundBreakdown, RoundAnalytics } from "@/lib/types";
+import { isRoundRewardsLocked } from "@/lib/round-utils";
 import {
   computeRelayerROI,
   computeRelayerRoundB3tr,
@@ -273,6 +275,7 @@ function RoundRow({
   b3trRaw,
   b3trToVtho,
   isActive,
+  isLocked,
   totalWeighted,
   t,
 }: {
@@ -281,6 +284,7 @@ function RoundRow({
   b3trRaw: string;
   b3trToVtho: number | undefined;
   isActive?: boolean;
+  isLocked?: boolean;
   totalWeighted?: number;
   t: (key: string) => string;
 }) {
@@ -311,6 +315,12 @@ function RoundRow({
         {isActive && (
           <Badge size="sm" variant="solid" colorPalette="green">
             {t("Active")}
+          </Badge>
+        )}
+        {isLocked && (
+          <Badge size="sm" variant="solid" colorPalette="red" gap="1">
+            <LuLock size={10} />
+            {t("Rewards Locked")}
           </Badge>
         )}
       </HStack>
@@ -354,6 +364,7 @@ const ACTIVITY_PAGE_SIZE = 5;
 interface RelayerDetailContentProps {
   relayer: RelayerAnalytics;
   currentRound: number;
+  reportRounds?: RoundAnalytics[];
   roundCtx?: Map<
     number,
     { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number }
@@ -363,6 +374,7 @@ interface RelayerDetailContentProps {
 export function RelayerDetailContent({
   relayer,
   currentRound,
+  reportRounds,
   roundCtx,
 }: RelayerDetailContentProps) {
   const { t } = useTranslation();
@@ -388,6 +400,14 @@ export function RelayerDetailContent({
     }
     return map;
   }, [relayer.rounds]);
+
+  const lockedRounds = useMemo(() => {
+    const set = new Set<number>();
+    for (const rd of reportRounds ?? []) {
+      if (isRoundRewardsLocked(rd)) set.add(rd.roundId);
+    }
+    return set;
+  }, [reportRounds]);
 
   const activityItems = buildActivityItems(relayer.rounds);
   const visibleActivity = activityItems.slice(0, visibleActivityCount);
@@ -488,6 +508,7 @@ export function RelayerDetailContent({
                       rd={rd}
                       prevClaimedFor={prevClaimedMap.get(rd.roundId - 1) ?? 0}
                       isActive={isActiveRound}
+                      isLocked={lockedRounds.has(rd.roundId)}
                       b3trToVtho={b3trToVtho}
                       totalWeighted={ctx?.totalWeighted}
                       b3trRaw={

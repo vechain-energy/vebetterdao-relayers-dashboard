@@ -1323,19 +1323,25 @@ async function analyzeRound(
   );
   console.log(`    - Round ended: ${isRoundEnded ? "Yes" : "No"}`);
 
-  // Simple status check based on user counts (not weighted actions)
-  // For round N: Did we vote for all eligible users? (users - legitSkips)
+  // Status check: voting + claiming completion
   const expectedToVote = autoVotingUsers.length - reducedUsersCount;
   const votingComplete = votedForUsers.size >= expectedToVote;
   const missedVotes = expectedToVote - votedForUsers.size;
 
-  let actionStatus: string;
-  const allActionsOk = votingComplete;
+  // For ended rounds, use on-chain action counters (includes both votes AND claims)
+  // For active rounds, only voting is expected — claiming happens after the round ends
+  const allActionsOk = isRoundEnded
+    ? verificationData.completedActions >= verificationData.expectedActions
+    : votingComplete;
 
+  let actionStatus: string;
   if (autoVotingUsers.length === 0) {
     actionStatus = "N/A";
   } else if (votingComplete) {
-    if (reducedUsersCount === 0) {
+    if (isRoundEnded && !allActionsOk) {
+      const missedClaims = Math.max(0, expectedToVote - claimedUsers.size);
+      actionStatus = `⚠ ${missedClaims} claims missing`;
+    } else if (reducedUsersCount === 0) {
       actionStatus = "✓ All voted";
     } else {
       actionStatus = `✓ OK (${reducedUsersCount} skips)`;

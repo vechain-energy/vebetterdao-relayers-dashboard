@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { useMemo } from "react"
+import { useMemo } from "react";
 
-import { computeRelayerRoundB3tr } from "@/lib/relayer-utils"
-import type { RelayerAnalytics, RoundAnalytics } from "@/lib/types"
+import { computeRelayerRoundB3tr } from "@/lib/relayer-utils";
+import type { RelayerAnalytics, RoundAnalytics } from "@/lib/types";
 
 export interface UnclaimedRound {
-  roundId: number
-  amountRaw: string
+  roundId: number;
+  amountRaw: string;
 }
 
 export interface UnclaimedRelayerRewards {
-  rounds: UnclaimedRound[]
-  totalAmountRaw: string
-  hasUnclaimed: boolean
+  rounds: UnclaimedRound[];
+  totalAmountRaw: string;
+  hasUnclaimed: boolean;
 }
 
 /**
@@ -30,39 +30,39 @@ export function useUnclaimedRelayerRewards(
   roundCtx?: Map<number, { poolRaw: bigint; totalWeighted: number }>,
 ): UnclaimedRelayerRewards {
   return useMemo(() => {
-    const roundStatusMap = new Map(
-      reportRounds.map((r) => [r.roundId, r]),
-    )
+    const roundStatusMap = new Map(reportRounds.map((r) => [r.roundId, r]));
 
-    const unclaimed: UnclaimedRound[] = []
-    let totalRaw = BigInt(0)
+    const unclaimed: UnclaimedRound[] = [];
+    let totalRaw = BigInt(0);
 
     for (const rd of relayer.rounds) {
-      if (rd.weightedActions <= 0) continue
-      if (BigInt(rd.relayerRewardsClaimedRaw ?? "0") > BigInt(0)) continue
+      if (rd.weightedActions <= 0) continue;
+      if (BigInt(rd.relayerRewardsClaimedRaw ?? "0") > BigInt(0)) continue;
 
-      const globalRound = roundStatusMap.get(rd.roundId)
-      if (!globalRound?.isRoundEnded || !globalRound?.allActionsOk) continue
+      const globalRound = roundStatusMap.get(rd.roundId);
+      if (!globalRound?.isRoundEnded || !globalRound?.allActionsOk) continue;
+      // Belt-and-suspenders: verify on-chain action completion (pool must be unlocked)
+      if (globalRound.completedActions < globalRound.expectedActions) continue;
 
-      let amount = BigInt(rd.claimableRewardsRaw || "0")
+      let amount = BigInt(rd.claimableRewardsRaw || "0");
       if (amount <= BigInt(0) && roundCtx) {
         amount = computeRelayerRoundB3tr(
           rd.weightedActions,
           roundCtx.get(rd.roundId),
-        )
+        );
       }
-      if (amount <= BigInt(0)) continue
+      if (amount <= BigInt(0)) continue;
 
-      unclaimed.push({ roundId: rd.roundId, amountRaw: amount.toString() })
-      totalRaw += amount
+      unclaimed.push({ roundId: rd.roundId, amountRaw: amount.toString() });
+      totalRaw += amount;
     }
 
-    unclaimed.sort((a, b) => a.roundId - b.roundId)
+    unclaimed.sort((a, b) => a.roundId - b.roundId);
 
     return {
       rounds: unclaimed,
       totalAmountRaw: totalRaw.toString(),
       hasUnclaimed: unclaimed.length > 0,
-    }
-  }, [relayer.rounds, reportRounds, roundCtx])
+    };
+  }, [relayer.rounds, reportRounds, roundCtx]);
 }

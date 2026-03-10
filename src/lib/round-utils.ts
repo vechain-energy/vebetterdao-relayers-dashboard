@@ -24,10 +24,20 @@ export function computeRoundCompletion(round: RoundAnalytics): number {
 
 export function parseRoundStatus(round: RoundAnalytics): { label: string; colorPalette: string } {
   if (round.actionStatus === "N/A") return { label: "N/A", colorPalette: "gray" }
+  // On-chain truth: if completed < expected, the pool is locked regardless of report flags
+  if (isRoundRewardsLocked(round))
+    return { label: "Claims missing", colorPalette: "red" }
+  if (round.actionStatus.includes("claims missing"))
+    return { label: "Claims missing", colorPalette: "red" }
   if (round.allActionsOk || round.actionStatus.startsWith("\u2713"))
     return { label: "All voted", colorPalette: "green" }
   if (round.actionStatus.startsWith("\u26A0")) return { label: "Missed votes", colorPalette: "orange" }
   return { label: round.actionStatus, colorPalette: "gray" }
+}
+
+/** Whether a round's reward pool is locked (ended but not all actions completed). */
+export function isRoundRewardsLocked(round: RoundAnalytics): boolean {
+  return round.isRoundEnded && round.expectedActions > 0 && round.completedActions < round.expectedActions
 }
 
 export function getRoundPhaseLabel(round: RoundAnalytics): string {
