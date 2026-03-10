@@ -12,6 +12,8 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useGetAvatarOfAddress, useVechainDomain } from "@vechain/vechain-kit";
+
+import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
 import NextLink from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaAngleRight } from "react-icons/fa6";
@@ -73,6 +75,7 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
     b3trToVtho,
   );
 
+  const { data: isRegistered } = useRelayerRegistration(summary.address);
   const { data: avatarSrc } = useGetAvatarOfAddress(summary.address);
 
   const { t } = useTranslation();
@@ -104,9 +107,15 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
         <Badge
           size="sm"
           variant="solid"
-          colorPalette={active ? "green" : "gray"}
+          colorPalette={
+            !isRegistered ? "red" : active ? "green" : "gray"
+          }
         >
-          {active ? t("Active") : t("Inactive")}
+          {!isRegistered
+            ? t("Unregistered")
+            : active
+              ? t("Active")
+              : t("Inactive")}
         </Badge>
       </HStack>
       <Text textStyle="xxs" color="text.subtle" lineClamp={1}>

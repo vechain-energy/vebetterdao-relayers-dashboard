@@ -162,6 +162,7 @@
   "Total VTHO Spent": "Total VTHO gastado",
   "Try a different address or domain": "Prueba otra dirección o dominio",
   "Unknown": "Desconocido",
+  "Unregistered": "No registrado",
   "Updated": "Actualizado",
   "User Eligibility (at snapshot time)": "Elegibilidad de usuario (en el momento del snapshot)",
   "Users": "Usuarios",
@@ -190,6 +191,6 @@
   "Who Actually Casts My Vote?": "¿Quién emite realmente mi voto?",
   "Who Can Be a Relayer?": "¿Quién puede ser Relayer?",
   "Who claims the relayer payout?": "¿Quién reclama el pago del relayer?",
-  "You need a VeChain wallet with some VTHO for gas fees. This wallet will be used to register as a relayer and run the node.": "Necesitas una wallet VeChain con VTHO para las comisiones de gas. Esta wallet se usará para registrarte como relayer y ejecutar el nodo.",
+  "You need a VeChain wallet with some VTHO for gas fees. We recommend creating a dedicated wallet for this purpose — its private key will be used to run the relayer node, so it's best to keep it separate from your main wallet.": "Necesitas una wallet VeChain con VTHO para las comisiones de gas. Recomendamos crear una wallet dedicada — su clave privada se usará para ejecutar el nodo relayer, por lo que es mejor mantenerla separada de tu wallet principal.",
   "You run a relayer node that watches the blockchain. When a new round starts, it sees who has auto-voting enabled, submits their votes, and claims their rewards in batches.": "Ejecutas un nodo Relayer que observa la blockchain. Cuando empieza una ronda, detecta quién tiene auto-voto, envía sus votos y reclama sus recompensas en lotes."
 }
