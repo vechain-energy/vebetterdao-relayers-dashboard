@@ -15,29 +15,25 @@ import {
   useMediaQuery,
   VStack,
 } from "@chakra-ui/react";
-import {
-  useAccountModal,
-  useConnectModal,
-  useWallet,
-  WalletButton,
-} from "@vechain/vechain-kit";
+import { useWallet, WalletButton } from "@vechain/vechain-kit";
 import Image from "next/image";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LuHouse,
   LuInfo,
-  LuLogIn,
   LuMenu,
   LuPlay,
   LuRadar,
+  LuTimer,
+  LuUsers,
 } from "react-icons/lu";
 
 import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
 import { basePath } from "@/config/basePath";
 import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
 
-type NavPage = "home" | "learn";
+type NavPage = "home" | "relayers" | "rounds" | "manage" | "learn";
 
 type NavRoute = {
   value: NavPage;
@@ -48,6 +44,8 @@ type NavRoute = {
 
 const BASE_ROUTES: NavRoute[] = [
   { value: "home", label: "Home", href: "/", icon: LuHouse },
+  { value: "relayers", label: "Relayers", href: "/relayers", icon: LuUsers },
+  { value: "rounds", label: "Rounds", href: "/round", icon: LuTimer },
   { value: "learn", label: "Learn", href: "/learn", icon: LuInfo },
 ];
 
@@ -55,12 +53,15 @@ export function Navbar() {
   const [isDesktop] = useMediaQuery(["(min-width: 1200px)"]);
   const { open, onClose, onOpen } = useDisclosure();
   const pathname = usePathname();
-  const { account, connection } = useWallet();
-  const { open: openConnectModal } = useConnectModal();
-  const { open: openAccountModal } = useAccountModal();
+  const { account } = useWallet();
   const { data: isRegistered } = useRelayerRegistration(account?.address);
 
-  const routes: NavRoute[] = BASE_ROUTES;
+  const routes: NavRoute[] = isRegistered
+    ? [
+        ...BASE_ROUTES,
+        { value: "manage", label: "Manage", href: "/relayer", icon: LuRadar },
+      ]
+    : BASE_ROUTES;
   const logoFilter = useColorModeValue("none", "brightness(0) invert(1)");
   const walletTextColor = useColorModeValue("#1A1A1A", "#E4E4E4");
   const walletHoverBg = useColorModeValue("#f8f8f8", "#2D2D2F");
@@ -128,31 +129,17 @@ export function Navbar() {
         )}
 
         <HStack flex="1" gap={2} justifyContent="end" alignItems="center">
-          <NextLink href={isRegistered ? "/relayer" : "/run"}>
-            <Button
-              variant="primary"
-              size={isDesktop ? "md" : "sm"}
-              rounded="full"
-            >
-              {isRegistered ? <LuRadar /> : <LuPlay />}
-              {isRegistered ? "Manage" : "Run"}
-            </Button>
-          </NextLink>
-
-          {isDesktop && (
-            <>
-              <WalletButton
-                buttonStyle={{
-                  variant: "outline",
-                  size: "md",
-                  borderRadius: "full",
-                  textColor: walletTextColor,
-                  _hover: { bg: walletHoverBg },
-                }}
-                connectionVariant="popover"
-              />
-            </>
-          )}
+          <WalletButton
+            mobileVariant="icon"
+            buttonStyle={{
+              variant: "outline",
+              size: "md",
+              borderRadius: "full",
+              textColor: walletTextColor,
+              _hover: { bg: walletHoverBg },
+            }}
+            connectionVariant="popover"
+          />
 
           {!isDesktop && (
             <IconButton
@@ -205,18 +192,6 @@ export function Navbar() {
                   justifyContent="space-between"
                 >
                   <VStack gap={0} w="full" align="stretch">
-                    <WalletButton
-                      buttonStyle={{
-                        variant: "outline",
-                        width: "full",
-                        size: "md",
-                        borderRadius: "full",
-                        textColor: walletTextColor,
-                        _hover: { bg: walletHoverBg },
-                      }}
-                      connectionVariant="popover"
-                    />
-                    <Separator my={2} />
                     {routes.map((route) => (
                       <NextLink
                         key={route.value}
@@ -230,7 +205,7 @@ export function Navbar() {
                           justifyContent="flex-start"
                           alignItems="center"
                           gap={4}
-                          size="lg"
+                          size="2xl"
                           fontWeight={isActive(route) ? "bold" : "normal"}
                         >
                           <route.icon size={20} />

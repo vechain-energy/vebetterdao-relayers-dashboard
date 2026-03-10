@@ -123,7 +123,7 @@ export function Footer() {
           w="full"
           direction={{ base: "column", md: "row" }}
           justify="space-between"
-          gap={{ base: 8, md: 6 }}
+          gap={{ base: 8, md: 8 }}
         >
           <VStack align="start" gap={2} flexShrink={0}>
             <HStack gap={2} align="flex-start" w="full">
@@ -144,7 +144,7 @@ export function Footer() {
             {isDesktop && <ColorModeToggle mt="2" />}
           </VStack>
 
-          <SimpleGrid columns={{ base: 2, md: 4 }} gap={{ base: 8, md: 6 }}>
+          <SimpleGrid columns={{ base: 2, md: 3 }} gap={{ base: 8, md: 8 }}>
             <VStack align="start" gap={2}>
               <Text fontWeight="bold" textStyle="sm">
                 {"RESOURCES"}
@@ -184,13 +184,6 @@ export function Footer() {
             </VStack>
 
             <NavigationLinks />
-
-            <VStack align="start" gap={2}>
-              <Text fontWeight="bold" textStyle="sm">
-                {"Network"}
-              </Text>
-              <SyncingBlock />
-            </VStack>
           </SimpleGrid>
         </Flex>
 
