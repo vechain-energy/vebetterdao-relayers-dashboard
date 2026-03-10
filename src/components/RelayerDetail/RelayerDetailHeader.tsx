@@ -7,7 +7,15 @@ import {
   Card,
   Clipboard,
   HStack,
+  IconButton,
   Image,
+  MenuContent,
+  MenuItem,
+  MenuPositioner,
+  MenuRoot,
+  MenuSeparator,
+  MenuTrigger,
+  Portal,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -25,11 +33,13 @@ import { useTranslation } from "react-i18next";
 import {
   LuCheck,
   LuClipboard,
+  LuEllipsisVertical,
   LuExternalLink,
   LuHeart,
   LuPencil,
   LuPlay,
   LuShare2,
+  LuTriangleAlert,
 } from "react-icons/lu";
 
 import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
@@ -37,6 +47,7 @@ import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
 import { ShareRelayerModal } from "@/components/SetupGuide/ShareRelayerModal";
 
 import { ChooseRelayerModal } from "./ChooseRelayerModal";
+import { UnregisterRelayerModal } from "./UnregisterRelayerModal";
 
 interface RelayerDetailHeaderProps {
   address: string;
@@ -58,6 +69,7 @@ export function RelayerDetailHeader({
   const { open: openCustomization } = useAccountCustomizationModal();
   const [showModal, setShowModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showUnregisterModal, setShowUnregisterModal] = useState(false);
 
   const { t } = useTranslation();
   const displayName = domain?.domain ?? t("Unknown");
@@ -157,17 +169,6 @@ export function RelayerDetailHeader({
                         <LuExternalLink size={12} />
                       </Box>
                     </a>
-                    {isOwnRelayer && (
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        rounded="full"
-                        onClick={() => openCustomization()}
-                      >
-                        <LuPencil />
-                        {t("Customize")}
-                      </Button>
-                    )}
                   </HStack>
 
                   {description && (
@@ -182,24 +183,27 @@ export function RelayerDetailHeader({
               <HStack
                 flexShrink={0}
                 gap={2}
-                flexDir={{ base: "row", sm: "row" }}
+                w={{ base: "full", sm: "auto" }}
               >
+                {/* Share — visible on sm+, in menu on mobile */}
                 <Button
                   variant="outline"
                   size="sm"
                   rounded="full"
+                  hideBelow="sm"
                   onClick={() => setShowShareModal(true)}
                 >
                   <LuShare2 />
-                  {t("Share")}
+                  <Box hideBelow="md">{t("Share")}</Box>
                 </Button>
+
                 {isOwnRelayer ? (
-                  <NextLink href="/run" style={{ width: "full" }}>
+                  <NextLink href="/run" style={{ flex: 1 }}>
                     <Button
-                      w={"full"}
                       variant="primary"
                       size="sm"
                       rounded="full"
+                      w={{ base: "full", sm: "auto" }}
                     >
                       <LuPlay />
                       {t("Run")}
@@ -211,14 +215,69 @@ export function RelayerDetailHeader({
                       variant="primary"
                       size="sm"
                       rounded="full"
-                      w={"full"}
+                      flex={{ base: 1, sm: "initial" }}
                       onClick={handleChooseRelayer}
                     >
                       <LuHeart />
-                      {t("Set as default relayer")}
+                      <Box hideBelow="md">{t("Set as default relayer")}</Box>
+                      <Box hideFrom="md">{t("Set as default")}</Box>
                     </Button>
                   )
                 )}
+
+                <MenuRoot>
+                  <MenuTrigger asChild>
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
+                      rounded="full"
+                      aria-label={t("More options")}
+                    >
+                      <LuEllipsisVertical />
+                    </IconButton>
+                  </MenuTrigger>
+                  <Portal>
+                    <MenuPositioner>
+                      <MenuContent>
+                        {/* Share — in menu on mobile only */}
+                        <Box hideFrom="sm">
+                          <MenuItem
+                            value="share"
+                            cursor="pointer"
+                            onClick={() => setShowShareModal(true)}
+                          >
+                            <LuShare2 />
+                            {t("Share")}
+                          </MenuItem>
+                        </Box>
+                        {isOwnRelayer && (
+                          <MenuItem
+                            value="customize"
+                            cursor="pointer"
+                            onClick={() => openCustomization()}
+                          >
+                            <LuPencil />
+                            {t("Customize profile")}
+                          </MenuItem>
+                        )}
+                        {isOwnRelayer && isRegistered && (
+                          <>
+                            <MenuSeparator />
+                            <MenuItem
+                              value="unregister"
+                              color="fg.error"
+                              cursor="pointer"
+                              onClick={() => setShowUnregisterModal(true)}
+                            >
+                              <LuTriangleAlert />
+                              {t("Unregister relayer")}
+                            </MenuItem>
+                          </>
+                        )}
+                      </MenuContent>
+                    </MenuPositioner>
+                  </Portal>
+                </MenuRoot>
               </HStack>
             </HStack>
           </Card.Body>
@@ -236,6 +295,12 @@ export function RelayerDetailHeader({
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
         relayerAddress={domain?.domain ?? address}
+      />
+
+      <UnregisterRelayerModal
+        isOpen={showUnregisterModal}
+        onClose={() => setShowUnregisterModal(false)}
+        relayerAddress={address}
       />
     </>
   );
