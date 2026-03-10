@@ -11,6 +11,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useTranslation } from "react-i18next";
 import { LuArrowUpRight, LuRadar, LuRocket } from "react-icons/lu";
 
 import { useDismissedBanner } from "@/hooks/useDismissedBanners";
@@ -26,6 +27,7 @@ export function BecomeRelayerCard({
   forceBanner = false,
   mt,
 }: BecomeRelayerCardProps) {
+  const { t } = useTranslation();
   const { open, onOpen, onClose } = useDisclosure();
   const { isDismissed, dismiss } = useDismissedBanner("become-relayer");
 
@@ -60,10 +62,10 @@ export function BecomeRelayerCard({
             fontWeight="bold"
             color="white"
           >
-            {"Become a relayer"}
+            {t("Become a relayer")}
           </Text>
           <Text textStyle="md" color="whiteAlpha.800">
-            {"Run a relayer node, serve voters, earn B3TR."}
+            {t("Run a relayer node, serve voters, earn B3TR.")}
           </Text>
           <HStack gap="2" mt="4" flexWrap="wrap">
             <NextLink href="/new-relayer">
@@ -75,7 +77,7 @@ export function BecomeRelayerCard({
                 borderColor="whiteAlpha.500"
                 _hover={{ bg: "whiteAlpha.200" }}
               >
-                {"Become a Relayer"}
+                {t("Become a Relayer")}
                 <LuRocket />
               </Button>
             </NextLink>
@@ -86,7 +88,7 @@ export function BecomeRelayerCard({
               color="white"
               onClick={onOpen}
             >
-              {"Learn"}
+              {t("Learn")}
               <LuArrowUpRight />
             </Button>
           </HStack>

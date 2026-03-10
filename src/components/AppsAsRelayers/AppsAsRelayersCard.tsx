@@ -11,6 +11,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useTranslation } from "react-i18next";
 import { LuArrowUpRight, LuRocket, LuSmartphone } from "react-icons/lu";
 
 import { useDismissedBanner } from "@/hooks/useDismissedBanners";
@@ -24,6 +25,7 @@ interface AppsAsRelayersCardProps {
 export function AppsAsRelayersCard({
   forceBanner = false,
 }: AppsAsRelayersCardProps) {
+  const { t } = useTranslation();
   const { isDismissed, dismiss } = useDismissedBanner("apps-as-relayers");
   const { open, onOpen, onClose } = useDisclosure();
 
@@ -50,20 +52,20 @@ export function AppsAsRelayersCard({
         )}
         <VStack align="start" gap="3" position="relative" zIndex={1}>
           <Text textStyle={{ base: "lg", md: "xl" }} fontWeight="bold">
-            {"Autovoting as a Service"}
+            {t("Autovoting as a Service")}
           </Text>
           <Text textStyle="md" color="text.subtle">
-            {"Stop paying for votes. Start getting paid to handle them."}
+            {t("Stop paying for votes. Start getting paid to handle them.")}
           </Text>
           <HStack gap="2" mt="4" flexWrap="wrap">
             <NextLink href="/new-relayer">
               <Button variant="primary" size="sm" rounded="full">
-                {"Become a Relayer"}
+                {t("Become a Relayer")}
                 <LuRocket />
               </Button>
             </NextLink>
             <Button variant="link" size="sm" rounded="full" onClick={onOpen}>
-              {"Learn"}
+              {t("Learn")}
               <LuArrowUpRight />
             </Button>
           </HStack>

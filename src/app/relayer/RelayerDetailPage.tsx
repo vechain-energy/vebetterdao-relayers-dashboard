@@ -7,6 +7,7 @@ import {
   useWallet,
 } from "@vechain/vechain-kit";
 import { useSearchParams } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { LuArrowLeft, LuWallet } from "react-icons/lu";
 
 import {
@@ -30,6 +31,7 @@ function isAddress(value: string): boolean {
 }
 
 export default function RelayerDetailPage() {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const { account } = useWallet();
   const addressParam = searchParams.get("address") ?? "";
@@ -67,7 +69,7 @@ export default function RelayerDetailPage() {
     return (
       <VStack w="full" align="center" gap="4" py="16">
         <Text color="text.subtle" textStyle="sm">
-          {"Connect your wallet to view your relayer dashboard."}
+          {t("Connect your wallet to view your relayer dashboard.")}
         </Text>
         <Button
           variant="outline"
@@ -76,7 +78,7 @@ export default function RelayerDetailPage() {
           onClick={() => openConnect()}
         >
           <LuWallet />
-          {"Connect Wallet"}
+          {t("Connect Wallet")}
         </Button>
       </VStack>
     );
@@ -90,7 +92,7 @@ export default function RelayerDetailPage() {
     return (
       <VStack w="full" align="stretch" gap="4">
         <Text color="status.negative.primary" textStyle="sm">
-          {"Could not resolve VET domain: "}
+          {t("Could not resolve VET domain: ")}
           {addressOrDomain}
         </Text>
       </VStack>
@@ -101,7 +103,7 @@ export default function RelayerDetailPage() {
     return (
       <VStack w="full" align="stretch" gap="4">
         <Text color="status.negative.primary" textStyle="sm">
-          {"Invalid address or domain."}
+          {t("Invalid address or domain.")}
         </Text>
       </VStack>
     );
@@ -118,7 +120,7 @@ export default function RelayerDetailPage() {
         <NextLink href="/relayers">
           <Button variant="ghost" size="sm">
             <LuArrowLeft />
-            {"Back to relayers"}
+            {t("Back to relayers")}
           </Button>
         </NextLink>
       </HStack>

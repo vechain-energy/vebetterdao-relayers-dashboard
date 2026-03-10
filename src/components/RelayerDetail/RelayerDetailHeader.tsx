@@ -21,6 +21,7 @@ import {
 } from "@vechain/vechain-kit";
 import NextLink from "next/link";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   LuCheck,
   LuClipboard,
@@ -58,7 +59,8 @@ export function RelayerDetailHeader({
   const [showModal, setShowModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
 
-  const displayName = domain?.domain ?? "Unknown";
+  const { t } = useTranslation();
+  const displayName = domain?.domain ?? t("Unknown");
   const shortAddress = `${address.slice(0, 6)}...${address.slice(-4)}`;
   const explorerUrl = `https://explore.vechain.org/address/${address}`;
   const description = textRecords?.description;
@@ -119,7 +121,7 @@ export function RelayerDetailHeader({
                       variant="solid"
                       colorPalette={isActive ? "green" : "gray"}
                     >
-                      {isActive ? "Active" : "Inactive"}
+                      {isActive ? t("Active") : t("Inactive")}
                     </Badge>
                   </HStack>
 
@@ -134,7 +136,7 @@ export function RelayerDetailHeader({
                           cursor="pointer"
                           _hover={{ color: "text.primary" }}
                           transition="color 0.15s"
-                          aria-label="Copy address"
+                          aria-label={t("Copy address")}
                         >
                           <Clipboard.Indicator copied={<LuCheck size={12} />}>
                             <LuClipboard size={12} />
@@ -171,7 +173,7 @@ export function RelayerDetailHeader({
                       onClick={() => openCustomization()}
                     >
                       <LuPencil />
-                      {"Customize"}
+                      {t("Customize")}
                     </Button>
                   )}
                 </VStack>
@@ -186,13 +188,13 @@ export function RelayerDetailHeader({
                   onClick={() => setShowShareModal(true)}
                 >
                   <LuShare2 />
-                  {"Share"}
+                  {t("Share")}
                 </Button>
                 {isOwnRelayer ? (
                   <NextLink href="/run">
                     <Button variant="primary" size="sm" rounded="full">
                       <LuPlay />
-                      {"Run"}
+                      {t("Run")}
                     </Button>
                   </NextLink>
                 ) : (
@@ -204,7 +206,7 @@ export function RelayerDetailHeader({
                       onClick={handleChooseRelayer}
                     >
                       <LuHeart />
-                      {"Set as default relayer"}
+                      {t("Set as default relayer")}
                     </Button>
                   )
                 )}

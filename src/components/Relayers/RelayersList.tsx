@@ -16,6 +16,7 @@ import {
 import { useVechainDomain } from "@vechain/vechain-kit";
 import NextLink from "next/link";
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   LuArrowDown,
   LuArrowUp,
@@ -42,10 +43,10 @@ type SortField = "rounds" | "b3tr" | "vtho" | "roi" | "lastActive";
 type SortDir = "asc" | "desc";
 type FilterStatus = "all" | "active" | "inactive";
 
-const SORT_COLUMNS: { field: SortField; label: string }[] = [
-  { field: "vtho", label: "VTHO spent" },
-  { field: "b3tr", label: "B3TR earned" },
-  { field: "roi", label: "ROI" },
+const SORT_COLUMNS: { field: SortField; labelKey: string }[] = [
+  { field: "vtho", labelKey: "VTHO spent" },
+  { field: "b3tr", labelKey: "B3TR earned" },
+  { field: "roi", labelKey: "ROI" },
 ];
 
 function getSortValue(
@@ -112,6 +113,7 @@ function useSearchAddress(query: string) {
 }
 
 export function RelayersList() {
+  const { t } = useTranslation();
   const { data: report, isLoading, error } = useReportData();
   const b3trToVtho = useB3trToVthoRate();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -196,7 +198,7 @@ export function RelayersList() {
     <VStack gap="4" align="stretch">
       <HStack justify="space-between" flexWrap="wrap" gap="3">
         <HStack gap="2" align="center">
-          <Heading size="lg">{"Relayers"}</Heading>
+          <Heading size="lg">{t("Relayers")}</Heading>
           <Badge size="sm" variant="subtle" colorPalette="gray">
             {filtered.length}
           </Badge>
@@ -204,7 +206,7 @@ export function RelayersList() {
         <NextLink href="/new-relayer">
           <Button variant="primary" size="sm" rounded="full">
             <LuPlus />
-            {"Register new relayer"}
+            {t("Register new relayer")}
           </Button>
         </NextLink>
       </HStack>
@@ -221,7 +223,7 @@ export function RelayersList() {
             }}
           />
           <Input
-            placeholder="Search by address or VET domain..."
+            placeholder={t("Search by address or VET domain...")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -245,7 +247,7 @@ export function RelayersList() {
               }}
               textTransform="capitalize"
             >
-              {status}
+              {t(status)}
             </Button>
           ))}
         </HStack>
@@ -257,13 +259,13 @@ export function RelayersList() {
           <SimpleGrid columns={5} gap="4" w="full" alignItems="center">
             <Box gridColumn="span 2">
               <Text textStyle="xxs" color="text.subtle" fontWeight="medium">
-                {"Relayer"}
+                {t("Relayer")}
               </Text>
             </Box>
             {SORT_COLUMNS.map((col) => (
               <SortableHeader
                 key={col.field}
-                label={col.label}
+                label={t(col.labelKey)}
                 active={sortField === col.field}
                 dir={sortDir}
                 onClick={() => handleSort(col.field)}
@@ -278,10 +280,10 @@ export function RelayersList() {
       <Stack gap="3">
         {visible.length === 0 ? (
           <VStack py="12" gap="1">
-            <Text color="text.subtle">{"No relayers found"}</Text>
+            <Text color="text.subtle">{t("No relayers found")}</Text>
             {search.trim() && (
               <Text textStyle="sm" color="text.subtle">
-                {"Try a different address or domain"}
+                {t("Try a different address or domain")}
               </Text>
             )}
           </VStack>
@@ -304,7 +306,7 @@ export function RelayersList() {
           onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
         >
           <LuChevronsDown size={12} />
-          {"Load more relayers"}
+          {t("Load more relayers")}
           <LuChevronsDown size={12} />
         </Button>
       )}

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import {
   Grid,
   Button,
@@ -130,25 +131,24 @@ export function SetupGuide() {
     router.push("/run");
   }, [completeStep, router]);
 
+  const { t } = useTranslation();
   return (
     <VStack align="start" gap="6" w="full">
       <HStack gap="3" align="center">
         <NextLink href="/">
           <Button variant="ghost" size="sm" rounded="full">
             <LuArrowLeft />
-            {"Back"}
+            {t("Back")}
           </Button>
         </NextLink>
       </HStack>
 
       <VStack align="start" gap="1">
         <Heading size={{ base: "xl", md: "2xl" }} fontWeight="bold">
-          {"Become a Relayer"}
+          {t("Become a Relayer")}
         </Heading>
         <Text textStyle="md" color="text.subtle">
-          {
-            "Follow these steps to join the network and start earning B3TR rewards."
-          }
+          {t("Follow these steps to join the network and start earning B3TR rewards.")}
         </Text>
       </VStack>
 
@@ -157,13 +157,11 @@ export function SetupGuide() {
           {/* Step 1: Prepare wallet */}
           <Step
             number={1}
-            title="Prepare a Wallet"
+            title={t("Prepare a Wallet")}
             completed={isStepCompleted(1)}
           >
             <Text textStyle="sm" color="text.subtle">
-              {
-                "You need a VeChain wallet with some VTHO for gas fees. This wallet will be used to register as a relayer and run the node."
-              }
+              {t("You need a VeChain wallet with some VTHO for gas fees. This wallet will be used to register as a relayer and run the node.")}
             </Text>
             {!isStepCompleted(1) && (
               <Button
@@ -174,7 +172,7 @@ export function SetupGuide() {
                 gap={2}
               >
                 <LuWallet size={14} />
-                {"I have a wallet prepared"}
+                {t("I have a wallet prepared")}
               </Button>
             )}
           </Step>
@@ -182,14 +180,12 @@ export function SetupGuide() {
           {/* Step 2: Register as relayer */}
           <Step
             number={2}
-            title="Register as a Relayer"
+            title={t("Register as a Relayer")}
             disabled={!isStepEnabled(2)}
             completed={isStepCompleted(2)}
           >
             <Text textStyle="sm" color="text.subtle">
-              {
-                "Register your address on the RelayerRewardsPool contract to join the network. This is a one-time on-chain transaction."
-              }
+              {t("Register your address on the RelayerRewardsPool contract to join the network. This is a one-time on-chain transaction.")}
             </Text>
             {!isStepCompleted(2) && (
               <>
@@ -202,7 +198,7 @@ export function SetupGuide() {
                     gap={2}
                   >
                     <LuWallet size={14} />
-                    {"Connect Wallet"}
+                    {t("Connect Wallet")}
                   </Button>
                 ) : (
                   <Button
@@ -213,7 +209,7 @@ export function SetupGuide() {
                     gap={2}
                   >
                     <LuUserPlus size={14} />
-                    {"Register"}
+                    {t("Register")}
                   </Button>
                 )}
               </>
@@ -223,14 +219,12 @@ export function SetupGuide() {
           {/* Step 3: Run the node */}
           <Step
             number={3}
-            title="Run the Node"
+            title={t("Run the Node")}
             disabled={!isStepEnabled(3)}
             completed={isStepCompleted(3)}
           >
             <Text textStyle="sm" color="text.subtle">
-              {
-                "Choose how to run your relayer node. You can run it directly in your browser, with Docker, or via npm."
-              }
+              {t("Choose how to run your relayer node. You can run it directly in your browser, with Docker, or via npm.")}
             </Text>
             {!isStepCompleted(3) && isStepEnabled(3) && (
               <RunOptions onRunInBrowser={handleRunInBrowser} />
@@ -240,14 +234,12 @@ export function SetupGuide() {
           {/* Step 4: Share your profile */}
           <Step
             number={4}
-            title="Share Your Profile"
+            title={t("Share Your Profile")}
             disabled={!isStepEnabled(4)}
             completed={isStepCompleted(4)}
           >
             <Text textStyle="sm" color="text.subtle">
-              {
-                "Let people know you're a relayer so they can choose you. The more users you serve, the more you earn."
-              }
+              {t("Let people know you're a relayer so they can choose you. The more users you serve, the more you earn.")}
             </Text>
             {!isStepCompleted(4) && isStepEnabled(4) && (
               <Button
@@ -261,7 +253,7 @@ export function SetupGuide() {
                 gap={2}
               >
                 <LuShare2 size={14} />
-                {"Share"}
+                {t("Share")}
               </Button>
             )}
           </Step>
@@ -279,12 +271,10 @@ export function SetupGuide() {
           <VStack gap={6} align="stretch">
             <VStack gap={2} align="start">
               <Heading size="lg" fontWeight="bold">
-                {"What Are Relayers?"}
+                {t("What Are Relayers?")}
               </Heading>
               <Text color="text.subtle">
-                {
-                  "Relayers are services that cast votes and claim rewards for users who enabled auto-voting. Anyone can run one — apps, community members, developers. You earn a share of rewards for the work you do."
-                }
+                {t("Relayers are services that cast votes and claim rewards for users who enabled auto-voting. Anyone can run one — apps, community members, developers. You earn a share of rewards for the work you do.")}
               </Text>
             </VStack>
 
@@ -293,11 +283,9 @@ export function SetupGuide() {
                 <LuZap />
               </Box>
               <VStack gap={1} align="start">
-                <Text fontWeight="semibold">{"What You Do"}</Text>
+                <Text fontWeight="semibold">{t("What You Do")}</Text>
                 <Text textStyle="sm" color="text.subtle">
-                  {
-                    "You run a relayer node that watches the blockchain. When a new round starts, it sees who has auto-voting enabled, submits their votes, and claims their rewards in batches."
-                  }
+                  {t("You run a relayer node that watches the blockchain. When a new round starts, it sees who has auto-voting enabled, submits their votes, and claims their rewards in batches.")}
                 </Text>
               </VStack>
             </HStack>
@@ -307,11 +295,9 @@ export function SetupGuide() {
                 <LuCoins />
               </Box>
               <VStack gap={1} align="start">
-                <Text fontWeight="semibold">{"How You Earn"}</Text>
+                <Text fontWeight="semibold">{t("How You Earn")}</Text>
                 <Text textStyle="sm" color="text.subtle">
-                  {
-                    "Each user you serve pays 10% of their weekly rewards (max 100 B3TR) into a shared pool. At the end of the week, the pool is split among relayers based on work done."
-                  }
+                  {t("Each user you serve pays 10% of their weekly rewards (max 100 B3TR) into a shared pool. At the end of the week, the pool is split among relayers based on work done.")}
                 </Text>
               </VStack>
             </HStack>
@@ -321,11 +307,9 @@ export function SetupGuide() {
                 <LuServer />
               </Box>
               <VStack gap={1} align="start">
-                <Text fontWeight="semibold">{"What You Need"}</Text>
+                <Text fontWeight="semibold">{t("What You Need")}</Text>
                 <Text textStyle="sm" color="text.subtle">
-                  {
-                    "A wallet with some VTHO for gas, the relayer node software, and a connection to a VeChain Thor node."
-                  }
+                  {t("A wallet with some VTHO for gas, the relayer node software, and a connection to a VeChain Thor node.")}
                 </Text>
               </VStack>
             </HStack>
@@ -335,11 +319,9 @@ export function SetupGuide() {
                 <LuScale />
               </Box>
               <VStack gap={1} align="start">
-                <Text fontWeight="semibold">{"The Rules"}</Text>
+                <Text fontWeight="semibold">{t("The Rules")}</Text>
                 <Text textStyle="sm" color="text.subtle">
-                  {
-                    "Every user must be served. If even one gets missed, nobody gets paid — the whole pool stays locked."
-                  }
+                  {t("Every user must be served. If even one gets missed, nobody gets paid — the whole pool stays locked.")}
                 </Text>
               </VStack>
             </HStack>
@@ -359,7 +341,7 @@ export function SetupGuide() {
               rel="noopener noreferrer"
             >
               <Button variant="outline" size="sm" rounded="full" w="full">
-                {"Full Documentation"}
+                {t("Full Documentation")}
                 <LuExternalLink />
               </Button>
             </Link>

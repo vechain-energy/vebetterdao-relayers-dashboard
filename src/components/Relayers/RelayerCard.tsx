@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { useGetAvatarOfAddress, useVechainDomain } from "@vechain/vechain-kit";
 import NextLink from "next/link";
+import { useTranslation } from "react-i18next";
 import { FaAngleRight } from "react-icons/fa6";
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
@@ -74,7 +75,8 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
 
   const { data: avatarSrc } = useGetAvatarOfAddress(summary.address);
 
-  const displayName = domain?.domain || "Unknown";
+  const { t } = useTranslation();
+  const displayName = domain?.domain || t("Unknown");
   const shortAddress = `${summary.address.slice(0, 6)}...${summary.address.slice(-4)}`;
   const href = `/relayer?address=${domain?.domain || summary.address}`;
 
@@ -104,7 +106,7 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
           variant="solid"
           colorPalette={active ? "green" : "gray"}
         >
-          {active ? "Active" : "Inactive"}
+          {active ? t("Active") : t("Inactive")}
         </Badge>
       </HStack>
       <Text textStyle="xxs" color="text.subtle" lineClamp={1}>
@@ -116,17 +118,17 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
   const stats = (
     <>
       <StatPill
-        label="Total spent"
+        label={t("Total spent")}
         value={formatToken(summary.totalVthoSpentRaw)}
         unit="VTHO"
       />
       <StatPill
-        label="Total earned"
+        label={t("Total earned")}
         value={formatToken(summary.totalB3trEarnedRaw)}
         unit="B3TR"
       />
       <StatPill
-        label="ROI"
+        label={t("ROI")}
         value={roi != null ? `${formatNumber(Math.round(roi))}%` : "-"}
         valueColor={roi != null ? "status.positive.primary" : undefined}
       />
@@ -147,7 +149,7 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
                 </HStack>
                 {stats}
               </SimpleGrid>
-              <IconButton aria-label="View relayer" variant="ghost" size="sm">
+              <IconButton aria-label={t("View relayer")} variant="ghost" size="sm">
                 <FaAngleRight />
               </IconButton>
             </HStack>
@@ -161,7 +163,7 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
                   {avatarSection}
                   {identitySection}
                 </HStack>
-                <IconButton aria-label="View relayer" variant="ghost" size="sm">
+                <IconButton aria-label={t("View relayer")} variant="ghost" size="sm">
                   <FaAngleRight />
                 </IconButton>
               </HStack>

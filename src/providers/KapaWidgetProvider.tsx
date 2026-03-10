@@ -1,21 +1,28 @@
-"use client"
+"use client";
 
-import { Button, Icon } from "@chakra-ui/react"
-import Script from "next/script"
-import { useCallback } from "react"
+import { Button, Icon } from "@chakra-ui/react";
+import Script from "next/script";
+import { useCallback } from "react";
 
-import { useColorMode } from "@/components/ui/color-mode"
+import { useColorMode } from "@/components/ui/color-mode";
+import { useTranslation } from "react-i18next";
 
 declare global {
   interface Window {
-    Kapa?: { open: () => void }
+    Kapa?: { open: () => void };
   }
 }
 
 function RobotIcon() {
   return (
     <Icon asChild boxSize="18px">
-      <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+      >
         <path
           d="M6.08679 7.99999C6.43895 8.00001 6.72446 8.29848 6.72446 8.66666V10C6.72437 10.3681 6.4389 10.6666 6.08679 10.6667C5.73477 10.6665 5.44921 10.368 5.44912 10V8.66666C5.44913 8.29854 5.73472 8.00011 6.08679 7.99999Z"
           fillRule="evenodd"
@@ -33,16 +40,17 @@ function RobotIcon() {
         />
       </svg>
     </Icon>
-  )
+  );
 }
 
 export function KapaWidgetProvider() {
-  const { colorMode } = useColorMode()
-  const isDarkMode = colorMode === "dark"
+  const { colorMode } = useColorMode();
+  const { i18n, t } = useTranslation();
+  const isDarkMode = colorMode === "dark";
 
   const handleOpen = useCallback(() => {
-    window.Kapa?.open()
-  }, [])
+    window.Kapa?.open();
+  }, []);
 
   return (
     <>
@@ -58,6 +66,7 @@ export function KapaWidgetProvider() {
         data-modal-ask-ai-input-placeholder="Ask about relayers, auto-voting, rewards..."
         data-modal-example-questions="How does auto-voting work?,What are relayer rewards?,How do I register as a relayer?"
         strategy="afterInteractive"
+        lang={i18n.language?.split("-")[0] ?? "en"}
       />
       <Button
         onClick={handleOpen}
@@ -73,10 +82,11 @@ export function KapaWidgetProvider() {
         fontWeight="semibold"
         boxShadow="0 2px 12px rgba(61, 186, 103, 0.25)"
         _hover={{ bg: "#3DBA67", color: "white" }}
-        transition="all 0.2s ease">
+        transition="all 0.2s ease"
+      >
         <RobotIcon />
-        {"Ask me"}
+        {t("Ask me")}
       </Button>
     </>
-  )
+  );
 }

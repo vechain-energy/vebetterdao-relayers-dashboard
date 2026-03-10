@@ -2,6 +2,7 @@
 
 import { Box, Button, HStack, Text, VStack } from "@chakra-ui/react"
 import { useSendTransaction, useWallet } from "@vechain/vechain-kit"
+import { useTranslation } from "react-i18next"
 import { LuCoins, LuSparkles } from "react-icons/lu"
 import { encodeFunctionData } from "viem"
 
@@ -31,6 +32,7 @@ export function UnclaimedRewardsBanner({
   relayerAddress,
   onClaimed,
 }: Props) {
+  const { t } = useTranslation()
   const { account } = useWallet()
 
   const { sendTransaction, isTransactionPending, resetStatus } =
@@ -93,13 +95,15 @@ export function UnclaimedRewardsBanner({
               fontWeight="bold"
               color={{ base: "yellow.800", _dark: "yellow.200" }}
             >
-              {`${formatToken(totalAmountRaw)} B3TR unclaimed rewards`}
+              {t("{{amount}} B3TR unclaimed rewards", {
+                amount: formatToken(totalAmountRaw),
+              })}
             </Text>
             <Text
               textStyle="xs"
               color={{ base: "yellow.700/80", _dark: "yellow.400/70" }}
             >
-              {`From rounds ${formatRoundIds(rounds)}`}
+              {t("From rounds")} {formatRoundIds(rounds)}
             </Text>
           </VStack>
         </HStack>
@@ -107,7 +111,7 @@ export function UnclaimedRewardsBanner({
         <Button
           onClick={handleClaim}
           loading={isTransactionPending}
-          loadingText="Claiming..."
+          loadingText={t("Claiming...")}
           variant="solid"
           size="sm"
           rounded="full"
@@ -118,8 +122,8 @@ export function UnclaimedRewardsBanner({
         >
           <LuCoins />
           {rounds.length === 1
-            ? "Claim Reward"
-            : `Claim All (${rounds.length})`}
+            ? t("Claim Reward")
+            : t("Claim All ({{count}})", { count: rounds.length })}
         </Button>
       </HStack>
     </Box>

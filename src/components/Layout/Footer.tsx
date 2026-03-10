@@ -13,8 +13,6 @@ import {
   Image,
   Heading,
 } from "@chakra-ui/react";
-import { useQuery } from "@tanstack/react-query";
-import { useThor } from "@vechain/vechain-kit";
 import NextLink from "next/link";
 import { useTranslation } from "react-i18next";
 
@@ -24,12 +22,18 @@ import { LanguageSelector } from "./components/LanguageSelector";
 
 const RESOURCES = [
   { labelKey: "Network Status", href: "https://vechainstats.com" },
-  { labelKey: "API Documentation", href: "https://docs.vechain.org" },
+  {
+    labelKey: "API Documentation",
+    href: "https://docs.vebetterdao.org/automation-and-relayers/automation",
+  },
   { labelKey: "Governance App", href: "https://governance.vebetterdao.org" },
 ];
 
 const GITHUB_REPOS = [
-  { labelKey: "Skills", href: "https://github.com/vechain/vebetterdao-skills" },
+  {
+    labelKey: "AI Skills",
+    href: "https://github.com/vechain/vechain-ai-skills",
+  },
   {
     labelKey: "Relayer Node",
     href: "https://github.com/vechain/vebetterdao-relayer-node",
@@ -47,46 +51,6 @@ const NAVIGATION = [
   { labelKey: "Become a Relayer", href: "/new-relayer" },
   { labelKey: "Learn", href: "/learn" },
 ];
-
-function SyncingBlock() {
-  const { t } = useTranslation();
-  const thor = useThor();
-
-  const { data: blockNumber } = useQuery({
-    queryKey: ["footerBestBlock"],
-    queryFn: () => thor.blocks.getBestBlockCompressed(),
-    enabled: !!thor,
-    refetchInterval: 10_000,
-    select: (b) => b?.number,
-  });
-
-  return (
-    <HStack
-      border="sm"
-      borderColor="border.primary"
-      borderRadius="md"
-      px={3}
-      py={2}
-      justify="space-between"
-      gap={4}
-    >
-      <VStack gap={0} align="start">
-        <Text
-          textStyle="xs"
-          color="text.subtle"
-          fontWeight="semibold"
-          textTransform="uppercase"
-        >
-          {t("Syncing Block")}
-        </Text>
-        <Text textStyle="sm" fontWeight="semibold">
-          {blockNumber != null ? `#${blockNumber.toLocaleString()}` : "–"}
-        </Text>
-      </VStack>
-      <Box w={2} h={2} borderRadius="full" bg="status.positive.primary" />
-    </HStack>
-  );
-}
 
 function NavigationLinks() {
   const { t } = useTranslation();

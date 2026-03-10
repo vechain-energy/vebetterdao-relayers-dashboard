@@ -10,6 +10,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import type { IconType } from "react-icons";
+import { useTranslation } from "react-i18next";
 import { LuActivity, LuFlame } from "react-icons/lu";
 
 import { useReportData } from "@/hooks/useReportData";
@@ -63,6 +64,7 @@ function StatItem({
 }
 
 export function RelayersOverviewCards() {
+  const { t } = useTranslation();
   const { data: report, isLoading: reportLoading } = useReportData();
 
   const overview = report ? computeRelayersOverview(report) : null;
@@ -70,7 +72,7 @@ export function RelayersOverviewCards() {
   return (
     <SimpleGrid w="full" columns={{ base: 1, md: 2 }} gap="4">
       <StatItem
-        label="Active relayers"
+        label={t("Active relayers")}
         value={
           reportLoading
             ? "..."
@@ -78,12 +80,12 @@ export function RelayersOverviewCards() {
               ? formatNumber(overview.activeRelayers)
               : "\u2014"
         }
-        sublabel="in last 3 rounds"
+        sublabel={t("in last 3 rounds")}
         icon={LuActivity}
         isLoading={reportLoading}
       />
       <StatItem
-        label="VTHO spent"
+        label={t("VTHO spent")}
         value={
           reportLoading
             ? "..."
@@ -91,7 +93,7 @@ export function RelayersOverviewCards() {
               ? `${formatToken(overview.totalVthoSpentRaw)} VTHO`
               : "\u2014"
         }
-        sublabel="for gas costs"
+        sublabel={t("for gas costs")}
         icon={LuFlame}
         isLoading={reportLoading}
       />

@@ -10,6 +10,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useTranslation } from "react-i18next";
 import { LuLayoutGrid, LuUsers } from "react-icons/lu";
 
 import { BaseModal } from "../Base/BaseModal";
@@ -23,11 +24,12 @@ export function AppsAsRelayersModal({
   isOpen,
   onClose,
 }: AppsAsRelayersModalProps) {
+  const { t } = useTranslation();
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} showCloseButton isCloseable>
       <VStack gap={5} align="stretch">
         <Heading size="lg" fontWeight="bold">
-          {"Autovoting as a Service"}
+          {t("Autovoting as a Service")}
         </Heading>
 
         <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
@@ -37,17 +39,15 @@ export function AppsAsRelayersModal({
                 <LuUsers />
               </Box>
               <Text fontWeight="semibold">
-                {"For Community Navigators \uD83C\uDF1F"}
+                {t("For Community Navigators \uD83C\uDF1F")}
               </Text>
               <Text textStyle="sm" color="text.subtle">
-                {
-                  "This is your chance to make an impact! \uD83D\uDE80 As a respected community member, run a relayer node to help decentralize the voting process and earn B3TR rewards for every vote you handle. Be the backbone of VeBetterDAO \uD83D\uDCAA"
-                }
+                {t("This is your chance to make an impact! \uD83D\uDE80 As a respected community member, run a relayer node to help decentralize the voting process and earn B3TR rewards for every vote you handle. Be the backbone of VeBetterDAO \uD83D\uDCAA")}
               </Text>
 
               <NextLink href="/new-relayer" onClick={onClose}>
                 <Button variant="primary" size="sm" rounded="full">
-                  {"Register as a Relayer"}
+                  {t("Register as a Relayer")}
                 </Button>
               </NextLink>
             </VStack>
@@ -58,15 +58,13 @@ export function AppsAsRelayersModal({
               <Box as="span" color="blue.solid" fontSize="24px" lineHeight="1">
                 <LuLayoutGrid />
               </Box>
-              <Text fontWeight="semibold">{"For X2Earn Apps"}</Text>
+              <Text fontWeight="semibold">{t("For X2Earn Apps")}</Text>
               <Text textStyle="sm" color="text.subtle">
-                {
-                  "As an app on VeBetterDAO, running your own relayer is a powerful economic opportunity. Your users set you as a preference, you execute their votes (directed to your app), and you earn relayer fees \u2014 all without anyone transferring funds or giving up custody of their tokens."
-                }
+                {t("As an app on VeBetterDAO, running your own relayer is a powerful economic opportunity. Your users set you as a preference, you execute their votes (directed to your app), and you earn relayer fees — all without anyone transferring funds or giving up custody of their tokens.")}
               </Text>
 
               <Button variant="solid" size="sm" rounded="full" disabled>
-                {"SDK Coming Soon"}
+                {t("SDK Coming Soon")}
               </Button>
             </VStack>
           </Card.Root>

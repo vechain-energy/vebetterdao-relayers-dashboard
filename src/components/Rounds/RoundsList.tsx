@@ -2,6 +2,7 @@
 
 import { Button, Heading, Skeleton, Stack, VStack } from "@chakra-ui/react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { LuChevronsDown } from "react-icons/lu";
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
@@ -13,6 +14,7 @@ import { RoundCard } from "./RoundCard";
 const PAGE_SIZE = 3;
 
 export function RoundsList() {
+  const { t } = useTranslation();
   const { data: report, isLoading, error } = useReportData();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const b3trToVtho = useB3trToVthoRate();
@@ -37,7 +39,7 @@ export function RoundsList() {
 
   return (
     <VStack gap="4" align="stretch">
-      <Heading size="lg">{"Voting rounds"}</Heading>
+      <Heading size="lg">{t("Voting rounds")}</Heading>
       <Stack gap="3">
         {visible.map((round) => {
           const rewardsRaw = round.isRoundEnded
@@ -69,7 +71,7 @@ export function RoundsList() {
           onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}
         >
           <LuChevronsDown size={12} />
-          {"Load more rounds"}
+          {t("Load more rounds")}
           <LuChevronsDown size={12} />
         </Button>
       )}

@@ -9,6 +9,7 @@ import {
   Box,
   Link,
 } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 import { FaXTwitter, FaTelegram, FaLink } from "react-icons/fa6"
 import { LuPartyPopper } from "react-icons/lu"
 
@@ -110,11 +111,12 @@ function ConfettiCanvas({ active }: { active: boolean }) {
 }
 
 export function ShareRelayerModal({ isOpen, onClose, relayerAddress }: Props) {
+  const { t } = useTranslation()
   const dashboardUrl = typeof window !== "undefined"
     ? `${window.location.origin}/relayer?address=${relayerAddress ?? ""}`
     : ""
 
-  const shareText = "I just became a relayer on @VeBetterDAO! Choose me as your relayer and let's earn together."
+  const shareText = t("I just became a relayer on @VeBetterDAO! Choose me as your relayer and let's earn together.")
 
   const handleCopyLink = useCallback(() => {
     navigator.clipboard.writeText(dashboardUrl)
@@ -134,10 +136,10 @@ export function ShareRelayerModal({ isOpen, onClose, relayerAddress }: Props) {
 
         <VStack gap={2} zIndex={2}>
           <Text textStyle="lg" fontWeight="bold" textAlign="center">
-            {"You're All Set!"}
+            {t("You're All Set!")}
           </Text>
           <Text textStyle="sm" color="text.subtle" textAlign="center">
-            {"Share your relayer profile so users can choose you as their preferred relayer."}
+            {t("Share your relayer profile so users can choose you as their preferred relayer.")}
           </Text>
         </VStack>
 
@@ -151,7 +153,7 @@ export function ShareRelayerModal({ isOpen, onClose, relayerAddress }: Props) {
           >
             <Button variant="outline" rounded="full" w="full" gap={2}>
               <FaXTwitter />
-              {"Share on X"}
+              {t("Share on X")}
             </Button>
           </Link>
 
@@ -164,7 +166,7 @@ export function ShareRelayerModal({ isOpen, onClose, relayerAddress }: Props) {
           >
             <Button variant="outline" rounded="full" w="full" gap={2}>
               <FaTelegram />
-              {"Share on Telegram"}
+              {t("Share on Telegram")}
             </Button>
           </Link>
 
@@ -176,13 +178,13 @@ export function ShareRelayerModal({ isOpen, onClose, relayerAddress }: Props) {
             onClick={handleCopyLink}
           >
             <FaLink />
-            {"Copy Link"}
+            {t("Copy Link")}
           </Button>
         </VStack>
 
         <HStack zIndex={2}>
           <Button variant="ghost" size="sm" onClick={onClose}>
-            {"Maybe later"}
+            {t("Maybe later")}
           </Button>
         </HStack>
       </VStack>

@@ -14,6 +14,7 @@ import {
   useSendTransaction,
   useVechainDomain,
 } from "@vechain/vechain-kit"
+import { useTranslation } from "react-i18next"
 import { encodeFunctionData } from "viem"
 import { LuCircleCheck, LuCircleAlert, LuLoaderCircle } from "react-icons/lu"
 
@@ -27,6 +28,7 @@ type Props = {
 }
 
 export function RegisterRelayerModal({ isOpen, onClose, onSuccess }: Props) {
+  const { t } = useTranslation()
   const { account } = useWallet()
   const [relayerAddress, setRelayerAddress] = useState("")
   const [isCustomAddress, setIsCustomAddress] = useState(false)
@@ -111,14 +113,14 @@ export function RegisterRelayerModal({ isOpen, onClose, onSuccess }: Props) {
           </Box>
           <VStack gap={2}>
             <Text textStyle="lg" fontWeight="bold" textAlign="center">
-              {"Registration Successful"}
+              {t("Registration Successful")}
             </Text>
             <Text textStyle="sm" color="text.subtle" textAlign="center">
-              {"You are now a registered relayer. Time to run your node!"}
+              {t("You are now a registered relayer. Time to run your node!")}
             </Text>
           </VStack>
           <Button onClick={onClose} variant="solid" rounded="full" w="full">
-            {"Continue"}
+            {t("Continue")}
           </Button>
         </VStack>
       </BaseModal>
@@ -130,17 +132,17 @@ export function RegisterRelayerModal({ isOpen, onClose, onSuccess }: Props) {
       <VStack gap={6} py={4} align="stretch">
         <VStack gap={2} align="start">
           <Text textStyle="lg" fontWeight="bold">
-            {"Register as Relayer"}
+            {t("Register as Relayer")}
           </Text>
           <Text textStyle="sm" color="text.subtle">
-            {"This will register the address below as a relayer on RelayerRewardsPool."}
+            {t("This will register the address below as a relayer on RelayerRewardsPool.")}
           </Text>
         </VStack>
 
         <VStack gap={2} align="stretch">
           <HStack justify="space-between">
             <Text textStyle="sm" fontWeight="medium">
-              {"Relayer Address"}
+              {t("Relayer Address")}
             </Text>
             {isCustomAddress && account?.address && (
               <Button
@@ -148,43 +150,43 @@ export function RegisterRelayerModal({ isOpen, onClose, onSuccess }: Props) {
                 size="xs"
                 onClick={handleResetToConnected}
               >
-                {"Use connected wallet"}
+                {t("Use connected wallet")}
               </Button>
             )}
           </HStack>
           <Input
             value={relayerAddress}
             onChange={e => handleAddressChange(e.target.value)}
-            placeholder="0x... or name.vet"
+            placeholder={t("0x... or name.vet")}
             fontFamily="mono"
             size="sm"
           />
           {!isCustomAddress && account?.address && (
             <Text textStyle="xs" color="text.subtle">
-              {"Your connected wallet address is pre-filled. You can change it or enter a .vet domain."}
+              {t("Your connected wallet address is pre-filled. You can change it or enter a .vet domain.")}
             </Text>
           )}
           {isDomainInput && domainLoading && (
             <HStack gap={1}>
               <LuLoaderCircle size={12} className="animate-spin" />
               <Text textStyle="xs" color="text.subtle">
-                {"Resolving domain..."}
+                {t("Resolving domain...")}
               </Text>
             </HStack>
           )}
           {isDomainInput && !domainLoading && domainData?.address && (
             <Text textStyle="xs" color="green.400" fontFamily="mono">
-              {`Resolved: ${domainData.address}`}
+              {t("Resolved: {{address}}", { address: domainData.address })}
             </Text>
           )}
           {isDomainInput && !domainLoading && !domainData?.address && relayerAddress.length > 2 && (
             <Text textStyle="xs" color="red.400">
-              {"Could not resolve this domain."}
+              {t("Could not resolve this domain.")}
             </Text>
           )}
           {isCustomAddress && !isDomainInput && !isRawAddress && relayerAddress.length > 0 && (
             <Text textStyle="xs" color="red.400">
-              {"Enter a valid address (0x...) or a .vet domain."}
+              {t("Enter a valid address (0x...) or a .vet domain.")}
             </Text>
           )}
         </VStack>
@@ -193,7 +195,7 @@ export function RegisterRelayerModal({ isOpen, onClose, onSuccess }: Props) {
           <HStack gap={2} color="red.400">
             <LuCircleAlert />
             <Text textStyle="sm">
-              {error.reason ?? "Transaction failed. Please try again."}
+              {error.reason ?? t("Transaction failed. Please try again.")}
             </Text>
           </HStack>
         )}
@@ -205,9 +207,9 @@ export function RegisterRelayerModal({ isOpen, onClose, onSuccess }: Props) {
           rounded="full"
           w="full"
           loading={isTransactionPending}
-          loadingText="Registering..."
+          loadingText={t("Registering...")}
         >
-          {"Register"}
+          {t("Register")}
         </Button>
       </VStack>
     </BaseModal>

@@ -10,6 +10,7 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { LuArrowRight } from "react-icons/lu";
 
 import { useReportData } from "@/hooks/useReportData";
@@ -24,6 +25,7 @@ import { RelayerCard } from "./RelayerCard";
 const TOP_COUNT = 3;
 
 export function TopRelayers() {
+  const { t } = useTranslation();
   const { data: report, isLoading, error } = useReportData();
 
   const topSummaries = useMemo(() => {
@@ -53,10 +55,10 @@ export function TopRelayers() {
   return (
     <VStack gap="4" align="stretch">
       <HStack justify="space-between" align="center">
-        <Heading size="lg">{"Top Relayers"}</Heading>
+        <Heading size="lg">{t("Top Relayers")}</Heading>
         <NextLink href="/relayers">
           <Button variant="ghost" size="sm">
-            {"View all"}
+            {t("View all")}
             <LuArrowRight />
           </Button>
         </NextLink>

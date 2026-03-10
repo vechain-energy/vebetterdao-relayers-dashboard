@@ -2,9 +2,11 @@
 
 import { Box, Heading, HStack, Text, VStack } from "@chakra-ui/react"
 import NextLink from "next/link"
+import { useTranslation } from "react-i18next"
 import { LuChevronRight, LuCircleHelp } from "react-icons/lu"
 
 export function FeelLostBanner() {
+  const { t } = useTranslation()
   return (
     <NextLink href="/learn">
       <Box
@@ -21,10 +23,10 @@ export function FeelLostBanner() {
             </Box>
             <VStack align="start" gap={1}>
               <Heading size="md" fontWeight="bold">
-                {"Feel lost?"}
+                {t("Feel lost?")}
               </Heading>
               <Text textStyle="sm" color="text.subtle">
-                {"Learn how auto-voting, relayers, and rewards work on VeBetterDAO."}
+                {t("Learn how auto-voting, relayers, and rewards work on VeBetterDAO.")}
               </Text>
             </VStack>
           </HStack>

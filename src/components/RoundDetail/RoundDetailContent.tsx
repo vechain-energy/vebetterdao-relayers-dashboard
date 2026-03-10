@@ -18,6 +18,7 @@ import {
   useGetTokenUsdPrice,
 } from "@vechain/vechain-kit";
 import { type ReactNode, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { LuInfo, LuWallet, LuUsers } from "react-icons/lu";
 import { formatEther } from "viem";
 
@@ -241,6 +242,7 @@ export function RoundDetailContent({
   prevRound,
   generatedAt,
 }: RoundDetailContentProps) {
+  const { t } = useTranslation();
   const b3trToVtho = useB3trToVthoRate();
   const { data: totalVoters } = useTotalVoters(round.roundId);
   const { data: b3trUsd } = useGetTokenUsdPrice("B3TR");
@@ -270,7 +272,7 @@ export function RoundDetailContent({
     ? round.totalRelayerRewardsRaw
     : round.estimatedRelayerRewardsRaw;
   const roi = computeROI(roiRewardsRaw, round.vthoSpentTotalRaw, b3trToVtho);
-  const roiLabel = round.isRoundEnded ? "ROI" : "Expected ROI";
+  const roiLabel = round.isRoundEnded ? t("ROI") : t("Expected ROI");
 
   const status = parseRoundStatus(round);
   const [isStatusModalOpen, setStatusModalOpen] = useState(false);
@@ -287,11 +289,11 @@ export function RoundDetailContent({
           <Card.Root variant="primary">
             <Card.Body>
               <VStack gap="4" align="stretch">
-                <SectionHeader title="Round Summary" />
+                <SectionHeader title={t("Round Summary")} />
                 <VStack gap="2" align="stretch">
                   <HStack justify="space-between" w="full">
                     <Text textStyle="sm" color="text.subtle">
-                      {"Current Status"}
+                      {t("Current Status")}
                     </Text>
                     <HStack
                       gap="1"
@@ -304,26 +306,26 @@ export function RoundDetailContent({
                         variant="solid"
                         colorPalette={status.colorPalette}
                       >
-                        {status.label}
+                        {t(status.label)}
                       </Badge>
                       <Box as="span" color="text.subtle" fontSize="14px">
                         <LuInfo />
                       </Box>
                     </HStack>
                   </HStack>
-                  <SummaryRow label="Phase" value={phaseLabel} />
+                  <SummaryRow label={t("Phase")} value={t(phaseLabel)} />
                   <SummaryRow
-                    label="Total Voters"
+                    label={t("Total Voters")}
                     value={
                       totalVoters != null ? formatNumber(totalVoters) : "\u2014"
                     }
                   />
                   <SummaryRow
-                    label="Users to Serve"
+                    label={t("Users to Serve")}
                     value={formatNumber(round.autoVotingUsersCount)}
                   />
                   <SummaryRow
-                    label="Active Relayers"
+                    label={t("Active Relayers")}
                     value={round.numRelayers}
                   />
                 </VStack>
@@ -332,8 +334,8 @@ export function RoundDetailContent({
                   <HStack justify="space-between" w="full">
                     <Text textStyle="sm" fontWeight="semibold">
                       {round.isRoundEnded
-                        ? "Completion Progress"
-                        : "Voting Progress"}
+                        ? t("Completion Progress")
+                        : t("Voting Progress")}
                     </Text>
                     <Text
                       textStyle="sm"
@@ -360,8 +362,7 @@ export function RoundDetailContent({
                       color="text.subtle"
                       letterSpacing="wider"
                     >
-                      {"Updated "}
-                      {timeAgo(generatedAt)}
+                      {t("Updated")} {timeAgo(generatedAt)}
                     </Text>
                   )}
                 </VStack>
@@ -371,13 +372,13 @@ export function RoundDetailContent({
 
           <SimpleGrid columns={2} gap="4">
             <MiniStatCard
-              label="Voted for"
+              label={t("Voted for")}
               value={formatNumber(round.votedForCount)}
               secondaryValue={formatNumber(round.autoVotingUsersCount - round.reducedUsersCount)}
-              sublabel="users"
+              sublabel={t("users")}
             />
             <MiniStatCard
-              label="Claimed for"
+              label={t("Claimed for")}
               value={
                 prevRound
                   ? formatNumber(prevRound.rewardsClaimedCount)
@@ -388,7 +389,7 @@ export function RoundDetailContent({
                   ? formatNumber(prevRound.autoVotingUsersCount - prevRound.reducedUsersCount)
                   : undefined
               }
-              sublabel={prevRound ? "users" : undefined}
+              sublabel={prevRound ? t("users") : undefined}
             />
           </SimpleGrid>
         </VStack>
@@ -399,13 +400,13 @@ export function RoundDetailContent({
             <Card.Body>
               <VStack gap="3" align="stretch">
                 <SectionHeader
-                  title="Financials & Performance"
+                  title={t("Financials & Performance")}
                   icon={<LuWallet />}
                 />
                 <SimpleGrid columns={{ base: 1, md: 2 }} gap="2">
                   <Box order={{ base: 1, md: 0 }}>
                     <FinancialCell
-                      label="VTHO (Voting)"
+                      label={t("VTHO (Voting)")}
                       value={formatToken(round.vthoSpentOnVotingRaw)}
                       unit="VTHO"
                       usdValue={rawToFiat(
@@ -420,8 +421,8 @@ export function RoundDetailContent({
                     <FinancialCell
                       label={
                         round.isRoundEnded
-                          ? "Accrued Rewards"
-                          : "Projected Rewards"
+                          ? t("Accrued Rewards")
+                          : t("Projected Rewards")
                       }
                       value={formatToken(
                         round.isRoundEnded
@@ -441,7 +442,7 @@ export function RoundDetailContent({
                   </Box>
                   <Box order={{ base: 2, md: 0 }}>
                     <FinancialCell
-                      label="VTHO (Claiming)"
+                      label={t("VTHO (Claiming)")}
                       value={formatToken(round.vthoSpentOnClaimingRaw)}
                       unit="VTHO"
                       usdValue={rawToFiat(
@@ -458,7 +459,7 @@ export function RoundDetailContent({
                   />
                   <Box order={{ base: 3, md: 0 }}>
                     <FinancialCell
-                      label="Total VTHO Spent"
+                      label={t("Total VTHO Spent")}
                       value={formatToken(round.vthoSpentTotalRaw)}
                       unit="VTHO"
                       usdValue={rawToFiat(

@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   LuChevronDown,
   LuCoins,
@@ -116,14 +117,23 @@ function ActivityIcon({ type }: { type: ActivityItem["type"] }) {
   );
 }
 
-function activityLabel(item: ActivityItem): string {
+function activityLabel(
+  item: ActivityItem,
+  t: (key: string, opts?: { count?: string; amount?: string }) => string,
+): string {
   switch (item.type) {
     case "vote":
-      return `Voted for ${formatNumber(item.count)} users`;
+      return t("Voted for {{count}} users", {
+        count: formatNumber(item.count),
+      });
     case "claim":
-      return `Claimed rewards for ${formatNumber(item.count)} users`;
+      return t("Claimed rewards for {{count}} users", {
+        count: formatNumber(item.count),
+      });
     case "reward":
-      return `Claimed ${formatToken(item.amountRaw)} B3TR from pool`;
+      return t("Claimed {{amount}} B3TR from pool", {
+        amount: formatToken(item.amountRaw),
+      });
   }
 }
 
@@ -136,9 +146,11 @@ function activityDetail(item: ActivityItem): string | null {
 function ActivityRow({
   item,
   isCurrentRound,
+  t,
 }: {
   item: ActivityItem;
   isCurrentRound: boolean;
+  t: (key: string, opts?: { count?: string; amount?: string }) => string;
 }) {
   const detail = activityDetail(item);
   return (
@@ -147,17 +159,17 @@ function ActivityRow({
       <VStack gap="0" align="start" flex="1" minW="0">
         <HStack gap="1.5">
           <Text textStyle="sm" fontWeight="semibold" lineClamp={1}>
-            {activityLabel(item)}
+            {activityLabel(item, t)}
           </Text>
           {isCurrentRound && (
             <Badge size="sm" variant="solid" colorPalette="green">
-              {"Live"}
+              {t("Live")}
             </Badge>
           )}
         </HStack>
         <HStack gap="1" color="text.subtle">
           <Text textStyle="xxs">
-            {"Round #"}
+            {t("Round #")}
             {item.roundId}
           </Text>
           {detail && (
@@ -262,6 +274,7 @@ function RoundRow({
   b3trToVtho,
   isActive,
   totalWeighted,
+  t,
 }: {
   rd: RelayerAnalytics["rounds"][number];
   prevClaimedFor: number;
@@ -269,6 +282,7 @@ function RoundRow({
   b3trToVtho: number | undefined;
   isActive?: boolean;
   totalWeighted?: number;
+  t: (key: string) => string;
 }) {
   const vthoSpentRaw = (
     BigInt(rd.vthoSpentOnVotingRaw) + BigInt(rd.vthoSpentOnClaimingRaw)
@@ -291,24 +305,24 @@ function RoundRow({
     >
       <HStack gap="2">
         <Text textStyle="sm" fontWeight="bold">
-          {"Round #"}
+          {t("Round #")}
           {rd.roundId}
         </Text>
         {isActive && (
           <Badge size="sm" variant="solid" colorPalette="green">
-            {"Active"}
+            {t("Active")}
           </Badge>
         )}
       </HStack>
       <SimpleGrid columns={{ base: 2, sm: 6 }} gap="3">
-        <RoundStat label="Voted for" value={rd.votedForCount} unit="users" />
+        <RoundStat label={t("Voted for")} value={rd.votedForCount} unit={t("users")} />
         <RoundStat
-          label="Claimed for"
+          label={t("Claimed for")}
           value={prevClaimedFor}
-          unit="users"
+          unit={t("users")}
         />
         <RoundStat
-          label="Weight"
+          label={t("Weight")}
           value={
             weightPct != null
               ? `${formatNumber(parseFloat(weightPct.toFixed(2)))}%`
@@ -316,17 +330,17 @@ function RoundRow({
           }
         />
         <RoundStat
-          label={isActive ? "Projected B3TR rewards" : "B3TR earned"}
+          label={isActive ? t("Projected B3TR rewards") : t("B3TR earned")}
           value={formatToken(b3trRaw)}
           unit="B3TR"
         />
         <RoundStat
-          label="VTHO spent"
+          label={t("VTHO spent")}
           value={formatToken(vthoSpentRaw)}
           unit="VTHO"
         />
         <RoundStat
-          label={isActive ? "Projected ROI" : "ROI"}
+          label={isActive ? t("Projected ROI") : t("ROI")}
           value={roi != null ? `${formatNumber(Math.round(roi))}%` : "\u2014"}
         />
       </SimpleGrid>
@@ -351,6 +365,7 @@ export function RelayerDetailContent({
   currentRound,
   roundCtx,
 }: RelayerDetailContentProps) {
+  const { t } = useTranslation();
   const b3trToVtho = useB3trToVthoRate();
   const summary = computeRelayerSummary(relayer, roundCtx);
   const roi = computeRelayerROI(
@@ -384,18 +399,18 @@ export function RelayerDetailContent({
         <Card.Root variant="primary">
           <Card.Body>
             <VStack gap="4" align="stretch">
-              <SectionHeader title="Performance Overview" icon={<LuTarget />} />
+              <SectionHeader title={t("Performance Overview")} icon={<LuTarget />} />
               <SimpleGrid columns={2} gap="4">
                 <MetricCell
-                  label="Users voted for"
+                  label={t("Users voted for")}
                   value={formatNumber(summary.totalVotedFor)}
                 />
                 <MetricCell
-                  label="Rewards claimed"
+                  label={t("Rewards claimed")}
                   value={formatNumber(summary.totalRewardsClaimed)}
                 />
                 <MetricCell
-                  label="Rounds active"
+                  label={t("Rounds active")}
                   value={formatNumber(summary.activeRoundsCount)}
                 />
               </SimpleGrid>
@@ -406,20 +421,20 @@ export function RelayerDetailContent({
         <Card.Root variant="primary">
           <Card.Body>
             <VStack gap="4" align="stretch">
-              <SectionHeader title="Financials" icon={<LuCoins />} />
+              <SectionHeader title={t("Financials")} icon={<LuCoins />} />
               <SimpleGrid columns={2} gap="4">
                 <MetricCell
-                  label="B3TR earned"
+                  label={t("B3TR earned")}
                   value={formatToken(summary.totalB3trEarnedRaw)}
                   unit="B3TR"
                 />
                 <MetricCell
-                  label="VTHO spent"
+                  label={t("VTHO spent")}
                   value={formatToken(summary.totalVthoSpentRaw)}
                   unit="VTHO"
                 />
                 <MetricCell
-                  label="ROI"
+                  label={t("ROI")}
                   value={
                     roi != null ? `${formatNumber(Math.round(roi))}%` : "\u2014"
                   }
@@ -428,7 +443,7 @@ export function RelayerDetailContent({
                   }
                 />
                 <MetricCell
-                  label="Avg VTHO / user"
+                  label={t("Avg VTHO / user")}
                   value={
                     summary.totalVotedFor > 0
                       ? formatToken(
@@ -450,10 +465,10 @@ export function RelayerDetailContent({
       <Card.Root variant="primary">
         <Card.Body>
           <VStack gap="3" align="stretch">
-            <SectionHeader title="Round History" icon={<LuFlame />} />
+            <SectionHeader title={t("Round History")} icon={<LuFlame />} />
             {roundsDesc.length === 0 ? (
               <Text textStyle="sm" color="text.subtle">
-                {"No round data available."}
+                {t("No round data available.")}
               </Text>
             ) : (
               <VStack gap="1" align="stretch">
@@ -483,6 +498,7 @@ export function RelayerDetailContent({
                             ).toString()
                           : rd.claimableRewardsRaw
                       }
+                      t={t}
                     />
                   );
                 })}
@@ -496,7 +512,7 @@ export function RelayerDetailContent({
                     }
                   >
                     <LuChevronDown />
-                    {"Load more"}
+                    {t("Load more")}
                   </Button>
                 )}
               </VStack>

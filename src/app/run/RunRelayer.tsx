@@ -24,6 +24,7 @@ import {
   runClaimRewardCycle,
 } from "@vechain/vebetterdao-relayer-node/dist/relayer";
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { FaAndroid, FaApple } from "react-icons/fa";
 import {
   LuContainer,
@@ -80,6 +81,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export function RunRelayer() {
+  const { t } = useTranslation();
   const [mnemonic, setMnemonic] = useState("");
   const [running, setRunning] = useState(false);
   const [started, setStarted] = useState(false);
@@ -274,12 +276,12 @@ export function RunRelayer() {
     <VStack gap={6} align="stretch" w="full">
       <VStack align="start" gap={1}>
         <Heading size="lg">
-          {started ? "Node output" : "Run Relayer Node"}
+          {started ? t("Node output") : t("Run Relayer Node")}
         </Heading>
         <Text textStyle="sm" color="text.subtle">
           {started
-            ? "Live log from your relayer running in this browser. Stop or force exit above; close the tab to end the session."
-            : "Choose how to run your relayer node. All options use the same core logic."}
+            ? t("Live log from your relayer running in this browser. Stop or force exit above; close the tab to end the session.")
+            : t("Choose how to run your relayer node. All options use the same core logic.")}
         </Text>
       </VStack>
 
@@ -295,12 +297,10 @@ export function RunRelayer() {
                   </Box>
                   <VStack align="start" gap={0}>
                     <Text fontWeight="bold" textStyle="md">
-                      {"Run in Browser"}
+                      {t("Run in Browser")}
                     </Text>
                     <Text textStyle="sm" color="text.subtle">
-                      {
-                        "Paste your mnemonic and run directly here. No install needed."
-                      }
+                      {t("Paste your mnemonic and run directly here. No install needed.")}
                     </Text>
                   </VStack>
                 </HStack>
@@ -308,14 +308,14 @@ export function RunRelayer() {
                 <VStack align="start" gap={5}>
                   <Input
                     type="password"
-                    placeholder="Enter your mnemonic..."
+                    placeholder={t("Enter your mnemonic...")}
                     value={mnemonic}
                     onChange={(e) => setMnemonic(e.target.value)}
                     fontFamily="mono"
                     size="lg"
                   />
                   <Text textStyle="xs" color="text.subtle">
-                    {"Stays in memory only — cleared when you leave."}
+                    {t("Stays in memory only — cleared when you leave.")}
                   </Text>
                   <HStack>
                     <Button
@@ -325,7 +325,7 @@ export function RunRelayer() {
                       rounded="full"
                     >
                       <LuPlay />
-                      {"Start Relayer"}
+                      {t("Start Relayer")}
                     </Button>
                   </HStack>
                 </VStack>
@@ -342,10 +342,10 @@ export function RunRelayer() {
                     </Box>
                     <VStack align="start" gap={0}>
                       <Text fontWeight="bold" textStyle="md">
-                        {"Run with Docker"}
+                        {t("Run with Docker")}
                       </Text>
                       <Text textStyle="sm" color="text.subtle">
-                        {"Persistent, headless, auto-restarts."}
+                        {t("Persistent, headless, auto-restarts.")}
                       </Text>
                     </VStack>
                   </HStack>
@@ -377,10 +377,10 @@ export function RunRelayer() {
                     </Box>
                     <VStack align="start" gap={0}>
                       <Text fontWeight="bold" textStyle="md">
-                        {"Run with npm"}
+                        {t("Run with npm")}
                       </Text>
                       <Text textStyle="sm" color="text.subtle">
-                        {"One command, requires Node.js 20+."}
+                        {t("One command, requires Node.js 20+.")}
                       </Text>
                     </VStack>
                   </HStack>
@@ -422,14 +422,14 @@ export function RunRelayer() {
                   <VStack align="start" gap={0}>
                     <HStack gap={2}>
                       <Text fontWeight="bold" textStyle="md">
-                        {"Run on Phone"}
+                        {t("Run on Phone")}
                       </Text>
                       <Badge variant="subtle" size="sm">
-                        {"Coming soon"}
+                        {t("Coming soon")}
                       </Badge>
                     </HStack>
                     <Text textStyle="sm" color="text.subtle">
-                      {"Run your relayer from your mobile device."}
+                      {t("Run your relayer from your mobile device.")}
                     </Text>
                   </VStack>
                 </HStack>
@@ -474,10 +474,10 @@ export function RunRelayer() {
                 truncate
               >
                 {running && !stopRequested
-                  ? "Running"
+                  ? t("Running")
                   : stopRequested
-                    ? "Stopping"
-                    : "Stopped"}
+                    ? t("Stopping")
+                    : t("Stopped")}
                 {walletAddress &&
                   ` · ${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
               </Text>
@@ -502,7 +502,7 @@ export function RunRelayer() {
                     css={{ touchAction: "manipulation" }}
                   >
                     <LuCircleX />
-                    {"Force exit"}
+                    {t("Force exit")}
                   </Button>
                 ) : (
                   <Button
@@ -516,7 +516,7 @@ export function RunRelayer() {
                     css={{ touchAction: "manipulation" }}
                   >
                     <LuSquare />
-                    {"Stop"}
+                    {t("Stop")}
                   </Button>
                 )
               ) : (
@@ -529,7 +529,7 @@ export function RunRelayer() {
                   css={{ touchAction: "manipulation" }}
                 >
                   <LuPlay />
-                  {"Restart"}
+                  {t("Restart")}
                 </Button>
               )}
               <Button
@@ -539,11 +539,11 @@ export function RunRelayer() {
                 size="sm"
                 minH="44px"
                 minW="44px"
-                title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+                title={isFullscreen ? t("Exit fullscreen") : t("Fullscreen")}
                 css={{ touchAction: "manipulation" }}
               >
                 {isFullscreen ? <LuMinimize2 /> : <LuMaximize2 />}
-                {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+                {isFullscreen ? t("Exit fullscreen") : t("Fullscreen")}
               </Button>
             </HStack>
           </HStack>
@@ -573,7 +573,7 @@ export function RunRelayer() {
                 _hover={{ bg: "bg.tertiary" }}
               >
                 <LuMinimize2 />
-                {"Exit fullscreen"}
+                {t("Exit fullscreen")}
               </Button>
             )}
             <RelayerTerminal

@@ -13,6 +13,7 @@ import {
   VStack,
 } from "@chakra-ui/react"
 import { useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { formatEther } from "viem"
 
@@ -28,10 +29,10 @@ const PERIOD_ROUND_LIMITS: Record<Period, number | null> = {
   All: null,
 }
 
-const METRIC_CONFIG: Record<ChartMetric, { label: string; colorKey: string; unit: string }> = {
-  vthoSpent: { label: "VTHO Spent", colorKey: "blue.400", unit: "VTHO" },
-  rewards: { label: "B3TR Rewards", colorKey: "green.400", unit: "B3TR" },
-  users: { label: "Auto-voting Users", colorKey: "purple.400", unit: "" },
+const METRIC_CONFIG_KEYS: Record<ChartMetric, { labelKey: string; colorKey: string; unit: string }> = {
+  vthoSpent: { labelKey: "VTHO Spent", colorKey: "blue.400", unit: "VTHO" },
+  rewards: { labelKey: "B3TR Rewards", colorKey: "green.400", unit: "B3TR" },
+  users: { labelKey: "Auto-voting Users", colorKey: "purple.400", unit: "" },
 }
 
 const compact = new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 })
@@ -47,13 +48,14 @@ function CustomTooltip({
   label?: number
   metric: ChartMetric
 }) {
-  const unit = METRIC_CONFIG[metric].unit
+  const { t } = useTranslation()
+  const unit = METRIC_CONFIG_KEYS[metric].unit
   if (!active || !payload?.length) return null
 
   return (
     <Box bg="bg.primary" border="1px solid" borderColor="border.secondary" borderRadius="lg" p={3} boxShadow="lg">
       <Text textStyle="xs" fontWeight="semibold" mb={1}>
-        {"Round #"}
+        {t("Round #")}
         {label}
       </Text>
       <Text textStyle="xs" color="text.subtle">
@@ -65,13 +67,21 @@ function CustomTooltip({
 }
 
 export function RoundsChart() {
+  const { t } = useTranslation()
   const { data: report, isLoading } = useReportData()
   const [metric, setMetric] = useState<ChartMetric>("rewards")
   const [period, setPeriod] = useState<Period>("3M")
 
-  const allColorKeys = Object.values(METRIC_CONFIG).map(c => c.colorKey)
+  const allColorKeys = Object.values(METRIC_CONFIG_KEYS).map(c => c.colorKey)
   const tokenColors = useToken("colors", allColorKeys)
   const colorMap = Object.fromEntries(allColorKeys.map((key, i) => [key, tokenColors[i]]))
+  const METRIC_CONFIG: Record<ChartMetric, { label: string; colorKey: string; unit: string }> =
+    Object.fromEntries(
+      Object.entries(METRIC_CONFIG_KEYS).map(([k, v]) => [
+        k,
+        { label: t(v.labelKey), colorKey: v.colorKey, unit: v.unit },
+      ])
+    ) as Record<ChartMetric, { label: string; colorKey: string; unit: string }>
 
   const chartData = useMemo(() => {
     if (!report?.rounds) return []
@@ -98,7 +108,7 @@ export function RoundsChart() {
     return (
       <Center w="full" py={6}>
         <Text textStyle="sm" color="text.subtle">
-          {"No round data available yet"}
+          {t("No round data available yet")}
         </Text>
       </Center>
     )
@@ -166,7 +176,7 @@ export function RoundsChart() {
                   tickLine={false}
                 />
                 <Tooltip content={<CustomTooltip metric={metric} />} />
-                <Bar dataKey={metric} fill={colorMap[METRIC_CONFIG[metric].colorKey]} radius={[4, 4, 0, 0]} />
+                <Bar dataKey={metric} fill={colorMap[METRIC_CONFIG_KEYS[metric].colorKey]} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Box>

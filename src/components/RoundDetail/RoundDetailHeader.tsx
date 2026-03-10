@@ -3,6 +3,7 @@
 import { Badge, Button, Heading, HStack, IconButton, VStack } from "@chakra-ui/react"
 import NextLink from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useTranslation } from "react-i18next"
 import { LuArrowLeft, LuArrowRight } from "react-icons/lu"
 
 import type { RoundAnalytics } from "@/lib/types"
@@ -14,6 +15,7 @@ interface RoundDetailHeaderProps {
 }
 
 export function RoundDetailHeader({ round, firstRound, currentRound }: RoundDetailHeaderProps) {
+  const { t } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
   const roundIdParam = searchParams.get("roundId")
@@ -33,23 +35,23 @@ export function RoundDetailHeader({ round, firstRound, currentRound }: RoundDeta
       <NextLink href="/">
         <Button variant="ghost" size="sm">
           <LuArrowLeft />
-          {"Back to home"}
+          {t("Back to home")}
         </Button>
       </NextLink>
 
       <HStack justify="space-between" w="full">
         <HStack gap="3" align="center">
           <Heading size={{ base: "xl", md: "2xl" }}>
-            {"Round #"}
+            {t("Round #")}
             {roundId}
           </Heading>
           {round?.isRoundEnded ? (
             <Badge size="sm" variant="subtle" colorPalette="gray">
-              {"Concluded"}
+              {t("Concluded")}
             </Badge>
           ) : (
             <Badge size="sm" variant="solid" colorPalette="blue">
-              {"Active"}
+              {t("Active")}
             </Badge>
           )}
         </HStack>
@@ -59,7 +61,7 @@ export function RoundDetailHeader({ round, firstRound, currentRound }: RoundDeta
             size="lg"
             onClick={() => handleRoundNavigation(roundId - 1)}
             disabled={!canGoPrev}
-            aria-label="Previous round">
+            aria-label={t("Previous round")}>
             <LuArrowLeft />
           </IconButton>
           <IconButton
@@ -67,7 +69,7 @@ export function RoundDetailHeader({ round, firstRound, currentRound }: RoundDeta
             size="lg"
             disabled={!canGoNext}
             onClick={() => handleRoundNavigation(roundId + 1)}
-            aria-label="Next round">
+            aria-label={t("Next round")}>
             <LuArrowRight />
           </IconButton>
         </HStack>

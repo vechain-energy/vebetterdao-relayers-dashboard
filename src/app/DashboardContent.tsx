@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Heading, SimpleGrid, VStack } from "@chakra-ui/react";
+import { useTranslation } from "react-i18next";
 
 import { AiSkillBanner, FeelLostBanner } from "@/components/Banners";
 import { BecomeRelayerCard } from "@/components/RelayerInfo";
@@ -9,6 +10,7 @@ import { RoundsChart, RoundsList } from "@/components/Rounds";
 import { StatsCards } from "@/components/StatsCards";
 
 export default function DashboardContent() {
+  const { t } = useTranslation();
   return (
     <VStack w="full" gap={{ base: 10, md: 14 }} align="stretch">
       <SimpleGrid columns={{ base: 1, md: 1 }} gap="4">
@@ -16,7 +18,7 @@ export default function DashboardContent() {
       </SimpleGrid>
 
       <VStack w="full" gap={4} align="stretch">
-        <Heading size="lg">{"Overview"}</Heading>
+        <Heading size="lg">{t("Overview")}</Heading>
 
         <SimpleGrid w="full" columns={{ base: 1, md: 2, lg: 2 }} gap="4">
           <StatsCards />

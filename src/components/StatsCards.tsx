@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import type { IconType } from "react-icons";
 import { LuChartLine, LuCircleCheck, LuCoins, LuRadar } from "react-icons/lu";
+import { useTranslation } from "react-i18next";
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
 import { useRegisteredRelayers } from "@/hooks/useRegisteredRelayers";
@@ -68,10 +69,11 @@ export function StatsCards() {
     useRegisteredRelayers();
   const b3trToVtho = useB3trToVthoRate();
 
+  const { t } = useTranslation();
   if (error) {
     return (
       <Text color="status.negative.primary" textStyle="sm">
-        {"Failed to load report data."}
+        {t("Failed to load report data.")}
       </Text>
     );
   }
@@ -97,7 +99,7 @@ export function StatsCards() {
   return (
     <SimpleGrid w="full" columns={{ base: 2, md: 2, lg: 2 }} gap="4">
       <StatItem
-        label="Current round"
+        label={t("Current round")}
         value={
           isLoading
             ? "..."
@@ -109,21 +111,21 @@ export function StatsCards() {
           isLoading
             ? ""
             : currentRoundData
-              ? `#${currentRoundData.roundId} · ${roundPhase}`
-              : "no data"
+              ? `#${currentRoundData.roundId} · ${t(roundPhase)}`
+              : t("no data")
         }
         icon={LuCircleCheck}
         isLoading={isLoading}
       />
       <StatItem
-        label="Total relayers"
+        label={t("Total relayers")}
         value={relayersLoading ? "..." : String(relayerCount)}
-        sublabel="registered"
+        sublabel={t("registered")}
         icon={LuRadar}
         isLoading={relayersLoading}
       />
       <StatItem
-        label="B3TR distributed"
+        label={t("B3TR distributed")}
         value={
           isLoading
             ? "..."
@@ -131,12 +133,12 @@ export function StatsCards() {
               ? `${formatToken(overview.totalB3trDistributedRaw)} B3TR`
               : "\u2014"
         }
-        sublabel="to relayers"
+        sublabel={t("to relayers")}
         icon={LuCoins}
         isLoading={isLoading}
       />
       <StatItem
-        label="Average ROI"
+        label={t("Average ROI")}
         value={
           isLoading
             ? "..."
@@ -146,8 +148,10 @@ export function StatsCards() {
         }
         sublabel={
           b3trToVtho != null
-            ? `rate: 1 B3TR = ${formatNumber(Math.round(b3trToVtho))} VTHO`
-            : "rate: 1 B3TR = \u2026 VTHO"
+            ? t("rate: 1 B3TR = {{vtho}} VTHO", {
+                vtho: formatNumber(Math.round(b3trToVtho)),
+              })
+            : t("rate: 1 B3TR = … VTHO")
         }
         icon={LuChartLine}
         isLoading={isLoading}

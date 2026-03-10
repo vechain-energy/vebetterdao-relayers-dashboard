@@ -1,12 +1,14 @@
 "use client"
 
 import { Box, Heading, HStack, Link, Text, VStack } from "@chakra-ui/react"
+import { useTranslation } from "react-i18next"
 import { LuExternalLink } from "react-icons/lu"
 import { RiRobot3Line } from "react-icons/ri"
 
 const SKILL_URL = "https://github.com/vechain/vechain-ai-skills"
 
 export function AiSkillBanner() {
+  const { t } = useTranslation()
   return (
     <Link href={SKILL_URL} target="_blank" rel="noopener noreferrer" _hover={{ textDecoration: "none" }}>
       <Box
@@ -28,12 +30,10 @@ export function AiSkillBanner() {
             </Box>
             <VStack align="start" gap={1}>
               <Heading size="md" fontWeight="bold">
-                {"Build with the AI Skill"}
+                {t("Build with the AI Skill")}
               </Heading>
               <Text textStyle="sm" color="text.subtle">
-                {
-                  "Install our AI skill to give your coding assistant full context on the relayer system — contracts, APIs, architecture, and best practices."
-                }
+                {t("Install our AI skill text")}
               </Text>
             </VStack>
           </HStack>

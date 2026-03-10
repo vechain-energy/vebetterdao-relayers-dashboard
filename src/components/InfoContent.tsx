@@ -13,6 +13,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useTranslation } from "react-i18next";
 import {
   LuBookOpen,
   LuCode,
@@ -63,115 +64,94 @@ function BulletList({ items }: { items: string[] }) {
 }
 
 function VeBetterTab() {
+  const { t } = useTranslation();
   return (
     <VStack gap={5} align="stretch">
-      <Section title="What Is Auto-Voting?">
+      <Section title={t("What Is Auto-Voting?")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Every week, VeBetterDAO runs a voting round where you vote for your favorite sustainable apps. The more votes an app gets, the more B3TR rewards it earns \u2014 and you earn rewards too just for voting."
-          }
+          {t("Every week, VeBetterDAO runs a voting round where you vote for your favorite sustainable apps. The more votes an app gets, the more B3TR rewards it earns — and you earn rewards too just for voting.")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "The problem? You have to remember to vote every single week. Miss a week, miss your rewards."
-          }
+          {t("The problem? You have to remember to vote every single week. Miss a week, miss your rewards.")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Auto-voting fixes this. You pick your favorite apps once, flip a switch, and your votes get cast automatically every week. Your rewards get claimed automatically too. You never have to think about it again."
-          }
+          {t("Auto-voting fixes this. You pick your favorite apps once, flip a switch, and your votes get cast automatically every week. Your rewards get claimed automatically too. You never have to think about it again.")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="Who Actually Casts My Vote?">
+      <Section title={t("Who Actually Casts My Vote?")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Relayers. They\u2019re services (run by apps, community members, or anyone trusted) that watch the blockchain, see you\u2019ve opted in, and submit your vote + claim your rewards for you."
-          }
+          {t("Relayers. They're services (run by apps, community members, or anyone trusted) that watch the blockchain, see you've opted in, and submit your vote + claim your rewards for you.")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Think of them like a helpful neighbor who drops your ballot in the mailbox every week because you asked them to."
-          }
+          {t("Think of them like a helpful neighbor who drops your ballot in the mailbox every week because you asked them to.")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="Do I Pay For This?">
+      <Section title={t("Do I Pay For This?")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Sort of \u2014 but you never reach into your pocket. A small fee (10% of your weekly rewards, max 100 B3TR) is automatically taken from your earnings to pay the relayers. If you earn 500 B3TR, 50 goes to the relayer pool. You keep 450."
-          }
+          {t("Sort of — but you never reach into your pocket. A small fee (10% of your weekly rewards, max 100 B3TR) is automatically taken from your earnings to pay the relayers. If you earn 500 B3TR, 50 goes to the relayer pool. You keep 450.")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {"No gas costs. No transactions to sign. No tokens to send anywhere."}
+          {t("No gas costs. No transactions to sign. No tokens to send anywhere.")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="Is My Money Safe?">
+      <Section title={t("Is My Money Safe?")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Your tokens never leave your wallet. Unlike delegation-based approaches where you transfer your voting power to someone else, auto-voting keeps full custody with you. Relayers can only do two things: cast your vote with YOUR preferences, and send YOUR rewards to YOUR wallet. That\u2019s it."
-          }
+          {t("Your tokens never leave your wallet. Unlike delegation-based approaches where you transfer your voting power to someone else, auto-voting keeps full custody with you. Relayers can only do two things: cast your vote with YOUR preferences, and send YOUR rewards to YOUR wallet. That's it.")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="What Do I Need To Get Started?">
+      <Section title={t("What Do I Need To Get Started?")}>
         <BulletList
           items={[
-            "Hold at least 1 VOT3 token",
-            "Have completed 3 sustainable actions on any app",
-            "Not be flagged as a bot",
-            "Pick at least one app to vote for",
+            t("Hold at least 1 VOT3 token"),
+            t("Have completed 3 sustainable actions on any app"),
+            t("Not be flagged as a bot"),
+            t("Pick at least one app to vote for"),
           ]}
         />
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Go to the allocations page, choose your apps, toggle auto-voting on. It kicks in next week."
-          }
+          {t("Go to the allocations page, choose your apps, toggle auto-voting on. It kicks in next week.")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="What If I Change My Mind?">
+      <Section title={t("What If I Change My Mind?")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Turn it off anytime. You can also change your app preferences whenever you want \u2014 the new choices apply from the next round."
-          }
+          {t("Turn it off anytime. You can also change your app preferences whenever you want — the new choices apply from the next round.")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "While auto-voting is active, you can\u2019t vote manually. If the relayer hasn\u2019t claimed your rewards after 5 days, you can step in and claim them yourself."
-          }
+          {t("While auto-voting is active, you can't vote manually. If the relayer hasn't claimed your rewards after 5 days, you can step in and claim them yourself.")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="What If Something Goes Wrong?">
+      <Section title={t("What If Something Goes Wrong?")}>
         <Text textStyle="sm" color="text.subtle">
-          {"Auto-voting turns itself off if:"}
+          {t("Auto-voting turns itself off if:")}
         </Text>
         <BulletList
           items={[
-            "Your VOT3 balance drops below 1",
-            "All your chosen apps become ineligible",
-            "You stop doing sustainable actions",
-            "You get flagged as a bot",
+            t("Your VOT3 balance drops below 1"),
+            t("All your chosen apps become ineligible"),
+            t("You stop doing sustainable actions"),
+            t("You get flagged as a bot"),
           ]}
         />
         <Text textStyle="sm" color="text.subtle">
-          {
-            "You\u2019ll just go back to voting manually until you fix whatever triggered it."
-          }
+          {t("You'll just go back to voting manually until you fix whatever triggered it.")}
         </Text>
       </Section>
     </VStack>
@@ -179,105 +159,84 @@ function VeBetterTab() {
 }
 
 function RelayersTab() {
+  const { t } = useTranslation();
   return (
     <VStack gap={5} align="stretch">
-      <Section title="What Is a Relayer?">
+      <Section title={t("What Is a Relayer?")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            'You\u2019re basically volunteering to press the "vote" and "claim" buttons for other people who turned on auto-voting. In return, you get a cut of their rewards.'
-          }
+          {t("You're basically volunteering to press the \"vote\" and \"claim\" buttons for other people who turned on auto-voting. In return, you get a cut of their rewards.")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="Relayer Rewards">
+      <Section title={t("Relayer Rewards")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Every user you serve pays 10% of their weekly rewards (max 100 B3TR per user) into a shared pool. At the end of the week, that pool gets split among all relayers based on how much work each one did."
-          }
+          {t("Every user you serve pays 10% of their weekly rewards (max 100 B3TR per user) into a shared pool. At the end of the week, that pool gets split among all relayers based on how much work each one did.")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Everyone has to be served. If even one user gets missed \u2014 no vote cast, no rewards claimed \u2014 nobody gets paid. The whole pool stays locked until every single user is taken care of. This keeps relayers honest and motivated to finish the job."
-          }
+          {t("Everyone has to be served. If even one user gets missed — no vote cast, no rewards claimed — nobody gets paid. The whole pool stays locked until every single user is taken care of. This keeps relayers honest and motivated to finish the job.")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Safety net: if registered relayers don\u2019t finish within 5 days, anyone can step in and complete the remaining work."
-          }
+          {t("Safety net: if registered relayers don't finish within 5 days, anyone can step in and complete the remaining work.")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="Weights">
+      <Section title={t("Weights")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Weights determine how the reward pool is distributed among relayers:"
-          }
+          {t("Weights determine how the reward pool is distributed among relayers:")}
         </Text>
         <BulletList
           items={[
-            "Voting for someone = 3 points (higher because voting is more gas-intensive)",
-            "Claiming their rewards = 1 point",
-            "One full user per round = 4 weighted points (1 vote + 1 claim)",
+            t("Voting for someone = 3 points (higher because voting is more gas-intensive)"),
+            t("Claiming their rewards = 1 point"),
+            t("One full user per round = 4 weighted points (1 vote + 1 claim)"),
           ]}
         />
         <Text textStyle="sm" color="text.subtle">
-          {"More points = bigger share of the pool."}
+          {t("More points = bigger share of the pool.")}
         </Text>
         <Text textStyle="sm" color="text.subtle" fontStyle="italic">
-          {
-            "Example: If the pool has 4 B3TR and a relayer completes 2 votes + 1 claim (2\u00D73 + 1\u00D71 = 7 points) out of 8 total points, they earn 3.5 B3TR."
-          }
+          {t("Example: If the pool has 4 B3TR and a relayer completes 2 votes + 1 claim (2×3 + 1×1 = 7 points) out of 8 total points, they earn 3.5 B3TR.")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="Who Can Be a Relayer?">
+      <Section title={t("Who Can Be a Relayer?")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "The system is designed for anyone: apps, community members, developers. If the community trusts you, you can run a relayer."
-          }
+          {t("The system is designed for anyone: apps, community members, developers. If the community trusts you, you can run a relayer.")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="FAQ">
+      <Section title={t("FAQ")}>
         <Text textStyle="sm" color="text.subtle" fontWeight="semibold">
-          {"Who claims the relayer payout?"}
+          {t("Who claims the relayer payout?")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Each relayer claims their own share after the round is fully complete."
-          }
+          {t("Each relayer claims their own share after the round is fully complete.")}
         </Text>
 
         <Text textStyle="sm" color="text.subtle" fontWeight="semibold" mt={2}>
-          {"Does it matter who you serve?"}
+          {t("Does it matter who you serve?")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "For users \u2014 no, they get the same result regardless. For relayers \u2014 yes, you only earn credit for work you personally do. And it\u2019s first-come-first-served: if another relayer handles a user before you, you get nothing for that user (and waste gas trying)."
-          }
+          {t("For users — no, they get the same result regardless. For relayers — yes, you only earn credit for work you personally do. And it's first-come-first-served: if another relayer handles a user before you, you get nothing for that user (and waste gas trying).")}
         </Text>
       </Section>
 
       <Separator />
 
-      <Section title="Why Would an App Want to Be a Relayer?">
+      <Section title={t("Why Would an App Want to Be a Relayer?")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Running your own relayer is a strong economic and security opportunity for apps on VeBetterDAO. Your users set you as a preference, you execute their votes (directed to your app), and you earn relayer fees \u2014 all without anyone needing to transfer funds or give up custody of their tokens."
-          }
+          {t("Running your own relayer is a strong economic and security opportunity for apps on VeBetterDAO. Your users set you as a preference, you execute their votes (directed to your app), and you earn relayer fees — all without anyone needing to transfer funds or give up custody of their tokens.")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Important: be transparent about it. Add your app to the user\u2019s preference list \u2014 don\u2019t replace their other choices."
-          }
+          {t("Important: be transparent about it. Add your app to the user's preference list — don't replace their other choices.")}
         </Text>
       </Section>
     </VStack>
@@ -285,52 +244,53 @@ function RelayersTab() {
 }
 
 function DevsTab() {
+  const { t } = useTranslation();
   return (
     <VStack gap={5} align="stretch">
-      <Section title="Getting Started">
+      <Section title={t("Getting Started")}>
         <Text textStyle="sm" color="text.subtle">
-          {"To integrate as a relayer:"}
+          {t("To integrate as a relayer:")}
         </Text>
         <BulletList
           items={[
-            "Register as a relayer by calling registerRelayer() on RelayerRewardsPool",
-            "Read getTotalAutoVotingUsersAtRoundStart() to know how many users to serve",
-            "Call castVoteOnBehalfOf() during early access window",
-            "Call reward claims after round ends",
-            "Claim your relayer rewards from RelayerRewardsPool.claimRewards()",
+            t("Register as a relayer by calling registerRelayer() on RelayerRewardsPool"),
+            t("Read getTotalAutoVotingUsersAtRoundStart() to know how many users to serve"),
+            t("Call castVoteOnBehalfOf() during early access window"),
+            t("Call reward claims after round ends"),
+            t("Claim your relayer rewards from RelayerRewardsPool.claimRewards()"),
           ]}
         />
       </Section>
 
       <Separator />
 
-      <Section title="User Eligibility (at snapshot time)">
+      <Section title={t("User Eligibility (at snapshot time)")}>
         <BulletList
           items={[
-            "Min 1 VOT3",
-            "3+ sustainable actions",
-            "Not bot-flagged by app owners",
-            "At least 1 eligible app selected",
+            t("Min 1 VOT3"),
+            t("3+ sustainable actions"),
+            t("Not bot-flagged by app owners"),
+            t("At least 1 eligible app selected"),
           ]}
         />
       </Section>
 
       <Separator />
 
-      <Section title="Timing & Rules">
+      <Section title={t("Timing & Rules")}>
         <BulletList
           items={[
-            "Enable during round N \u2192 kicks in from round N+1",
-            "Active auto-voting blocks manual voting/claiming during the round",
-            "If relayer hasn\u2019t processed after 5 days post-round, users can manually claim",
-            "Auto-disable triggers: all apps ineligible, VOT3 < 1, action threshold drop, bot detection",
+            t("Enable during round N → kicks in from round N+1"),
+            t("Active auto-voting blocks manual voting/claiming during the round"),
+            t("If relayer hasn't processed after 5 days post-round, users can manually claim"),
+            t("Auto-disable triggers: all apps ineligible, VOT3 < 1, action threshold drop, bot detection"),
           ]}
         />
       </Section>
 
       <Separator />
 
-      <Section title="Resources">
+      <Section title={t("Resources")}>
         <VStack align="start" gap={2}>
           <Link
             href="https://docs.vebetterdao.org/vebetter/automation"
@@ -338,7 +298,7 @@ function DevsTab() {
             textStyle="sm"
             colorPalette="blue"
           >
-            {"Docs: Auto-Voting Documentation"}
+            {t("Docs: Auto-Voting Documentation")}
           </Link>
           <Link
             href="https://governance.vebetterdao.org/proposals/93450486232994296830196736391400835825360450263361422145364815974754963306849"
@@ -346,7 +306,7 @@ function DevsTab() {
             textStyle="sm"
             colorPalette="blue"
           >
-            {"Governance proposal (full spec)"}
+            {t("Governance proposal (full spec)")}
           </Link>
           <Link
             href="https://vechain.discourse.group/t/vebetterdao-proposal-auto-voting-for-x-allocation-with-gasless-voting-and-relayer-rewards/559"
@@ -354,7 +314,7 @@ function DevsTab() {
             textStyle="sm"
             colorPalette="blue"
           >
-            {"Discourse proposal (design rationale)"}
+            {t("Discourse proposal (design rationale)")}
           </Link>
           <Link
             href="https://github.com/vechain/vebetterdao-contracts"
@@ -362,21 +322,19 @@ function DevsTab() {
             textStyle="sm"
             colorPalette="blue"
           >
-            {"GitHub: Contract source code"}
+            {t("GitHub: Contract source code")}
           </Link>
         </VStack>
       </Section>
 
       <Separator />
 
-      <Section title="NPM Package">
+      <Section title={t("NPM Package")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Install @vechain/vebetterdao-contracts via npm/yarn for ABIs and typechain types."
-          }
+          {t("Install @vechain/vebetterdao-contracts via npm/yarn for ABIs and typechain types.")}
         </Text>
         <Text textStyle="sm" color="text.subtle">
-          {"Key imports used in this dashboard:"}
+          {t("Key imports used in this dashboard:")}
         </Text>
         <BulletList
           items={[
@@ -388,11 +346,9 @@ function DevsTab() {
 
       <Separator />
 
-      <Section title="Inspect On-Chain">
+      <Section title={t("Inspect On-Chain")}>
         <Text textStyle="sm" color="text.subtle">
-          {
-            "Use VeChain Explorer (inspect.vechain.org) to inspect contracts on mainnet."
-          }
+          {t("Use VeChain Explorer (inspect.vechain.org) to inspect contracts on mainnet.")}
         </Text>
       </Section>
 
@@ -403,48 +359,17 @@ function DevsTab() {
   );
 }
 
-const QUICK_ACTIONS = [
-  {
-    label: "Dashboard",
-    href: "/",
-    icon: LuHouse,
-    description: "View live relayer stats",
-  },
-  {
-    label: "Run a Relayer",
-    href: "/run",
-    icon: LuPlay,
-    description: "Get started as a relayer",
-  },
-  {
-    label: "Browse Relayers",
-    href: "/relayers",
-    icon: LuRadar,
-    description: "See all registered relayers",
-  },
+const QUICK_ACTIONS_KEYS = [
+  { labelKey: "Dashboard", href: "/", icon: LuHouse, descKey: "View live relayer stats" },
+  { labelKey: "Run a Relayer", href: "/run", icon: LuPlay, descKey: "Get started as a relayer" },
+  { labelKey: "Browse Relayers", href: "/relayers", icon: LuRadar, descKey: "See all registered relayers" },
 ];
 
-const RESOURCES = [
-  {
-    label: "Auto-Voting Docs",
-    href: "https://docs.vebetterdao.org/vebetter/automation",
-    icon: LuBookOpen,
-  },
-  {
-    label: "Governance Proposal",
-    href: "https://governance.vebetterdao.org/proposals/93450486232994296830196736391400835825360450263361422145364815974754963306849",
-    icon: LuFileText,
-  },
-  {
-    label: "Contract Source",
-    href: "https://github.com/vechain/vebetterdao-contracts",
-    icon: LuGithub,
-  },
-  {
-    label: "Relayer Node",
-    href: "https://github.com/vechain/vebetterdao-relayer-node",
-    icon: LuGithub,
-  },
+const RESOURCES_KEYS = [
+  { labelKey: "Auto-Voting Docs", href: "https://docs.vebetterdao.org/vebetter/automation", icon: LuBookOpen },
+  { labelKey: "Governance Proposal", href: "https://governance.vebetterdao.org/proposals/93450486232994296830196736391400835825360450263361422145364815974754963306849", icon: LuFileText },
+  { labelKey: "Contract Source", href: "https://github.com/vechain/vebetterdao-contracts", icon: LuGithub },
+  { labelKey: "Relayer Node", href: "https://github.com/vechain/vebetterdao-relayer-node", icon: LuGithub },
 ];
 
 function SidebarCard({
@@ -474,11 +399,12 @@ function SidebarCard({
 }
 
 function Sidebar() {
+  const { t } = useTranslation();
   return (
     <VStack gap={4} align="stretch" w="full">
-      <SidebarCard title="Quick Actions">
+      <SidebarCard title={t("Quick Actions sidebar")}>
         <VStack gap={1} align="stretch">
-          {QUICK_ACTIONS.map((action) => (
+          {QUICK_ACTIONS_KEYS.map((action) => (
             <Link key={action.href} asChild _hover={{ textDecoration: "none" }}>
               <NextLink href={action.href}>
                 <HStack
@@ -494,10 +420,10 @@ function Sidebar() {
                   </Box>
                   <VStack gap={0} align="start">
                     <Text textStyle="sm" fontWeight="medium">
-                      {action.label}
+                      {t(action.labelKey)}
                     </Text>
                     <Text textStyle="xs" color="text.subtle">
-                      {action.description}
+                      {t(action.descKey)}
                     </Text>
                   </VStack>
                 </HStack>
@@ -507,9 +433,9 @@ function Sidebar() {
         </VStack>
       </SidebarCard>
 
-      <SidebarCard title="Resources">
+      <SidebarCard title={t("Resources sidebar")}>
         <VStack gap={0.5} align="stretch">
-          {RESOURCES.map((link) => (
+          {RESOURCES_KEYS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -529,7 +455,7 @@ function Sidebar() {
                   <link.icon size={14} />
                 </Box>
                 <Text textStyle="xs" color="text.subtle" flex={1}>
-                  {link.label}
+                  {t(link.labelKey)}
                 </Text>
                 <Box as="span" color="text.subtle" flexShrink={0}>
                   <LuExternalLink size={12} />
@@ -540,38 +466,38 @@ function Sidebar() {
         </VStack>
       </SidebarCard>
 
-      <SidebarCard title="Key Facts">
+      <SidebarCard title={t("Key Facts")}>
         <VStack gap={2} align="start" px={3} pb={1}>
           <VStack gap={0.5} align="start">
             <Text textStyle="xs" fontWeight="semibold">
-              {"Fee"}
+              {t("Fee")}
             </Text>
             <Text textStyle="xs" color="text.subtle">
-              {"10% of weekly rewards (max 100 B3TR)"}
+              {t("10% of weekly rewards (max 100 B3TR)")}
             </Text>
           </VStack>
           <VStack gap={0.5} align="start">
             <Text textStyle="xs" fontWeight="semibold">
-              {"Vote Weight"}
+              {t("Vote Weight")}
             </Text>
             <Text textStyle="xs" color="text.subtle">
-              {"3 pts per vote, 1 pt per claim"}
+              {t("3 pts per vote, 1 pt per claim")}
             </Text>
           </VStack>
           <VStack gap={0.5} align="start">
             <Text textStyle="xs" fontWeight="semibold">
-              {"Min Requirement"}
+              {t("Min Requirement")}
             </Text>
             <Text textStyle="xs" color="text.subtle">
-              {"1 VOT3 + 3 sustainable actions"}
+              {t("1 VOT3 + 3 sustainable actions")}
             </Text>
           </VStack>
           <VStack gap={0.5} align="start">
             <Text textStyle="xs" fontWeight="semibold">
-              {"Grace Period"}
+              {t("Grace Period")}
             </Text>
             <Text textStyle="xs" color="text.subtle">
-              {"5 days post-round for manual claims"}
+              {t("5 days post-round for manual claims")}
             </Text>
           </VStack>
         </VStack>
@@ -581,10 +507,11 @@ function Sidebar() {
 }
 
 export function InfoContent() {
+  const { t } = useTranslation();
   return (
     <VStack gap={6} align="stretch">
       <Heading size="xl" fontWeight="bold">
-        {"Auto-Voting & Relayers"}
+        {t("Auto-Voting & Relayers")}
       </Heading>
 
       <Grid templateColumns={{ base: "1fr", md: "2fr 1fr" }} gap="4" w="full">
@@ -593,19 +520,19 @@ export function InfoContent() {
             <Tabs.Trigger value="vebetter">
               <HStack gap={1.5}>
                 <B3trIcon width={16} height={16} />
-                {"VeBetter"}
+                {t("VeBetter")}
               </HStack>
             </Tabs.Trigger>
             <Tabs.Trigger value="relayers">
               <HStack gap={1.5}>
                 <LuRadar size={16} />
-                {"Relayers"}
+                {t("Relayers")}
               </HStack>
             </Tabs.Trigger>
             <Tabs.Trigger value="devs">
               <HStack gap={1.5}>
                 <LuCode size={16} />
-                {"For Devs"}
+                {t("For Devs")}
               </HStack>
             </Tabs.Trigger>
           </Tabs.List>

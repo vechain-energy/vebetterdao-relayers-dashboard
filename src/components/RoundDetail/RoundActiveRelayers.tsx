@@ -14,6 +14,7 @@ import {
 import { useGetAvatarOfAddress, useVechainDomain } from "@vechain/vechain-kit";
 import NextLink from "next/link";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { FaAngleRight } from "react-icons/fa6";
 import { LuRadar } from "react-icons/lu";
 
@@ -65,7 +66,8 @@ function ActiveRelayerRow({
   const { data: domain } = useVechainDomain(relayer.address);
   const { data: avatarSrc } = useGetAvatarOfAddress(relayer.address);
 
-  const displayName = domain?.domain || "Unknown";
+  const { t } = useTranslation();
+  const displayName = domain?.domain || t("Unknown");
   const shortAddress = `${relayer.address.slice(0, 6)}...${relayer.address.slice(-4)}`;
   const href = `/relayer?address=${domain?.domain || relayer.address}`;
 
@@ -111,21 +113,21 @@ function ActiveRelayerRow({
                   </VStack>
                 </HStack>
                 <StatPill
-                  label="Voted for"
+                  label={t("Voted for")}
                   value={formatNumber(rd.votedForCount)}
                 />
                 <StatPill
-                  label="Claimed for"
+                  label={t("Claimed for")}
                   value={formatNumber(prevBreakdown?.rewardsClaimedCount ?? 0)}
                 />
                 <StatPill
-                  label="VTHO spent"
+                  label={t("VTHO spent")}
                   value={formatToken(vthoSpentRaw)}
                   unit="VTHO"
                 />
-                <StatPill label="Weight" value={weightPct} />
+                <StatPill label={t("Weight")} value={weightPct} />
               </SimpleGrid>
-              <IconButton aria-label="View relayer" variant="ghost" size="sm">
+              <IconButton aria-label={t("View relayer")} variant="ghost" size="sm">
                 <FaAngleRight />
               </IconButton>
             </HStack>
@@ -159,25 +161,25 @@ function ActiveRelayerRow({
                     </Text>
                   </VStack>
                 </HStack>
-                <IconButton aria-label="View relayer" variant="ghost" size="sm">
+                <IconButton aria-label={t("View relayer")} variant="ghost" size="sm">
                   <FaAngleRight />
                 </IconButton>
               </HStack>
               <SimpleGrid columns={2} gap="2">
                 <StatPill
-                  label="Voted for"
+                  label={t("Voted for")}
                   value={formatNumber(rd.votedForCount)}
                 />
                 <StatPill
-                  label="Claimed for"
+                  label={t("Claimed for")}
                   value={formatNumber(prevBreakdown?.rewardsClaimedCount ?? 0)}
                 />
                 <StatPill
-                  label="VTHO spent"
+                  label={t("VTHO spent")}
                   value={formatToken(vthoSpentRaw)}
                   unit="VTHO"
                 />
-                <StatPill label="Weight" value={weightPct} />
+                <StatPill label={t("Weight")} value={weightPct} />
               </SimpleGrid>
             </VStack>
           </Box>
@@ -192,6 +194,7 @@ interface RoundActiveRelayersProps {
 }
 
 export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
+  const { t } = useTranslation();
   const { data: report } = useReportData();
 
   const { activeRelayers, totalWeighted } = useMemo(() => {
@@ -238,7 +241,7 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
           textTransform="uppercase"
           color="text.subtle"
         >
-          {"Active Relayers"}
+          {t("Active Relayers")}
         </Text>
         <Badge size="sm" variant="subtle" colorPalette="gray">
           {activeRelayers.length}

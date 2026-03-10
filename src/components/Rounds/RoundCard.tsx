@@ -11,6 +11,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
+import { useTranslation } from "react-i18next";
 import { FaAngleRight } from "react-icons/fa6";
 
 import { formatNumber, formatToken } from "@/lib/format";
@@ -61,9 +62,10 @@ function StatPill({
 }
 
 export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
+  const { t } = useTranslation();
   const isActive = !round.isRoundEnded;
   const displayRoi = isActive ? expectedRoi : roi;
-  const roiLabel = isActive ? "Expected ROI" : "ROI";
+  const roiLabel = isActive ? t("Expected ROI") : t("ROI");
   const status = parseRoundStatus(round);
 
   const roundLabel = (
@@ -74,7 +76,7 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
       </Text>
       {isActive && (
         <Badge size="sm" variant="solid" colorPalette="blue">
-          {"Active"}
+          {t("Active")}
         </Badge>
       )}
     </HStack>
@@ -83,17 +85,17 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
   const stats = (
     <>
       <StatPill
-        label="Users"
+        label={t("Users")}
         value={formatNumber(round.autoVotingUsersCount)}
       />
-      <StatPill label="Relayers" value={round.numRelayers} />
+      <StatPill label={t("Relayers")} value={round.numRelayers} />
       <StatPill
-        label="VTHO spent"
+        label={t("VTHO spent")}
         value={formatToken(round.vthoSpentTotalRaw)}
         unit="VTHO"
       />
       <StatPill
-        label={isActive ? "Projected Rewards" : "Rewards"}
+        label={isActive ? t("Projected Rewards") : t("Rewards")}
         value={formatToken(
           isActive
             ? round.estimatedRelayerRewardsRaw
@@ -126,18 +128,18 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
                 {stats}
                 <VStack gap="0" align="start" minW="0" justifyContent="center">
                   <Text textStyle="xxs" color="text.subtle" lineClamp={1}>
-                    {"Status"}
+                    {t("Status")}
                   </Text>
                   <Badge
                     size="sm"
                     variant="solid"
                     colorPalette={status.colorPalette}
                   >
-                    {status.label}
+                    {t(status.label)}
                   </Badge>
                 </VStack>
               </SimpleGrid>
-              <IconButton aria-label="Go to round" variant="ghost" size="sm">
+              <IconButton aria-label={t("Go to round")} variant="ghost" size="sm">
                 <FaAngleRight />
               </IconButton>
             </HStack>
@@ -148,7 +150,7 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
             <VStack gap="2" align="stretch" w="full">
               <HStack justify="space-between" w="full">
                 {roundLabel}
-                <IconButton aria-label="Go to round" variant="ghost" size="sm">
+                <IconButton aria-label={t("Go to round")} variant="ghost" size="sm">
                   <FaAngleRight />
                 </IconButton>
               </HStack>
