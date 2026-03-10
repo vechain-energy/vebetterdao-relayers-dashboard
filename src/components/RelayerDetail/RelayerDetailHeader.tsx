@@ -180,11 +180,17 @@ export function RelayerDetailHeader({
               </HStack>
 
               {/* Right: action buttons */}
-              <HStack flexShrink={0} gap={2}>
+              <HStack
+                flexShrink={0}
+                gap={2}
+                w={{ base: "full", sm: "auto" }}
+              >
+                {/* Share — visible on sm+, in menu on mobile */}
                 <Button
                   variant="outline"
                   size="sm"
                   rounded="full"
+                  hideBelow="sm"
                   onClick={() => setShowShareModal(true)}
                 >
                   <LuShare2 />
@@ -192,8 +198,13 @@ export function RelayerDetailHeader({
                 </Button>
 
                 {isOwnRelayer ? (
-                  <NextLink href="/run">
-                    <Button variant="primary" size="sm" rounded="full">
+                  <NextLink href="/run" style={{ flex: 1 }}>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      rounded="full"
+                      w={{ base: "full", sm: "auto" }}
+                    >
                       <LuPlay />
                       {t("Run")}
                     </Button>
@@ -204,6 +215,7 @@ export function RelayerDetailHeader({
                       variant="primary"
                       size="sm"
                       rounded="full"
+                      flex={{ base: 1, sm: "initial" }}
                       onClick={handleChooseRelayer}
                     >
                       <LuHeart />
@@ -213,21 +225,32 @@ export function RelayerDetailHeader({
                   )
                 )}
 
-                {isOwnRelayer && (
-                  <MenuRoot>
-                    <MenuTrigger asChild>
-                      <IconButton
-                        variant="ghost"
-                        size="sm"
-                        rounded="full"
-                        aria-label={t("More options")}
-                      >
-                        <LuEllipsisVertical />
-                      </IconButton>
-                    </MenuTrigger>
-                    <Portal>
-                      <MenuPositioner>
-                        <MenuContent>
+                <MenuRoot>
+                  <MenuTrigger asChild>
+                    <IconButton
+                      variant="ghost"
+                      size="sm"
+                      rounded="full"
+                      aria-label={t("More options")}
+                    >
+                      <LuEllipsisVertical />
+                    </IconButton>
+                  </MenuTrigger>
+                  <Portal>
+                    <MenuPositioner>
+                      <MenuContent>
+                        {/* Share — in menu on mobile only */}
+                        <Box hideFrom="sm">
+                          <MenuItem
+                            value="share"
+                            cursor="pointer"
+                            onClick={() => setShowShareModal(true)}
+                          >
+                            <LuShare2 />
+                            {t("Share")}
+                          </MenuItem>
+                        </Box>
+                        {isOwnRelayer && (
                           <MenuItem
                             value="customize"
                             cursor="pointer"
@@ -236,25 +259,25 @@ export function RelayerDetailHeader({
                             <LuPencil />
                             {t("Customize profile")}
                           </MenuItem>
-                          {isRegistered && (
-                            <>
-                              <MenuSeparator />
-                              <MenuItem
-                                value="unregister"
-                                color="fg.error"
-                                cursor="pointer"
-                                onClick={() => setShowUnregisterModal(true)}
-                              >
-                                <LuTriangleAlert />
-                                {t("Unregister relayer")}
-                              </MenuItem>
-                            </>
-                          )}
-                        </MenuContent>
-                      </MenuPositioner>
-                    </Portal>
-                  </MenuRoot>
-                )}
+                        )}
+                        {isOwnRelayer && isRegistered && (
+                          <>
+                            <MenuSeparator />
+                            <MenuItem
+                              value="unregister"
+                              color="fg.error"
+                              cursor="pointer"
+                              onClick={() => setShowUnregisterModal(true)}
+                            >
+                              <LuTriangleAlert />
+                              {t("Unregister relayer")}
+                            </MenuItem>
+                          </>
+                        )}
+                      </MenuContent>
+                    </MenuPositioner>
+                  </Portal>
+                </MenuRoot>
               </HStack>
             </HStack>
           </Card.Body>
