@@ -51,7 +51,7 @@ const ClientApp = dynamic(
   },
 );
 
-const ogImage = "https://prod-vechainkit-docs-images-bucket.s3.eu-west-1.amazonaws.com/relayer-banner.png";
+const ogImage = "https://prod-vechainkit-docs-images-bucket.s3.eu-west-1.amazonaws.com/vebetter-relayer-banner.png";
 
 export const metadata: Metadata = {
   title: "VeBetter Relayers",
