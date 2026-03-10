@@ -51,12 +51,25 @@ const ClientApp = dynamic(
   },
 );
 
+const ogImage = "https://prod-vechainkit-docs-images-bucket.s3.eu-west-1.amazonaws.com/relayer-banner.png";
+
 export const metadata: Metadata = {
-  title: "VeBetter Relayers | VeBetterDAO Auto-Voting",
-  description: "Auto-voting and relayer analytics for VeBetterDAO governance.",
+  title: "VeBetter Relayers",
+  description: "The central hub for managing and monitoring relayers.",
   icons: {
     icon: `${basePath}/assets/favicon/web-app-manifest-192x192.png`,
     apple: `${basePath}/assets/favicon/web-app-manifest-192x192.png`,
+  },
+  openGraph: {
+    title: "VeBetter Relayers",
+    description: "The central hub for managing and monitoring relayers.",
+    images: [{ url: ogImage, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "VeBetter Relayers",
+    description: "The central hub for managing and monitoring relayers.",
+    images: [ogImage],
   },
 };
 
