@@ -271,7 +271,7 @@ function RoundStat({
 
 function RoundRow({
   rd,
-  prevClaimedFor,
+  claimedFor,
   b3trRaw,
   b3trToVtho,
   isActive,
@@ -280,7 +280,7 @@ function RoundRow({
   t,
 }: {
   rd: RelayerAnalytics["rounds"][number];
-  prevClaimedFor: number;
+  claimedFor: number;
   b3trRaw: string;
   b3trToVtho: number | undefined;
   isActive?: boolean;
@@ -328,7 +328,7 @@ function RoundRow({
         <RoundStat label={t("Voted for")} value={rd.votedForCount} unit={t("users")} />
         <RoundStat
           label={t("Claimed for")}
-          value={prevClaimedFor}
+          value={claimedFor}
           unit={t("users")}
         />
         <RoundStat
@@ -340,7 +340,7 @@ function RoundRow({
           }
         />
         <RoundStat
-          label={isActive ? t("Projected B3TR rewards") : t("B3TR earned")}
+          label={isActive || rd.votedForCount === 0 ? t("Projected B3TR rewards") : t("B3TR earned")}
           value={formatToken(b3trRaw)}
           unit="B3TR"
         />
@@ -350,12 +350,66 @@ function RoundRow({
           unit="VTHO"
         />
         <RoundStat
-          label={isActive ? t("Projected ROI") : t("ROI")}
+          label={isActive || rd.votedForCount === 0 ? t("Projected ROI") : t("ROI")}
           value={roi != null ? `${formatNumber(Math.round(roi))}%` : "\u2014"}
         />
       </SimpleGrid>
     </VStack>
   );
+}
+
+interface MergedRound {
+  main: RelayerRoundBreakdown;
+  catchUp: RelayerRoundBreakdown | null;
+}
+
+/**
+ * Merge claim-only rounds into their adjacent voting round.
+ *
+ * Claiming for VBD round N happens during round N+1, so from the relayer's
+ * operational perspective claim-only work belongs to round N+1:
+ * - If a voting round N+1 exists, the claim-only round N is absorbed as catchUp.
+ * - Otherwise a synthetic round N+1 entry is created to display the claims
+ *   under the round the relayer was actually active in.
+ */
+function mergeRelayerRounds(rounds: RelayerRoundBreakdown[]): MergedRound[] {
+  const sorted = [...rounds].sort((a, b) => a.roundId - b.roundId);
+  const byId = new Map(sorted.map((rd) => [rd.roundId, rd]));
+  const consumed = new Set<number>();
+  const result: MergedRound[] = [];
+
+  for (const rd of sorted) {
+    if (consumed.has(rd.roundId)) continue;
+
+    if (rd.votedForCount > 0) {
+      const prev = byId.get(rd.roundId - 1);
+      const catchUp =
+        prev && prev.votedForCount === 0 && !consumed.has(prev.roundId)
+          ? prev
+          : null;
+      if (catchUp) consumed.add(catchUp.roundId);
+      result.push({ main: rd, catchUp });
+    } else {
+      const next = byId.get(rd.roundId + 1);
+      if (next && next.votedForCount > 0) continue;
+      result.push({
+        main: {
+          roundId: rd.roundId + 1,
+          votedForCount: 0,
+          rewardsClaimedCount: 0,
+          weightedActions: 0,
+          actions: 0,
+          claimableRewardsRaw: "0",
+          relayerRewardsClaimedRaw: "0",
+          vthoSpentOnVotingRaw: "0",
+          vthoSpentOnClaimingRaw: "0",
+        },
+        catchUp: rd,
+      });
+    }
+  }
+
+  return result;
 }
 
 const ROUNDS_PAGE_SIZE = 3;
@@ -367,7 +421,7 @@ interface RelayerDetailContentProps {
   reportRounds?: RoundAnalytics[];
   roundCtx?: Map<
     number,
-    { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number }
+    { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number; locked: boolean }
   >;
 }
 
@@ -379,7 +433,7 @@ export function RelayerDetailContent({
 }: RelayerDetailContentProps) {
   const { t } = useTranslation();
   const b3trToVtho = useB3trToVthoRate();
-  const summary = computeRelayerSummary(relayer, roundCtx);
+  const summary = computeRelayerSummary(relayer, roundCtx, currentRound);
   const roi = computeRelayerROI(
     summary.totalB3trEarnedRaw,
     summary.totalVthoSpentRaw,
@@ -389,17 +443,12 @@ export function RelayerDetailContent({
   const [visibleActivityCount, setVisibleActivityCount] =
     useState(ACTIVITY_PAGE_SIZE);
 
-  const roundsDesc = [...relayer.rounds].sort((a, b) => b.roundId - a.roundId);
-  const visibleRounds = roundsDesc.slice(0, visibleCount);
-  const hasMore = visibleCount < roundsDesc.length;
-
-  const prevClaimedMap = useMemo(() => {
-    const map = new Map<number, number>();
-    for (const rd of relayer.rounds) {
-      map.set(rd.roundId, rd.rewardsClaimedCount);
-    }
-    return map;
-  }, [relayer.rounds]);
+  const mergedRounds = useMemo(
+    () => mergeRelayerRounds(relayer.rounds).sort((a, b) => b.main.roundId - a.main.roundId),
+    [relayer.rounds],
+  );
+  const visibleMerged = mergedRounds.slice(0, visibleCount);
+  const hasMore = visibleCount < mergedRounds.length;
 
   const lockedRounds = useMemo(() => {
     const set = new Set<number>();
@@ -444,10 +493,21 @@ export function RelayerDetailContent({
               <SectionHeader title={t("Financials")} icon={<LuCoins />} />
               <SimpleGrid columns={2} gap="4">
                 <MetricCell
-                  label={t("B3TR earned")}
+                  label={
+                    summary.totalVotedFor > 0
+                      ? t("B3TR earned")
+                      : t("Projected B3TR")
+                  }
                   value={formatToken(summary.totalB3trEarnedRaw)}
                   unit="B3TR"
                 />
+                {BigInt(summary.estimatedB3trRaw ?? "0") > BigInt(0) && (
+                  <MetricCell
+                    label={t("Estimated")}
+                    value={formatToken(summary.estimatedB3trRaw)}
+                    unit="B3TR"
+                  />
+                )}
                 <MetricCell
                   label={t("VTHO spent")}
                   value={formatToken(summary.totalVthoSpentRaw)}
@@ -465,11 +525,14 @@ export function RelayerDetailContent({
                 <MetricCell
                   label={t("Avg VTHO / user")}
                   value={
-                    summary.totalVotedFor > 0
+                    summary.totalVotedFor + summary.totalRewardsClaimed > 0
                       ? formatToken(
                           (
                             BigInt(summary.totalVthoSpentRaw) /
-                            BigInt(summary.totalVotedFor)
+                            BigInt(
+                              summary.totalVotedFor +
+                                summary.totalRewardsClaimed,
+                            )
                           ).toString(),
                         )
                       : "\u2014"
@@ -486,39 +549,64 @@ export function RelayerDetailContent({
         <Card.Body>
           <VStack gap="3" align="stretch">
             <SectionHeader title={t("Round History")} icon={<LuFlame />} />
-            {roundsDesc.length === 0 ? (
+            {mergedRounds.length === 0 ? (
               <Text textStyle="sm" color="text.subtle">
                 {t("No round data available.")}
               </Text>
             ) : (
               <VStack gap="1" align="stretch">
-                {visibleRounds.map((rd) => {
-                  const ctx = roundCtx?.get(rd.roundId);
-                  const isActiveRound = rd.roundId === currentRound;
-                  const effectiveCtx =
-                    isActiveRound && ctx
-                      ? {
-                          poolRaw: ctx.estimatedPoolRaw,
-                          totalWeighted: ctx.totalWeighted,
-                        }
-                      : ctx;
+                {visibleMerged.map(({ main, catchUp }) => {
+                  const isActiveRound = main.roundId === currentRound;
+                  const mainCtx = roundCtx?.get(main.roundId);
+
+                  const sources = catchUp ? [catchUp, main] : [main];
+                  let b3trTotal = BigInt(0);
+                  for (const src of sources) {
+                    const ctx = roundCtx?.get(src.roundId);
+                    const srcActive = src.roundId === currentRound;
+                    const eff = ctx
+                      ? srcActive
+                        ? { poolRaw: ctx.estimatedPoolRaw, totalWeighted: ctx.totalWeighted }
+                        : { poolRaw: ctx.poolRaw, totalWeighted: ctx.totalWeighted }
+                      : undefined;
+                    b3trTotal += roundCtx
+                      ? computeRelayerRoundB3tr(src.weightedActions, eff)
+                      : BigInt(src.claimableRewardsRaw);
+                  }
+
+                  const combinedRd: RelayerRoundBreakdown = {
+                    ...main,
+                    weightedActions:
+                      main.weightedActions +
+                      (catchUp?.weightedActions ?? 0),
+                    vthoSpentOnVotingRaw: (
+                      BigInt(main.vthoSpentOnVotingRaw) +
+                      BigInt(catchUp?.vthoSpentOnVotingRaw ?? "0")
+                    ).toString(),
+                    vthoSpentOnClaimingRaw: (
+                      BigInt(main.vthoSpentOnClaimingRaw) +
+                      BigInt(catchUp?.vthoSpentOnClaimingRaw ?? "0")
+                    ).toString(),
+                  };
+
                   return (
                     <RoundRow
-                      key={rd.roundId}
-                      rd={rd}
-                      prevClaimedFor={prevClaimedMap.get(rd.roundId - 1) ?? 0}
-                      isActive={isActiveRound}
-                      isLocked={lockedRounds.has(rd.roundId)}
-                      b3trToVtho={b3trToVtho}
-                      totalWeighted={ctx?.totalWeighted}
-                      b3trRaw={
-                        roundCtx
-                          ? computeRelayerRoundB3tr(
-                              rd.weightedActions,
-                              effectiveCtx,
-                            ).toString()
-                          : rd.claimableRewardsRaw
+                      key={main.roundId}
+                      rd={combinedRd}
+                      claimedFor={
+                        (catchUp?.rewardsClaimedCount ?? 0) +
+                        main.rewardsClaimedCount
                       }
+                      isActive={isActiveRound}
+                      isLocked={lockedRounds.has(main.roundId)}
+                      b3trToVtho={b3trToVtho}
+                      totalWeighted={
+                        mainCtx?.totalWeighted ??
+                        (catchUp
+                          ? roundCtx?.get(catchUp.roundId)?.totalWeighted
+                          : undefined)
+                      }
+                      b3trRaw={b3trTotal.toString()}
                       t={t}
                     />
                   );

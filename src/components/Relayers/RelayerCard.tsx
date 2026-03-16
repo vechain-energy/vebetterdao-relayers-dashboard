@@ -74,6 +74,7 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
     summary.totalVthoSpentRaw,
     b3trToVtho,
   );
+  const hasEstimated = BigInt(summary.estimatedB3trRaw ?? "0") > BigInt(0);
 
   const { data: isRegistered } = useRelayerRegistration(summary.address);
   const { data: avatarSrc } = useGetAvatarOfAddress(summary.address);
@@ -133,8 +134,12 @@ export function RelayerCard({ summary, currentRound }: RelayerCardProps) {
       />
       <StatPill
         label={t("Total earned")}
-        value={formatToken(summary.totalB3trEarnedRaw)}
-        unit="B3TR"
+        value={
+          hasEstimated
+            ? `${formatToken(summary.totalB3trEarnedRaw)} (+ ${formatToken(summary.estimatedB3trRaw)} ${t("est.")})`
+            : formatToken(summary.totalB3trEarnedRaw)
+        }
+        unit={hasEstimated ? undefined : "B3TR"}
       />
       <StatPill
         label={t("ROI")}
