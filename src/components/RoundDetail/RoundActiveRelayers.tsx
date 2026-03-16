@@ -202,12 +202,10 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
       return { activeRelayers: [] as ActiveRelayer[], totalWeighted: 0 };
     const prevRoundId = roundId - 1;
     const result: ActiveRelayer[] = [];
-    let weighted = 0;
     for (const relayer of report.relayers) {
       const rd = relayer.rounds.find((r) => r.roundId === roundId);
       const prevRd = relayer.rounds.find((r) => r.roundId === prevRoundId);
       if (rd) {
-        weighted += rd.weightedActions;
         if (
           rd.votedForCount > 0 ||
           (prevRd && prevRd.rewardsClaimedCount > 0)
@@ -223,7 +221,9 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
     result.sort(
       (a, b) => b.breakdown.votedForCount - a.breakdown.votedForCount,
     );
-    return { activeRelayers: result, totalWeighted: weighted };
+    const roundExpected =
+      report.rounds.find((r) => r.roundId === roundId)?.expectedActions ?? 0;
+    return { activeRelayers: result, totalWeighted: roundExpected };
   }, [report, roundId]);
 
   if (activeRelayers.length === 0) return null;

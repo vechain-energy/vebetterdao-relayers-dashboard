@@ -109,7 +109,7 @@ export default function RelayerDetailPage() {
   }
 
   const currentRound = report?.currentRound ?? 0;
-  const summary = computeRelayerSummary(relayerData, roundCtx);
+  const summary = computeRelayerSummary(relayerData, roundCtx, currentRound);
   const active = isRelayerActive(summary, currentRound);
   const isOwnRelayer = account?.address?.toLowerCase() === resolvedAddress;
 

@@ -32,7 +32,7 @@ export function TopRelayers() {
     if (!report?.relayers) return [];
     const roundCtx = buildRoundRewardsContext(report);
     return report.relayers
-      .map((r) => computeRelayerSummary(r, roundCtx))
+      .map((r) => computeRelayerSummary(r, roundCtx, report.currentRound))
       .filter((s) => isRelayerActive(s, report.currentRound))
       .sort((a, b) => b.activeRoundsCount - a.activeRoundsCount)
       .slice(0, TOP_COUNT);

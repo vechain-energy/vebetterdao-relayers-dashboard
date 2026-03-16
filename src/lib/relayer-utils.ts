@@ -11,6 +11,7 @@ export interface RelayerSummary {
   totalRewardsClaimed: number
   totalWeightedActions: number
   totalB3trEarnedRaw: string
+  estimatedB3trRaw: string
   totalVthoSpentRaw: string
   lastActiveRound: number | null
   activeRoundsCount: number
@@ -18,27 +19,19 @@ export interface RelayerSummary {
 
 /**
  * Build a context needed for proportional B3TR share calculation.
- * For each round: maps roundId -> { totalRelayerRewardsRaw, totalWeightedActions across all relayers }.
+ * Uses each round's expectedActions as the denominator to match the on-chain
+ * RelayerRewardsPool formula: reward = pool * relayerWeighted / totalWeightedActions.
  */
-export function buildRoundRewardsContext(report: AnalyticsReport): Map<number, { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number }> {
-  const ctx = new Map<number, { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number }>()
+export function buildRoundRewardsContext(report: AnalyticsReport): Map<number, { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number; locked: boolean }> {
+  const ctx = new Map<number, { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number; locked: boolean }>()
 
   for (const rd of report.rounds) {
     ctx.set(rd.roundId, {
       poolRaw: BigInt(rd.totalRelayerRewardsRaw),
       estimatedPoolRaw: BigInt(rd.estimatedRelayerRewardsRaw),
-      totalWeighted: 0,
+      totalWeighted: rd.expectedActions,
+      locked: rd.isRoundEnded && rd.expectedActions > 0 && rd.completedActions < rd.expectedActions,
     })
-  }
-
-  // Sum weighted actions across all relayers per round
-  for (const relayer of report.relayers ?? []) {
-    for (const rd of relayer.rounds) {
-      const entry = ctx.get(rd.roundId)
-      if (entry) {
-        entry.totalWeighted += rd.weightedActions
-      }
-    }
   }
 
   return ctx
@@ -53,16 +46,20 @@ export function computeRelayerRoundB3tr(
   return (roundCtx.poolRaw * BigInt(relayerWeighted)) / BigInt(roundCtx.totalWeighted)
 }
 
+type RoundCtxEntry = { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number; locked: boolean }
+
 /** Compute summary stats for a single relayer from their round breakdowns. */
 export function computeRelayerSummary(
   relayer: RelayerAnalytics,
-  roundCtx?: Map<number, { poolRaw: bigint; totalWeighted: number }>,
+  roundCtx?: Map<number, RoundCtxEntry>,
+  currentRound?: number,
 ): RelayerSummary {
   let totalActions = 0
   let totalVotedFor = 0
   let totalRewardsClaimed = 0
   let totalWeightedActions = 0
   let totalB3trEarned = BigInt(0)
+  let estimatedB3tr = BigInt(0)
   let totalVthoSpent = BigInt(0)
   let lastActiveRound: number | null = null
 
@@ -71,10 +68,32 @@ export function computeRelayerSummary(
     totalVotedFor += rd.votedForCount
     totalRewardsClaimed += rd.rewardsClaimedCount
     totalWeightedActions += rd.weightedActions
-    // Use proportional share from round pool when context available, else fall back to claimableRewards
-    totalB3trEarned += roundCtx
-      ? computeRelayerRoundB3tr(rd.weightedActions, roundCtx.get(rd.roundId))
-      : BigInt(rd.claimableRewardsRaw)
+    const isActiveRound = currentRound != null && rd.roundId === currentRound
+    const isEstimated = isActiveRound
+    const isLocked = roundCtx?.get(rd.roundId)?.locked ?? false
+    if (!isLocked) {
+      if (roundCtx) {
+        const ctx = roundCtx.get(rd.roundId)
+        const effectiveCtx = ctx
+          ? isActiveRound
+            ? { poolRaw: ctx.estimatedPoolRaw, totalWeighted: ctx.totalWeighted }
+            : { poolRaw: ctx.poolRaw, totalWeighted: ctx.totalWeighted }
+          : undefined
+        const roundB3tr = computeRelayerRoundB3tr(rd.weightedActions, effectiveCtx)
+        if (isEstimated) {
+          estimatedB3tr += roundB3tr
+        } else {
+          totalB3trEarned += roundB3tr
+        }
+      } else {
+        const raw = BigInt(rd.claimableRewardsRaw)
+        if (isEstimated) {
+          estimatedB3tr += raw
+        } else {
+          totalB3trEarned += raw
+        }
+      }
+    }
     totalVthoSpent += BigInt(rd.vthoSpentOnVotingRaw) + BigInt(rd.vthoSpentOnClaimingRaw)
     if (rd.actions > 0 && (lastActiveRound == null || rd.roundId > lastActiveRound)) {
       lastActiveRound = rd.roundId
@@ -88,9 +107,10 @@ export function computeRelayerSummary(
     totalRewardsClaimed,
     totalWeightedActions,
     totalB3trEarnedRaw: totalB3trEarned.toString(),
+    estimatedB3trRaw: estimatedB3tr.toString(),
     totalVthoSpentRaw: totalVthoSpent.toString(),
     lastActiveRound,
-    activeRoundsCount: relayer.rounds.filter(rd => rd.actions > 0).length,
+    activeRoundsCount: relayer.rounds.filter(rd => rd.actions > 0 && rd.votedForCount > 0).length,
   }
 }
 
@@ -103,8 +123,10 @@ export function isRelayerActive(summary: RelayerSummary, currentRound: number, w
 /** Compute overview stats from all relayers in the report. */
 export function computeRelayersOverview(report: AnalyticsReport) {
   const roundCtx = buildRoundRewardsContext(report)
-  const summaries = (report.relayers ?? []).map(r => computeRelayerSummary(r, roundCtx))
   const currentRound = report.currentRound
+  const summaries = (report.relayers ?? []).map(r =>
+    computeRelayerSummary(r, roundCtx, currentRound),
+  )
 
   // Sum total B3TR from round-level pool data (total rewards generated, not just claimed)
   let totalB3trDistributed = BigInt(0)

@@ -286,8 +286,10 @@ async function getAutoVotesForRound(
   const autoVoteCastEvent = xAllocationVotingContract.getEvent(
     "AllocationAutoVoteCast",
   ) as any;
+  const autoVoteSkippedEvent = xAllocationVotingContract.getEvent(
+    "AutoVoteSkipped",
+  ) as any;
 
-  // Encode roundId as topic (indexed parameter)
   const roundIdHex = "0x" + roundId.toString(16).padStart(64, "0");
 
   const voters = new Set<string>();
@@ -315,16 +317,22 @@ async function getAutoVotesForRound(
           },
           eventAbi: autoVoteCastEvent,
         },
+        {
+          criteria: {
+            address: contractAddress,
+            topic0: autoVoteSkippedEvent.encodeFilterTopicsNoNull({})[0],
+            topic2: roundIdHex,
+          },
+          eventAbi: autoVoteSkippedEvent,
+        },
       ],
     });
 
     for (const log of logs) {
-      const decodedData = autoVoteCastEvent.decodeEventLog({
-        topics: log.topics.map((topic: string) => Hex.of(topic)),
-        data: Hex.of(log.data),
-      });
-      const voter = decodedData.args.voter as string;
-      voters.add(voter.toLowerCase());
+      const voter = log.topics?.[1];
+      if (voter) {
+        voters.add(("0x" + voter.slice(26)).toLowerCase());
+      }
     }
 
     if (logs.length < MAX_EVENTS_PER_REQUEST) {
@@ -475,15 +483,17 @@ async function estimateRelayerRewards(
 }
 
 /**
- * Get number of relayers for a specific round from TotalAutoVotingActionsSet event
+ * Get round setup data from TotalAutoVotingActionsSet event.
+ * This is the on-chain source of truth for how many auto-voting users
+ * the contract counted at the round snapshot via its checkpoint counter.
  */
-async function getNumRelayersForRound(
+async function getRoundSetupData(
   thor: ThorClient,
   contractAddress: string,
   roundId: number,
   fromBlock: number,
   toBlock: number,
-): Promise<number> {
+): Promise<{ contractAutoVotingUsersCount: number; numRelayers: number }> {
   const relayerPoolContract = ABIContract.ofAbi(
     RelayerRewardsPool__factory.abi,
   );
@@ -491,7 +501,6 @@ async function getNumRelayersForRound(
     "TotalAutoVotingActionsSet",
   ) as any;
 
-  // Encode roundId as topic (indexed parameter)
   const roundIdHex = "0x" + roundId.toString(16).padStart(64, "0");
 
   const logs = await thor.logs.filterEventLogs({
@@ -518,7 +527,7 @@ async function getNumRelayersForRound(
   });
 
   if (logs.length === 0) {
-    return 0;
+    return { contractAutoVotingUsersCount: 0, numRelayers: 0 };
   }
 
   const decodedData = actionsSetEvent.decodeEventLog({
@@ -526,7 +535,12 @@ async function getNumRelayersForRound(
     data: Hex.of(logs[0].data),
   });
 
-  return Number(decodedData.args.numRelayers ?? 0);
+  return {
+    contractAutoVotingUsersCount: Number(
+      decodedData.args.totalAutoVoteUsers ?? 0,
+    ),
+    numRelayers: Number(decodedData.args.numRelayers ?? 0),
+  };
 }
 
 /**
@@ -663,6 +677,9 @@ async function getVotingTransactionIds(
   const autoVoteCastEvent = xAllocationVotingContract.getEvent(
     "AllocationAutoVoteCast",
   ) as any;
+  const autoVoteSkippedEvent = xAllocationVotingContract.getEvent(
+    "AutoVoteSkipped",
+  ) as any;
   const roundIdHex = "0x" + roundId.toString(16).padStart(64, "0");
 
   const txIds = new Set<string>();
@@ -689,6 +706,14 @@ async function getVotingTransactionIds(
             topic2: roundIdHex,
           },
           eventAbi: autoVoteCastEvent,
+        },
+        {
+          criteria: {
+            address: contractAddress,
+            topic0: autoVoteSkippedEvent.encodeFilterTopicsNoNull({})[0],
+            topic2: roundIdHex,
+          },
+          eventAbi: autoVoteSkippedEvent,
         },
       ],
     });
@@ -934,9 +959,11 @@ async function getPerRelayerVthoSpentOnVoting(
   const autoVoteCastEvent = xAllocationVotingContract.getEvent(
     "AllocationAutoVoteCast",
   ) as any;
+  const autoVoteSkippedEvent = xAllocationVotingContract.getEvent(
+    "AutoVoteSkipped",
+  ) as any;
   const roundIdHex = "0x" + roundId.toString(16).padStart(64, "0");
 
-  // Collect tx IDs with their origin
   const txSet = new Set<string>();
   let offset = 0;
   const MAX_EVENTS_PER_REQUEST = 1000;
@@ -954,6 +981,14 @@ async function getPerRelayerVthoSpentOnVoting(
             topic2: roundIdHex,
           },
           eventAbi: autoVoteCastEvent,
+        },
+        {
+          criteria: {
+            address: contractAddress,
+            topic0: autoVoteSkippedEvent.encodeFilterTopicsNoNull({})[0],
+            topic2: roundIdHex,
+          },
+          eventAbi: autoVoteSkippedEvent,
         },
       ],
     });
@@ -1189,14 +1224,48 @@ async function analyzeRound(
     roundId,
   );
 
-  // Get auto-voting users at round start
+  // Get round setup data from the contract (source of truth for user count)
+  const roundSetup = await getRoundSetupData(
+    thor,
+    CONFIG.relayerRewardsPoolContractAddress,
+    roundId,
+    roundSnapshot,
+    roundDeadline,
+  );
+  const numRelayers = roundSetup.numRelayers;
+
+  // Get auto-voting users at round start via event scanning
   const autoVotingUsers = await getAllAutoVotingEnabledUsers(
     thor,
     CONFIG.xAllocationVotingContractAddress,
     0,
     roundSnapshot,
   );
-  console.log(`    - Auto-voting users at snapshot: ${autoVotingUsers.length}`);
+
+  // Verify event-based count matches the contract's checkpoint counter
+  const contractUsersCount = roundSetup.contractAutoVotingUsersCount;
+  if (
+    contractUsersCount > 0 &&
+    autoVotingUsers.length !== contractUsersCount
+  ) {
+    console.warn(
+      `    ⚠ USER COUNT MISMATCH: event scan found ${autoVotingUsers.length} users, ` +
+        `contract checkpoint has ${contractUsersCount} ` +
+        `(delta: ${contractUsersCount - autoVotingUsers.length})`,
+    );
+  }
+
+  // Use the contract's count as source of truth for autoVotingUsersCount
+  // since it's what determines totalWeightedActions on-chain
+  const autoVotingUsersCount =
+    contractUsersCount > 0 ? contractUsersCount : autoVotingUsers.length;
+  console.log(
+    `    - Auto-voting users at snapshot: ${autoVotingUsersCount}` +
+      (contractUsersCount > 0 &&
+      autoVotingUsers.length !== contractUsersCount
+        ? ` (event scan: ${autoVotingUsers.length})`
+        : ""),
+  );
 
   // Get users who were voted for by relayer
   const votedForUsers = await getAutoVotesForRound(
@@ -1238,15 +1307,6 @@ async function analyzeRound(
   );
   console.log(
     `    - Estimated relayer rewards: ${formatB3TR(estimatedRelayerRewards)}`,
-  );
-
-  // Get number of relayers for this round
-  const numRelayers = await getNumRelayersForRound(
-    thor,
-    CONFIG.relayerRewardsPoolContractAddress,
-    roundId,
-    roundSnapshot,
-    roundDeadline,
   );
   console.log(`    - Number of relayers: ${numRelayers}`);
 
@@ -1324,7 +1384,7 @@ async function analyzeRound(
   console.log(`    - Round ended: ${isRoundEnded ? "Yes" : "No"}`);
 
   // Status check: voting + claiming completion
-  const expectedToVote = autoVotingUsers.length - reducedUsersCount;
+  const expectedToVote = autoVotingUsersCount - reducedUsersCount;
   const votingComplete = votedForUsers.size >= expectedToVote;
   const missedVotes = expectedToVote - votedForUsers.size;
 
@@ -1335,7 +1395,7 @@ async function analyzeRound(
     : votingComplete;
 
   let actionStatus: string;
-  if (autoVotingUsers.length === 0) {
+  if (autoVotingUsersCount === 0) {
     actionStatus = "N/A";
   } else if (votingComplete) {
     if (isRoundEnded && !allActionsOk) {
@@ -1353,7 +1413,7 @@ async function analyzeRound(
 
   return {
     roundId,
-    autoVotingUsersCount: autoVotingUsers.length,
+    autoVotingUsersCount,
     votedForCount: votedForUsers.size,
     rewardsClaimedCount: claimedUsers.size,
     totalRelayerRewards: formatB3TR(totalRelayerRewards),
