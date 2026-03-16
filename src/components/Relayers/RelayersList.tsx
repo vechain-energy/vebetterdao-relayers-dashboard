@@ -123,8 +123,8 @@ export function RelayersList() {
   const b3trToVtho = useB3trToVthoRate();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<FilterStatus>("all");
-  const [sortField, setSortField] = useState<SortField>("b3tr");
+  const [statusFilter, setStatusFilter] = useState<FilterStatus>("active");
+  const [sortField, setSortField] = useState<SortField>("vtho");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -148,8 +148,9 @@ export function RelayersList() {
 
     if (report?.relayers) {
       const roundCtx = buildRoundRewardsContext(report);
+      const currentRound = report.currentRound;
       for (const r of report.relayers) {
-        reportSummaries.push(computeRelayerSummary(r, roundCtx));
+        reportSummaries.push(computeRelayerSummary(r, roundCtx, currentRound));
         reportAddresses.add(r.address.toLowerCase());
       }
     }
@@ -165,6 +166,7 @@ export function RelayersList() {
             totalRewardsClaimed: 0,
             totalWeightedActions: 0,
             totalB3trEarnedRaw: "0",
+            estimatedB3trRaw: "0",
             totalVthoSpentRaw: "0",
             lastActiveRound: null,
             activeRoundsCount: 0,
