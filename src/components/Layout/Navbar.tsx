@@ -140,7 +140,6 @@ export function Navbar() {
             mobileVariant="icon"
             buttonStyle={{
               variant: "outline",
-              size: "xs",
               borderRadius: "full",
               textColor: walletTextColor,
               _hover: { bg: walletHoverBg },
