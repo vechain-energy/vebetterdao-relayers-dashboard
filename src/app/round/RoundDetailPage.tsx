@@ -83,6 +83,7 @@ export default function RoundDetailPage() {
       roundId: effectiveRoundId,
       autoVotingUsersCount: 0,
       votedForCount: 0,
+      invalidVotesCount: 0,
       rewardsClaimedCount: 0,
       totalRelayerRewards: "0",
       totalRelayerRewardsRaw: "0",

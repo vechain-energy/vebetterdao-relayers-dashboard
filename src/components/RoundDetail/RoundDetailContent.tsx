@@ -427,7 +427,7 @@ export function RoundDetailContent({
             </Card.Body>
           </Card.Root>
 
-          <SimpleGrid columns={2} gap="4">
+          <SimpleGrid columns={{ base: 2, md: 3 }} gap="4">
             <MiniStatCard
               label={t("Voted for")}
               value={formatNumber(round.votedForCount)}
@@ -443,6 +443,11 @@ export function RoundDetailContent({
                 round.autoVotingUsersCount - round.reducedUsersCount,
               )}
               sublabel={t("users")}
+            />
+            <MiniStatCard
+              label={t("Invalid users")}
+              value={formatNumber(round.invalidVotesCount ?? 0)}
+              sublabel={t("vote skipped")}
             />
           </SimpleGrid>
         </VStack>

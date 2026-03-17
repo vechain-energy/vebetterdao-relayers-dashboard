@@ -2,6 +2,8 @@ export interface RoundAnalytics {
   roundId: number;
   autoVotingUsersCount: number;
   votedForCount: number;
+  /** Users for whom the relayer attempted a vote but it was skipped (invalid vote). */
+  invalidVotesCount: number;
   rewardsClaimedCount: number;
   totalRelayerRewards: string;
   totalRelayerRewardsRaw: string;

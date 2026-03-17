@@ -62,6 +62,8 @@ interface RoundAnalytics {
   roundId: number;
   autoVotingUsersCount: number;
   votedForCount: number;
+  /** Users for whom the relayer attempted a vote but it was skipped (invalid). */
+  invalidVotesCount: number;
   rewardsClaimedCount: number;
   totalRelayerRewards: string;
   totalRelayerRewardsRaw: string;
@@ -728,6 +730,125 @@ async function getVotingTransactionIds(
   return txIds;
 }
 
+// AutoVoteSkipped is emitted by XAllocationVotingGovernor when a vote was attempted but skipped (user didn't respect rules).
+// Minimal ABI fallback if the package ABI does not include this event.
+const AUTO_VOTE_SKIPPED_ABI = [
+  {
+    type: "event",
+    name: "AutoVoteSkipped",
+    inputs: [
+      { name: "voter", type: "address", indexed: true },
+      { name: "roundId", type: "uint256", indexed: true },
+      { name: "isPerson", type: "bool", indexed: false },
+      { name: "appCount", type: "uint256", indexed: false },
+      { name: "votingPower", type: "uint256", indexed: false },
+    ],
+  },
+];
+
+function getAutoVoteSkippedEventAbi(): any {
+  try {
+    const contract = ABIContract.ofAbi(XAllocationVoting__factory.abi);
+    return contract.getEvent("AutoVoteSkipped") as any;
+  } catch {
+    try {
+      const contract = ABIContract.ofAbi(AUTO_VOTE_SKIPPED_ABI as Parameters<typeof ABIContract.ofAbi>[0]);
+      return contract.getEvent("AutoVoteSkipped") as any;
+    } catch {
+      return null;
+    }
+  }
+}
+
+/**
+ * Query AutoVoteSkipped events for a round. Returns the set of voter addresses whose vote was skipped (invalid).
+ */
+async function getAutoVoteSkippedForRound(
+  thor: ThorClient,
+  contractAddress: string,
+  roundId: number,
+  fromBlock: number,
+  toBlock: number,
+): Promise<Set<string>> {
+  const eventAbi = getAutoVoteSkippedEventAbi();
+  if (!eventAbi) return new Set();
+  const roundIdHex = "0x" + roundId.toString(16).padStart(64, "0");
+  const voters = new Set<string>();
+  let offset = 0;
+  const MAX_EVENTS_PER_REQUEST = 1000;
+
+  while (true) {
+    const logs = await thor.logs.filterEventLogs({
+      range: { unit: "block" as const, from: fromBlock, to: toBlock },
+      options: { offset, limit: MAX_EVENTS_PER_REQUEST },
+      order: "asc",
+      criteriaSet: [
+        {
+          criteria: {
+            address: contractAddress,
+            topic0: eventAbi.encodeFilterTopicsNoNull({})[0],
+            topic2: roundIdHex,
+          },
+          eventAbi,
+        },
+      ],
+    });
+    for (const log of logs) {
+      const decoded = eventAbi.decodeEventLog({
+        topics: log.topics.map((t: string) => Hex.of(t)),
+        data: Hex.of(log.data),
+      });
+      const voter = (decoded.args as { voter?: string })?.voter;
+      if (voter) voters.add(voter.toLowerCase());
+    }
+    if (logs.length < MAX_EVENTS_PER_REQUEST) break;
+    offset += MAX_EVENTS_PER_REQUEST;
+  }
+  return voters;
+}
+
+/**
+ * Get unique transaction IDs from AutoVoteSkipped events for a round (for VTHO attribution).
+ */
+async function getSkippedVoteTransactionIds(
+  thor: ThorClient,
+  contractAddress: string,
+  roundId: number,
+  fromBlock: number,
+  toBlock: number,
+): Promise<Set<string>> {
+  const eventAbi = getAutoVoteSkippedEventAbi();
+  if (!eventAbi) return new Set();
+  const roundIdHex = "0x" + roundId.toString(16).padStart(64, "0");
+  const txIds = new Set<string>();
+  let offset = 0;
+  const MAX_EVENTS_PER_REQUEST = 1000;
+
+  while (true) {
+    const logs = await thor.logs.filterEventLogs({
+      range: { unit: "block" as const, from: fromBlock, to: toBlock },
+      options: { offset, limit: MAX_EVENTS_PER_REQUEST },
+      order: "asc",
+      criteriaSet: [
+        {
+          criteria: {
+            address: contractAddress,
+            topic0: eventAbi.encodeFilterTopicsNoNull({})[0],
+            topic2: roundIdHex,
+          },
+          eventAbi,
+        },
+      ],
+    });
+    for (const log of logs) {
+      if (log.meta?.txID) txIds.add(log.meta.txID);
+    }
+    if (logs.length < MAX_EVENTS_PER_REQUEST) break;
+    offset += MAX_EVENTS_PER_REQUEST;
+  }
+  return txIds;
+}
+
 /**
  * Get unique transaction IDs from RelayerFeeTaken events for a round
  */
@@ -801,17 +922,37 @@ async function calculateVthoSpent(
     try {
       const receipt = await thor.transactions.getTransactionReceipt(txId);
       if (receipt) {
-        // The receipt.paid field contains the actual VTHO paid
         const paid = BigInt(receipt.paid ?? 0);
         totalVtho += paid;
       }
     } catch (error) {
-      // Skip failed receipt fetches
       console.warn(`    Warning: Could not fetch receipt for tx ${txId}`);
     }
   }
 
   return totalVtho;
+}
+
+async function calculatePerRelayerVthoSpent(
+  thor: ThorClient,
+  txIds: Set<string>,
+): Promise<Map<string, bigint>> {
+  const relayerVtho = new Map<string, bigint>();
+
+  for (const txId of txIds) {
+    try {
+      const receipt = await thor.transactions.getTransactionReceipt(txId);
+      if (receipt) {
+        const origin = (receipt.meta?.txOrigin ?? "").toLowerCase();
+        const paid = BigInt(receipt.paid ?? 0);
+        relayerVtho.set(origin, (relayerVtho.get(origin) ?? BigInt(0)) + paid);
+      }
+    } catch {
+      // skip
+    }
+  }
+
+  return relayerVtho;
 }
 
 /**
@@ -941,66 +1082,6 @@ async function getRelayerActionsForRound(
  * Get per-relayer VTHO spent on voting for a round.
  * Groups voting transaction receipts by tx.origin (relayer).
  */
-async function getPerRelayerVthoSpentOnVoting(
-  thor: ThorClient,
-  contractAddress: string,
-  roundId: number,
-  fromBlock: number,
-  toBlock: number,
-): Promise<Map<string, bigint>> {
-  const xAllocationVotingContract = ABIContract.ofAbi(
-    XAllocationVoting__factory.abi,
-  );
-  const autoVoteCastEvent = xAllocationVotingContract.getEvent(
-    "AllocationAutoVoteCast",
-  ) as any;
-  const roundIdHex = "0x" + roundId.toString(16).padStart(64, "0");
-
-  // Collect tx IDs with their origin
-  const txSet = new Set<string>();
-  let offset = 0;
-  const MAX_EVENTS_PER_REQUEST = 1000;
-
-  while (true) {
-    const logs = await thor.logs.filterEventLogs({
-      range: { unit: "block" as const, from: fromBlock, to: toBlock },
-      options: { offset, limit: MAX_EVENTS_PER_REQUEST },
-      order: "asc",
-      criteriaSet: [
-        {
-          criteria: {
-            address: contractAddress,
-            topic0: autoVoteCastEvent.encodeFilterTopicsNoNull({})[0],
-            topic2: roundIdHex,
-          },
-          eventAbi: autoVoteCastEvent,
-        },
-      ],
-    });
-
-    for (const log of logs) {
-      if (log.meta?.txID) txSet.add(log.meta.txID);
-    }
-    if (logs.length < MAX_EVENTS_PER_REQUEST) break;
-    offset += MAX_EVENTS_PER_REQUEST;
-  }
-
-  const relayerVtho = new Map<string, bigint>();
-  for (const txId of txSet) {
-    try {
-      const receipt = await thor.transactions.getTransactionReceipt(txId);
-      if (receipt) {
-        const origin = (receipt.meta?.txOrigin ?? "").toLowerCase();
-        const paid = BigInt(receipt.paid ?? 0);
-        relayerVtho.set(origin, (relayerVtho.get(origin) ?? BigInt(0)) + paid);
-      }
-    } catch {
-      // skip
-    }
-  }
-
-  return relayerVtho;
-}
 
 /**
  * Get per-relayer VTHO spent on claiming for a round (claims for cycle=roundId after round ends).
@@ -1228,6 +1309,16 @@ async function analyzeRound(
   );
   console.log(`    - Users voted for: ${votedForUsers.size}`);
 
+  // Get users whose vote was skipped (invalid - relayer attempted but rules not respected)
+  const skippedVoteUsers = await getAutoVoteSkippedForRound(
+    thor,
+    CONFIG.xAllocationVotingContractAddress,
+    roundId,
+    roundSnapshot,
+    roundDeadline,
+  );
+  console.log(`    - Invalid votes (skipped): ${skippedVoteUsers.size}`);
+
   // Get users who had rewards claimed by relayer
   // Claims happen after the round ends, so we search from deadline onwards
   const claimedUsers = await getAutoClaimsForRound(
@@ -1270,7 +1361,7 @@ async function analyzeRound(
   );
   console.log(`    - Number of relayers: ${numRelayers}`);
 
-  // Get VTHO spent on voting transactions (voting for this round)
+  // Get VTHO spent on voting transactions (successful + skipped attempts count as relayer action)
   const votingTxIds = await getVotingTransactionIds(
     thor,
     CONFIG.xAllocationVotingContractAddress,
@@ -1278,9 +1369,17 @@ async function analyzeRound(
     roundSnapshot,
     roundDeadline,
   );
-  const vthoSpentOnVoting = await calculateVthoSpent(thor, votingTxIds);
+  const skippedTxIds = await getSkippedVoteTransactionIds(
+    thor,
+    CONFIG.xAllocationVotingContractAddress,
+    roundId,
+    roundSnapshot,
+    roundDeadline,
+  );
+  const allVotingTxIds = new Set([...votingTxIds, ...skippedTxIds]);
+  const vthoSpentOnVoting = await calculateVthoSpent(thor, allVotingTxIds);
   console.log(
-    `    - VTHO spent on voting (round ${roundId}): ${formatVTHO(vthoSpentOnVoting)} (${votingTxIds.size} txs)`,
+    `    - VTHO spent on voting (round ${roundId}): ${formatVTHO(vthoSpentOnVoting)} (${allVotingTxIds.size} txs)`,
   );
 
   // Get VTHO spent on claiming transactions for THIS round
@@ -1365,6 +1464,7 @@ async function analyzeRound(
     roundId,
     autoVotingUsersCount: autoVotingUsers.length,
     votedForCount: votedForUsers.size,
+    invalidVotesCount: skippedVoteUsers.size,
     rewardsClaimedCount: claimedUsers.size,
     totalRelayerRewards: formatB3TR(totalRelayerRewards),
     totalRelayerRewardsRaw: totalRelayerRewards.toString(),
@@ -1631,8 +1731,6 @@ async function main(): Promise<void> {
     (a, b) => a.roundId - b.roundId,
   );
 
-  printTable(rounds);
-
   // ============ Per-Relayer Analytics ============
   console.log("\n  Collecting per-relayer analytics...");
 
@@ -1684,14 +1782,23 @@ async function main(): Promise<void> {
       undefined,
     );
 
-    // Get per-relayer VTHO spent on voting
-    const votingVtho = await getPerRelayerVthoSpentOnVoting(
+    // Get per-relayer VTHO spent on voting (successful + skipped, deduplicated by txID)
+    const relayerVotingTxIds = await getVotingTransactionIds(
       thor,
       CONFIG.xAllocationVotingContractAddress,
       roundId,
       roundSnapshot,
       roundDeadline,
     );
+    const relayerSkippedTxIds = await getSkippedVoteTransactionIds(
+      thor,
+      CONFIG.xAllocationVotingContractAddress,
+      roundId,
+      roundSnapshot,
+      roundDeadline,
+    );
+    const allRelayerVotingTxIds = new Set([...relayerVotingTxIds, ...relayerSkippedTxIds]);
+    const votingVtho = await calculatePerRelayerVthoSpent(thor, allRelayerVotingTxIds);
 
     // Get per-relayer VTHO spent on claiming for this round (claims for cycle=roundId after deadline)
     const claimingVtho = await getPerRelayerVthoSpentOnClaiming(
@@ -1743,7 +1850,9 @@ async function main(): Promise<void> {
         relayerRewardsClaimedRaw: (
           relayerRewardsClaimed.get(addr) ?? BigInt(0)
         ).toString(),
-        vthoSpentOnVotingRaw: (votingVtho.get(addr) ?? BigInt(0)).toString(),
+        vthoSpentOnVotingRaw: (
+          votingVtho.get(addr) ?? BigInt(0)
+        ).toString(),
         vthoSpentOnClaimingRaw: (
           claimingVtho.get(addr) ?? BigInt(0)
         ).toString(),
@@ -1776,6 +1885,8 @@ async function main(): Promise<void> {
   );
 
   setActiveRelayersCountPerRound(rounds, relayers);
+
+  printTable(rounds);
 
   const report: AnalyticsReport = {
     generatedAt: new Date().toISOString(),

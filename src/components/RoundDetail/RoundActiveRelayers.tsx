@@ -18,8 +18,9 @@ import { useTranslation } from "react-i18next";
 import { FaAngleRight } from "react-icons/fa6";
 import { LuRadar } from "react-icons/lu";
 
-import { useReportData } from "@/hooks/useReportData";
+import { useRelayerReportDerived } from "@/hooks/useRelayerReportDerived";
 import { formatNumber, formatToken } from "@/lib/format";
+import { computeRelayerRoundB3tr } from "@/lib/relayer-utils";
 import type { RelayerRoundBreakdown } from "@/lib/types";
 
 interface ActiveRelayer {
@@ -58,9 +59,13 @@ function StatPill({
 function ActiveRelayerRow({
   relayer,
   totalWeighted,
+  b3trRaw,
+  isRoundEnded,
 }: {
   relayer: ActiveRelayer;
   totalWeighted: number;
+  b3trRaw: string;
+  isRoundEnded: boolean;
 }) {
   const { data: domain } = useVechainDomain(relayer.address);
   const { data: avatarSrc } = useGetAvatarOfAddress(relayer.address);
@@ -86,7 +91,7 @@ function ActiveRelayerRow({
           {/* Desktop */}
           <Box hideBelow="md">
             <HStack justify="space-between" w="full" gap="2">
-              <SimpleGrid columns={6} gap="4" w="full" alignItems="center">
+              <SimpleGrid columns={7} gap="4" w="full" alignItems="center">
                 <HStack gridColumn="span 2" gap="3" minW="0">
                   {avatarSrc && (
                     <Box flexShrink={0}>
@@ -123,6 +128,11 @@ function ActiveRelayerRow({
                   label={t("VTHO spent")}
                   value={formatToken(vthoSpentRaw)}
                   unit="VTHO"
+                />
+                <StatPill
+                  label={isRoundEnded ? t("B3TR earned") : t("B3TR est.")}
+                  value={formatToken(b3trRaw)}
+                  unit="B3TR"
                 />
                 <StatPill label={t("Weight")} value={weightPct} />
               </SimpleGrid>
@@ -178,6 +188,11 @@ function ActiveRelayerRow({
                   value={formatToken(vthoSpentRaw)}
                   unit="VTHO"
                 />
+                <StatPill
+                  label={isRoundEnded ? t("B3TR earned") : t("B3TR est.")}
+                  value={formatToken(b3trRaw)}
+                  unit="B3TR"
+                />
                 <StatPill label={t("Weight")} value={weightPct} />
               </SimpleGrid>
             </VStack>
@@ -194,11 +209,17 @@ interface RoundActiveRelayersProps {
 
 export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
   const { t } = useTranslation();
-  const { data: report } = useReportData();
+  const { report, roundCtx } = useRelayerReportDerived();
 
-  const { activeRelayers, totalWeighted } = useMemo(() => {
+  const { activeRelayers, totalWeighted, isRoundEnded } = useMemo(() => {
     if (!report?.relayers)
-      return { activeRelayers: [] as ActiveRelayer[], totalWeighted: 0 };
+      return {
+        activeRelayers: [] as ActiveRelayer[],
+        totalWeighted: 0,
+        isRoundEnded: false,
+      };
+
+    const round = report.rounds?.find((r) => r.roundId === roundId);
     const result: ActiveRelayer[] = [];
     let weighted = 0;
     for (const relayer of report.relayers) {
@@ -214,7 +235,11 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
     result.sort(
       (a, b) => b.breakdown.votedForCount - a.breakdown.votedForCount,
     );
-    return { activeRelayers: result, totalWeighted: weighted };
+    return {
+      activeRelayers: result,
+      totalWeighted: weighted,
+      isRoundEnded: round?.isRoundEnded ?? false,
+    };
   }, [report, roundId]);
 
   if (activeRelayers.length === 0) return null;
@@ -240,13 +265,26 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
       </HStack>
 
       <VStack gap="3" align="stretch">
-        {activeRelayers.map((relayer) => (
-          <ActiveRelayerRow
-            key={relayer.address}
-            relayer={relayer}
-            totalWeighted={totalWeighted}
-          />
-        ))}
+        {activeRelayers.map((relayer) => {
+          const ctx = roundCtx?.get(roundId);
+          const effectiveCtx =
+            !isRoundEnded && ctx
+              ? { poolRaw: ctx.estimatedPoolRaw, totalWeighted: ctx.totalWeighted }
+              : ctx;
+          const b3trRaw = effectiveCtx
+            ? computeRelayerRoundB3tr(relayer.breakdown.weightedActions, effectiveCtx).toString()
+            : relayer.breakdown.claimableRewardsRaw;
+
+          return (
+            <ActiveRelayerRow
+              key={relayer.address}
+              relayer={relayer}
+              totalWeighted={totalWeighted}
+              b3trRaw={b3trRaw}
+              isRoundEnded={isRoundEnded}
+            />
+          );
+        })}
       </VStack>
     </VStack>
   );
