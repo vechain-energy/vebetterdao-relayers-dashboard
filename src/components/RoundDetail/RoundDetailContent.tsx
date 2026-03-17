@@ -28,14 +28,14 @@ import { useTotalVoters } from "@/hooks/useTotalVoters";
 import { formatNumber, formatToken } from "@/lib/format";
 import { computeROI } from "@/lib/roi";
 import {
-  computeRoundCompletion,
-  getRoundPhaseLabel,
+  computeRoundProgress,
   isRoundRewardsLocked,
   parseRoundStatus,
 } from "@/lib/round-utils";
 import type { RoundAnalytics } from "@/lib/types";
 
 import { AppsAsRelayersCard } from "../AppsAsRelayers";
+import { InvalidUsersModal } from "./InvalidUsersModal";
 import { RoundActiveRelayers } from "./RoundActiveRelayers";
 import { StatusLegendModal } from "./StatusLegendModal";
 
@@ -226,6 +226,7 @@ function MiniStatCard({
 
 interface RoundDetailContentProps {
   round: RoundAnalytics;
+  currentRoundId: number;
   generatedAt?: string;
 }
 
@@ -244,6 +245,7 @@ function rawToFiat(
 
 export function RoundDetailContent({
   round,
+  currentRoundId,
   generatedAt,
 }: RoundDetailContentProps) {
   const { t } = useTranslation();
@@ -263,8 +265,7 @@ export function RoundDetailContent({
         ? (gbpRate ?? 1)
         : 1;
 
-  const completionPct = computeRoundCompletion(round);
-  const phaseLabel = getRoundPhaseLabel(round);
+  const progress = computeRoundProgress(round, currentRoundId);
 
   const participation = pct(round.votedForCount, round.autoVotingUsersCount);
 
@@ -278,13 +279,14 @@ export function RoundDetailContent({
   const roi = computeROI(roiRewardsRaw, round.vthoSpentTotalRaw, b3trToVtho);
   const roiLabel = round.isRoundEnded ? t("ROI") : t("Expected ROI");
 
-  const status = parseRoundStatus(round);
+  const status = parseRoundStatus(round, currentRoundId);
   const [isStatusModalOpen, setStatusModalOpen] = useState(false);
+  const [isInvalidUsersModalOpen, setInvalidUsersModalOpen] = useState(false);
 
   const { claimable, totalRewardsFormatted } = useRoundRewardStatus(
     round.isRoundEnded ? round.roundId : undefined,
   );
-  const rewardsLocked = isRoundRewardsLocked(round) || (round.isRoundEnded && claimable === false);
+  const rewardsLocked = isRoundRewardsLocked(round, currentRoundId) || (round.isRoundEnded && claimable === false);
   const missedClaims =
     round.isRoundEnded && round.expectedActions > 0
       ? Math.max(0, round.expectedActions - round.completedActions)
@@ -370,7 +372,6 @@ export function RoundDetailContent({
                       </Box>
                     </HStack>
                   </HStack>
-                  <SummaryRow label={t("Phase")} value={t(phaseLabel)} />
                   <SummaryRow
                     label={t("Total Voters")}
                     value={
@@ -381,6 +382,24 @@ export function RoundDetailContent({
                     label={t("Users to Serve")}
                     value={formatNumber(round.autoVotingUsersCount)}
                   />
+                  <HStack justify="space-between" w="full">
+                    <Text textStyle="sm" color="text.subtle">
+                      {t("Invalid users")}
+                    </Text>
+                    <HStack
+                      gap="1"
+                      cursor="pointer"
+                      onClick={() => setInvalidUsersModalOpen(true)}
+                      _hover={{ opacity: 0.8 }}
+                    >
+                      <Text textStyle="sm" fontWeight="semibold">
+                        {`${formatNumber(round.invalidVotesCount ?? 0)} ${t("vote skipped")}`}
+                      </Text>
+                      <Box as="span" color="text.subtle" fontSize="14px">
+                        <LuInfo />
+                      </Box>
+                    </HStack>
+                  </HStack>
                   <SummaryRow
                     label={t("Active Relayers")}
                     value={round.numRelayers}
@@ -390,28 +409,33 @@ export function RoundDetailContent({
                 <VStack gap="2" align="stretch">
                   <HStack justify="space-between" w="full">
                     <Text textStyle="sm" fontWeight="semibold">
-                      {round.isRoundEnded
-                        ? t("Completion Progress")
-                        : t("Voting Progress")}
+                      {t(progress.label)}
                     </Text>
                     <Text
                       textStyle="sm"
                       fontWeight="semibold"
                       color="status.info.strong"
                     >
-                      {completionPct}
+                      {progress.pct}
                       {"%"}
                     </Text>
                   </HStack>
                   <Progress.Root
-                    value={completionPct}
-                    colorPalette="blue"
+                    value={progress.pct}
+                    colorPalette={progress.colorPalette}
                     size="sm"
                   >
                     <Progress.Track>
                       <Progress.Range />
                     </Progress.Track>
                   </Progress.Root>
+                  <Text
+                    textStyle="xxs"
+                    color="text.subtle"
+                    letterSpacing="wider"
+                  >
+                    {t(progress.hint)}
+                  </Text>
                   {generatedAt && (
                     <Text
                       textStyle="xxs"
@@ -427,7 +451,7 @@ export function RoundDetailContent({
             </Card.Body>
           </Card.Root>
 
-          <SimpleGrid columns={{ base: 2, md: 3 }} gap="4">
+          <SimpleGrid columns={{ base: 2, md: 2 }} gap="4">
             <MiniStatCard
               label={t("Voted for")}
               value={formatNumber(round.votedForCount)}
@@ -443,11 +467,6 @@ export function RoundDetailContent({
                 round.autoVotingUsersCount - round.reducedUsersCount,
               )}
               sublabel={t("users")}
-            />
-            <MiniStatCard
-              label={t("Invalid users")}
-              value={formatNumber(round.invalidVotesCount ?? 0)}
-              sublabel={t("vote skipped")}
             />
           </SimpleGrid>
         </VStack>
@@ -557,6 +576,11 @@ export function RoundDetailContent({
       <StatusLegendModal
         isOpen={isStatusModalOpen}
         onClose={() => setStatusModalOpen(false)}
+      />
+
+      <InvalidUsersModal
+        isOpen={isInvalidUsersModalOpen}
+        onClose={() => setInvalidUsersModalOpen(false)}
       />
     </VStack>
   );

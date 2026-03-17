@@ -113,6 +113,7 @@ export default function RoundDetailPage() {
         />
         <RoundDetailContent
           round={placeholderRound}
+          currentRoundId={currentRound}
           generatedAt={report.generatedAt}
         />
       </VStack>
@@ -126,7 +127,7 @@ export default function RoundDetailPage() {
         firstRound={firstRound}
         currentRound={currentRound}
       />
-      <RoundDetailContent round={round} generatedAt={report.generatedAt} />
+      <RoundDetailContent round={round} currentRoundId={currentRound} generatedAt={report.generatedAt} />
     </VStack>
   );
 }

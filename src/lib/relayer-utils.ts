@@ -58,10 +58,10 @@ export function computeRelayerRoundB3tr(
  * Set of round IDs whose relayer reward pool is locked (not yet claimable).
  * When passed to computeRelayerSummary, those rounds are excluded from total B3TR earned.
  */
-export function getLockedRoundIds(rounds: RoundAnalytics[]): Set<number> {
+export function getLockedRoundIds(rounds: RoundAnalytics[], currentRoundId?: number): Set<number> {
   const set = new Set<number>()
   for (const r of rounds) {
-    if (isRoundRewardsLocked(r)) set.add(r.roundId)
+    if (isRoundRewardsLocked(r, currentRoundId)) set.add(r.roundId)
   }
   return set
 }
@@ -119,7 +119,7 @@ export function isRelayerActive(summary: RelayerSummary, currentRound: number, w
 /** Compute overview stats from all relayers in the report. */
 export function computeRelayersOverview(report: AnalyticsReport) {
   const roundCtx = buildRoundRewardsContext(report)
-  const lockedRoundIds = getLockedRoundIds(report.rounds ?? [])
+  const lockedRoundIds = getLockedRoundIds(report.rounds ?? [], report.currentRound)
   const summaries = (report.relayers ?? []).map(r =>
     computeRelayerSummary(r, roundCtx, lockedRoundIds),
   )

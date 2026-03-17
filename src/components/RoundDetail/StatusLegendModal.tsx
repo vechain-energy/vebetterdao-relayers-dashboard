@@ -11,9 +11,11 @@ interface StatusLegendModalProps {
 }
 
 const statuses = [
-  { labelKey: "All voted", descKey: "All voted desc", colorPalette: "green" },
-  { labelKey: "Claims missing", descKey: "Claims missing desc", colorPalette: "red" },
-  { labelKey: "Missed votes", descKey: "Missed votes desc", colorPalette: "orange" },
+  { labelKey: "Voting in progress", descKey: "Voting in progress desc", colorPalette: "yellow" },
+  { labelKey: "Voting complete", descKey: "Voting complete desc", colorPalette: "blue" },
+  { labelKey: "Claiming in progress", descKey: "Claiming in progress desc", colorPalette: "purple" },
+  { labelKey: "Actions completed", descKey: "Actions completed desc", colorPalette: "green" },
+  { labelKey: "Rewards Locked", descKey: "Rewards Locked desc", colorPalette: "red" },
   { labelKey: "N/A", descKey: "N/A desc", colorPalette: "gray" },
 ]
 

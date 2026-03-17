@@ -17,7 +17,7 @@ import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
 import { useRelayerReportDerived } from "@/hooks/useRelayerReportDerived";
 import { formatNumber, formatToken } from "@/lib/format";
 import { computeAverageROI } from "@/lib/roi";
-import { computeRoundCompletion, getRoundPhaseLabel } from "@/lib/round-utils";
+import { computeRoundProgress, parseRoundStatus } from "@/lib/round-utils";
 
 interface StatItemProps {
   label: string;
@@ -85,10 +85,11 @@ export function StatsCards() {
   );
   const avgRoi = computeAverageROI(concludedRounds, b3trToVtho);
 
-  const roundCompletion =
-    currentRoundData != null ? computeRoundCompletion(currentRoundData) : null;
-  const roundPhase =
-    currentRoundData != null ? getRoundPhaseLabel(currentRoundData) : "";
+  const currentRoundId = report?.currentRound;
+  const roundProgress =
+    currentRoundData != null ? computeRoundProgress(currentRoundData, currentRoundId) : null;
+  const roundStatus =
+    currentRoundData != null ? parseRoundStatus(currentRoundData, currentRoundId) : null;
 
   return (
     <SimpleGrid w="full" columns={{ base: 2, md: 2, lg: 2 }} gap="4">
@@ -97,15 +98,15 @@ export function StatsCards() {
         value={
           isLoading
             ? "..."
-            : roundCompletion != null
-              ? `${roundCompletion}%`
+            : roundProgress != null
+              ? `${roundProgress.pct}%`
               : "\u2014"
         }
         sublabel={
           isLoading
             ? ""
-            : currentRoundData
-              ? `#${currentRoundData.roundId} · ${t(roundPhase)}`
+            : currentRoundData && roundStatus
+              ? `#${currentRoundData.roundId} · ${t(roundStatus.label)}`
               : t("no data")
         }
         icon={LuCircleCheck}

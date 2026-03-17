@@ -49,6 +49,7 @@ export function RoundsList() {
             <RoundCard
               key={round.roundId}
               round={round}
+              currentRoundId={report.currentRound}
               roi={computeROI(
                 round.totalRelayerRewardsRaw,
                 round.vthoSpentTotalRaw,

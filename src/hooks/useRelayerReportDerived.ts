@@ -49,7 +49,7 @@ export function useRelayerReportDerived() {
       }
 
       const roundCtx = buildRoundRewardsContext(report);
-      const lockedRoundIds = getLockedRoundIds(report.rounds ?? []);
+      const lockedRoundIds = getLockedRoundIds(report.rounds ?? [], report.currentRound);
       const overview = computeRelayersOverview(report);
       const summaryByAddress = new Map<string, RelayerSummary>();
       for (const s of overview.summaries) {

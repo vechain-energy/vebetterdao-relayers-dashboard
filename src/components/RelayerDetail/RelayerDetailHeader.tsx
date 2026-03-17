@@ -235,6 +235,7 @@ export function RelayerDetailHeader({
                   )
                 )}
 
+                <Box {...(!isOwnRelayer && { hideFrom: "sm" })}>
                 <MenuRoot>
                   <MenuTrigger asChild>
                     <IconButton
@@ -288,6 +289,7 @@ export function RelayerDetailHeader({
                     </MenuPositioner>
                   </Portal>
                 </MenuRoot>
+                </Box>
               </HStack>
             </HStack>
           </Card.Body>
