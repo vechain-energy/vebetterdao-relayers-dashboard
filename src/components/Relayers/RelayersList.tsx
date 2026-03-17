@@ -119,7 +119,7 @@ export function RelayersList() {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("active");
-  const [sortField, setSortField] = useState<SortField>("vtho");
+  const [sortField, setSortField] = useState<SortField>("b3tr");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterOpen, setFilterOpen] = useState(false);
 
