@@ -13,7 +13,9 @@
     "build:mainnet": "NEXT_PUBLIC_APP_ENV=mainnet yarn build",
     "start": "next start",
     "lint": "next lint",
-    "analyze-auto-voting": "ts-node scripts/analyzeAutoVotingRounds.ts"
+    "analyze-auto-voting": "ts-node scripts/analyzeAutoVotingRounds.ts",
+    "report:fetch": "ts-node scripts/reportFetch.ts",
+    "report:update": "ts-node scripts/reportUpdate.ts"
   },
   "dependencies": {
     "@chakra-ui/react": "3.30.0",
@@ -42,6 +44,7 @@
   },
   "devDependencies": {
     "@chakra-ui/cli": "^3.5.0",
+    "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -49,6 +52,7 @@
     "@typescript-eslint/parser": "^7.0.0",
     "@vechain/sdk-core": "^2.0.7",
     "@vechain/sdk-network": "^2.0.7",
+    "better-sqlite3": "^12.8.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.25",
     "eslint-plugin-react-hooks": "^4.6.0",

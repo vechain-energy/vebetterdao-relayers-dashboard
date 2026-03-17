@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-03-17T09:06:26.167Z",
+  "network": "mainnet",
+  "roundId": 69,
+  "round": {
+    "roundId": 69,
+    "autoVotingUsersCount": 0,
+    "votedForCount": 0,
+    "rewardsClaimedCount": 0,
+    "totalRelayerRewards": "0.00 B3TR",
+    "totalRelayerRewardsRaw": "0",
+    "estimatedRelayerRewards": "0.00 B3TR",
+    "estimatedRelayerRewardsRaw": "0",
+    "numRelayers": 0,
+    "vthoSpentOnVoting": "0.00 VTHO",
+    "vthoSpentOnVotingRaw": "0",
+    "vthoSpentOnClaiming": "0.00 VTHO",
+    "vthoSpentOnClaimingRaw": "0",
+    "vthoSpentTotal": "0.00 VTHO",
+    "vthoSpentTotalRaw": "0",
+    "expectedActions": 0,
+    "completedActions": 0,
+    "reducedUsersCount": 0,
+    "missedUsersCount": 0,
+    "allActionsOk": true,
+    "actionStatus": "N/A",
+    "isRoundEnded": true
+  },
+  "relayers": []
+}
