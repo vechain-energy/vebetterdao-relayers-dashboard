@@ -3,7 +3,11 @@ name: Update Dashboard Data
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 * * * *"
+    # Every 6 hours (UTC)
+    - cron: "0 */6 * * *"
+    # Monday 6:40–7:10 UTC: every 10 minutes (6:40, 6:50, 7:00, 7:10)
+    - cron: "40,50 6 * * 1"
+    - cron: "0,10 7 * * 1"
 
 jobs:
   update-data:
