@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-30T15:40:24.719Z",
+  "generatedAt": "2026-03-30T18:35:14.242Z",
   "network": "mainnet",
   "firstRound": 69,
   "currentRound": 92,
@@ -587,8 +587,8 @@
       "rewardsClaimedCount": 0,
       "totalRelayerRewards": "0.00 B3TR",
       "totalRelayerRewardsRaw": "0",
-      "estimatedRelayerRewards": "7134.49 B3TR",
-      "estimatedRelayerRewardsRaw": "7134498044772602479634",
+      "estimatedRelayerRewards": "7014.55 B3TR",
+      "estimatedRelayerRewardsRaw": "7014558333249124783552",
       "numRelayers": 10,
       "vthoSpentOnVoting": "9906.30 VTHO",
       "vthoSpentOnVotingRaw": "9906303079479621117372",
@@ -741,8 +741,8 @@
           "rewardsClaimedCount": 215,
           "weightedActions": 215,
           "actions": 215,
-          "claimableRewardsRaw": "337568767598618561638",
-          "relayerRewardsClaimedRaw": "0",
+          "claimableRewardsRaw": "0",
+          "relayerRewardsClaimedRaw": "337568767598618561638",
           "vthoSpentOnVotingRaw": "2265057765745576080",
           "vthoSpentOnClaimingRaw": "459389813871153764594"
         },
@@ -923,8 +923,8 @@
           "rewardsClaimedCount": 64,
           "weightedActions": 814,
           "actions": 314,
-          "claimableRewardsRaw": "1278051055001281438016",
-          "relayerRewardsClaimedRaw": "0",
+          "claimableRewardsRaw": "0",
+          "relayerRewardsClaimedRaw": "1278051055001281438016",
           "vthoSpentOnVotingRaw": "2020768161677528235169",
           "vthoSpentOnClaimingRaw": "270650632554364623398"
         },
@@ -1234,8 +1234,8 @@
           "rewardsClaimedCount": 1,
           "weightedActions": 1,
           "actions": 1,
-          "claimableRewardsRaw": "1570087291156365402",
-          "relayerRewardsClaimedRaw": "0",
+          "claimableRewardsRaw": "0",
+          "relayerRewardsClaimedRaw": "1570087291156365402",
           "vthoSpentOnVotingRaw": "0",
           "vthoSpentOnClaimingRaw": "2170303125626266784"
         },
@@ -1251,6 +1251,10 @@
           "vthoSpentOnClaimingRaw": "0"
         }
       ]
+    },
+    {
+      "address": "0xb1b073d42d4e32026609671dc0445469a7a9fa08",
+      "rounds": []
     },
     {
       "address": "0xd15c50ec31d8a4fee3d168b447efe7beda8ae750",
