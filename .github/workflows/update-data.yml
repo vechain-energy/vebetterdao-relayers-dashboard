@@ -23,9 +23,27 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: "yarn"
+          cache-dependency-path: yarn.lock
+
+      # setup-node only restores Yarn's global package cache. Caching node_modules
+      # lets the scheduled refresh skip relinking and rebuilding native packages.
+      - name: Restore node_modules cache
+        id: node-modules-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-update-data-node-modules-${{ hashFiles('.nvmrc', 'yarn.lock') }}
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile --prefer-offline
+
+      - name: Save node_modules cache
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: node_modules
+          key: ${{ steps.node-modules-cache.outputs.cache-primary-key }}
 
       - name: Run incremental report refresh
         run: yarn report:refresh
