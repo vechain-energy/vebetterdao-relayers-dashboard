@@ -13,6 +13,7 @@ import { FaXTwitter, FaTelegram, FaLink } from "react-icons/fa6"
 import { LuPartyPopper } from "react-icons/lu"
 
 import { BaseModal } from "@/components/Base/BaseModal"
+import { toAppUrl } from "@/config/basePath"
 
 type Props = {
   isOpen: boolean
@@ -112,7 +113,11 @@ function ConfettiCanvas({ active }: { active: boolean }) {
 export function ShareRelayerModal({ isOpen, onClose, relayerAddress }: Props) {
   const { t } = useTranslation()
   const dashboardUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/relayer?address=${relayerAddress ?? ""}`
+    ? toAppUrl(
+        "/relayer",
+        { address: relayerAddress ?? "" },
+        { origin: window.location.origin },
+      )
     : ""
 
   const shareText = t("I just became a relayer on @VeBetterDAO! Choose me as your relayer and let's earn together.")

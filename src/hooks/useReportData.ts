@@ -2,10 +2,10 @@
 
 import { useQuery } from "@tanstack/react-query";
 
+import { withBasePath } from "@/config/basePath";
 import type { AnalyticsReport } from "@/lib/types";
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const REPORT_URL = `${basePath}/data/report.json`;
+const REPORT_URL = withBasePath("/data/report.json");
 
 async function fetchReport(): Promise<AnalyticsReport> {
   const res = await fetch(REPORT_URL, { cache: "no-store" });

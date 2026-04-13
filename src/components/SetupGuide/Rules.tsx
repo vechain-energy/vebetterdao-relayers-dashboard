@@ -18,6 +18,8 @@ import {
   LuExternalLink,
 } from "react-icons/lu";
 
+import { withBasePath } from "@/config/basePath";
+
 export function Rules() {
   const { t } = useTranslation();
   return (
@@ -99,7 +101,7 @@ export function Rules() {
 
         <HStack w="full" justify="center">
           <Image
-            src="/assets/b3mo/B3MO_coding_02 1.png"
+            src={withBasePath("/assets/b3mo/B3MO_coding_02 1.png")}
             maxW="200px"
             alt="B3MO Relayer"
             w="full"

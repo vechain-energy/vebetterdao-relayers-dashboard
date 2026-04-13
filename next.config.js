@@ -4,7 +4,17 @@ if (typeof self === "undefined") {
   global.self = global
 }
 
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ""
+function normalizeBasePath(value) {
+  if (!value) return ""
+
+  const trimmed = value.trim()
+  if (!trimmed || trimmed === "/") return ""
+
+  const withLeadingSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`
+  return withLeadingSlash.replace(/\/+$/, "")
+}
+
+const basePath = normalizeBasePath(process.env.NEXT_PUBLIC_BASE_PATH)
 
 const nextConfig = {
   output: "export",

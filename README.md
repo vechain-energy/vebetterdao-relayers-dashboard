@@ -2,7 +2,10 @@
 
 Dashboard for VeBetterDAO's auto-voting relayer system. Tracks relayer analytics, reward pool stats, round-by-round performance, and per-relayer information.
 
-**Live:** [relayers.vebetterdao.org](https://relayers.vebetterdao.org)
+## Deployments
+
+- Custom-domain build profile: [relayers.vebetterdao.org](https://relayers.vebetterdao.org)
+- GitHub Pages project-site build profile: `https://vechain-energy.github.io/vebetterdao-relayers-dashboard/`
 
 ## What are Relayers?
 
@@ -46,11 +49,18 @@ Next.js reads this automatically for the dashboard UI, and the report scripts lo
 ## Building
 
 ```bash
-yarn build:mainnet     # production build (mainnet)
-yarn build:staging     # production build (testnet-staging)
+NEXT_PUBLIC_BASE_PATH="" yarn build:mainnet
+NEXT_PUBLIC_BASE_PATH="/vebetterdao-relayers-dashboard" yarn build:mainnet
+NEXT_PUBLIC_BASE_PATH="" yarn build:staging
+NEXT_PUBLIC_BASE_PATH="/vebetterdao-relayers-dashboard" yarn build:staging
 ```
 
-Static output goes to `out/` (Next.js static export for GitHub Pages).
+Build profiles:
+
+- Root-domain profile: use `NEXT_PUBLIC_BASE_PATH=""` for custom-domain deployments such as `relayers.vebetterdao.org`
+- GitHub Pages project-site profile: use `NEXT_PUBLIC_BASE_PATH="/vebetterdao-relayers-dashboard"` for the default repository Pages deployment
+
+Static output goes to `out/` for both profiles.
 
 ## Data Updates
 
@@ -92,7 +102,11 @@ yarn analyze-auto-voting --checkpoint public/data/report.json --output public/da
 
 ## Deployment
 
-Deployed automatically to GitHub Pages on push to `main` via [deploy.yml](.github/workflows/deploy.yml).
+The GitHub Pages workflow in [deploy.yml](.github/workflows/deploy.yml):
+
+- validates both supported static-export profiles on every run
+- publishes only the repo-subpath Pages artifact on push to `main`
+- keeps the root-domain profile available as a separate supported build mode for non-Pages deployments
 
 ## License
 
