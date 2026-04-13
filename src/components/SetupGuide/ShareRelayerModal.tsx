@@ -1,6 +1,5 @@
 "use client"
 
-import { useCallback, useEffect, useRef } from "react"
 import {
   Button,
   Text,
@@ -8,6 +7,7 @@ import {
   Box,
   Link,
 } from "@chakra-ui/react"
+import { useCallback, useEffect, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { FaXTwitter, FaTelegram, FaLink } from "react-icons/fa6"
 import { LuPartyPopper } from "react-icons/lu"

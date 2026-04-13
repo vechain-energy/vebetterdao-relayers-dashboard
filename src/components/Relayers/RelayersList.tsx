@@ -9,7 +9,6 @@ import {
   IconButton,
   Input,
   SimpleGrid,
-  Skeleton,
   Stack,
   Text,
   VStack,
@@ -29,17 +28,17 @@ import {
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
 import { useRegisteredRelayers } from "@/hooks/useRegisteredRelayers";
-import { useReportData } from "@/hooks/useReportData";
-import type { RelayerSummary } from "@/lib/relayer-utils";
+import { useRelayerReportDerived } from "@/hooks/useRelayerReportDerived";
 import {
-  buildRoundRewardsContext,
   computeRelayerROI,
-  computeRelayerSummary,
   isRelayerActive,
+  type RelayerSummary,
 } from "@/lib/relayer-utils";
 
 import { BaseBottomSheet } from "../Base/BaseBottomSheet";
+
 import { RelayerCard } from "./RelayerCard";
+import { RelayersListSkeleton } from "./RelayersListSkeleton";
 
 const PAGE_SIZE = 10;
 
@@ -118,13 +117,13 @@ function useSearchAddress(query: string) {
 
 export function RelayersList() {
   const { t } = useTranslation();
-  const { data: report, isLoading, error } = useReportData();
+  const { report, overview, isLoading, error } = useRelayerReportDerived();
   const { relayers: registeredRelayers } = useRegisteredRelayers();
   const b3trToVtho = useB3trToVthoRate();
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("active");
-  const [sortField, setSortField] = useState<SortField>("vtho");
+  const [sortField, setSortField] = useState<SortField>("b3tr");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -146,12 +145,10 @@ export function RelayersList() {
     const reportSummaries: RelayerSummary[] = [];
     const reportAddresses = new Set<string>();
 
-    if (report?.relayers) {
-      const roundCtx = buildRoundRewardsContext(report);
-      const currentRound = report.currentRound;
-      for (const r of report.relayers) {
-        reportSummaries.push(computeRelayerSummary(r, roundCtx, currentRound));
-        reportAddresses.add(r.address.toLowerCase());
+    if (overview?.summaries) {
+      for (const s of overview.summaries) {
+        reportSummaries.push(s);
+        reportAddresses.add(s.address.toLowerCase());
       }
     }
 
@@ -185,7 +182,7 @@ export function RelayersList() {
         s.totalB3trEarnedRaw !== "0" ||
         s.totalVthoSpentRaw !== "0",
     );
-  }, [report, registeredRelayers]);
+  }, [overview, registeredRelayers]);
 
   const filtered = useMemo(() => {
     const currentRound = report?.currentRound ?? 0;
@@ -227,13 +224,7 @@ export function RelayersList() {
   if (error) return null;
 
   if (isLoading || !report) {
-    return (
-      <VStack gap="3" align="stretch">
-        <Skeleton height="16" rounded="xl" />
-        <Skeleton height="16" rounded="xl" />
-        <Skeleton height="16" rounded="xl" />
-      </VStack>
-    );
+    return <RelayersListSkeleton />;
   }
 
   const visible = filtered.slice(0, visibleCount);

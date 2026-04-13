@@ -14,9 +14,9 @@ import NextLink from "next/link";
 import { useTranslation } from "react-i18next";
 import { LuArrowUpRight, LuRadar, LuRocket } from "react-icons/lu";
 
+import { AppsAsRelayersModal } from "@/components/AppsAsRelayers/AppsAsRelayersModal";
 import { useDismissedBanner } from "@/hooks/useDismissedBanners";
 
-import { AppsAsRelayersModal } from "@/components/AppsAsRelayers/AppsAsRelayersModal";
 
 interface BecomeRelayerCardProps {
   forceBanner?: boolean;

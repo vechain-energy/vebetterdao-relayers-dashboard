@@ -9,17 +9,14 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import type { IconType } from "react-icons";
-import { LuChartLine, LuCircleCheck, LuCoins, LuRadar } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
+import type { IconType } from "react-icons";
+import { LuChartLine, LuCoins, LuFlame, LuRadar } from "react-icons/lu";
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
-
-import { useReportData } from "@/hooks/useReportData";
+import { useRelayerReportDerived } from "@/hooks/useRelayerReportDerived";
 import { formatNumber, formatToken } from "@/lib/format";
-import { computeRelayersOverview } from "@/lib/relayer-utils";
 import { computeAverageROI } from "@/lib/roi";
-import { computeRoundCompletion, getRoundPhaseLabel } from "@/lib/round-utils";
 
 interface StatItemProps {
   label: string;
@@ -64,7 +61,7 @@ function StatItem({ label, value, sublabel, icon, isLoading }: StatItemProps) {
 }
 
 export function StatsCards() {
-  const { data: report, isLoading, error } = useReportData();
+  const { report, overview, isLoading, error } = useRelayerReportDerived();
   const b3trToVtho = useB3trToVthoRate();
 
   const { t } = useTranslation();
@@ -77,65 +74,41 @@ export function StatsCards() {
   }
 
   const rounds = report?.rounds ?? [];
-
-  const currentRoundData = rounds.find(
-    (r) => r.roundId === report?.currentRound,
-  );
-
-  const overview = report ? computeRelayersOverview(report) : null;
-
   const concludedRounds = rounds.filter(
     (r) => r.isRoundEnded && r.totalRelayerRewardsRaw !== "0",
   );
   const avgRoi = computeAverageROI(concludedRounds, b3trToVtho);
 
-  const roundCompletion =
-    currentRoundData != null ? computeRoundCompletion(currentRoundData) : null;
-  const roundPhase =
-    currentRoundData != null ? getRoundPhaseLabel(currentRoundData) : "";
-
   return (
     <SimpleGrid w="full" columns={{ base: 2, md: 2, lg: 2 }} gap="4">
-      <StatItem
-        label={t("Current round")}
-        value={
-          isLoading
-            ? "..."
-            : roundCompletion != null
-              ? `${roundCompletion}%`
-              : "\u2014"
-        }
-        sublabel={
-          isLoading
-            ? ""
-            : currentRoundData
-              ? `#${currentRoundData.roundId} · ${t(roundPhase)}`
-              : t("no data")
-        }
-        icon={LuCircleCheck}
-        isLoading={isLoading}
-      />
       <StatItem
         label={t("Active relayers")}
         value={
           isLoading
             ? "..."
-            : overview
+            : overview != null
               ? String(overview.activeRelayers)
               : "\u2014"
         }
-        sublabel={
-          isLoading
-            ? ""
-            : overview
-              ? `${overview.totalRelayers} ${t("total")}`
-              : ""
-        }
+        sublabel={t("in last 3 rounds")}
         icon={LuRadar}
         isLoading={isLoading}
       />
       <StatItem
-        label={t("B3TR distributed")}
+        label={t("Total VTHO Spent")}
+        value={
+          isLoading
+            ? "..."
+            : overview != null
+              ? `${formatToken(overview.totalVthoSpentRaw)} VTHO`
+              : "\u2014"
+        }
+        sublabel={t("for gas costs")}
+        icon={LuFlame}
+        isLoading={isLoading}
+      />
+      <StatItem
+        label={t("Total B3TR distributed")}
         value={
           isLoading
             ? "..."
@@ -156,7 +129,7 @@ export function StatsCards() {
               ? `${formatNumber(Math.round(avgRoi))}%`
               : "\u2014"
         }
-        sublabel={""}
+        sublabel={"for relayers"}
         icon={LuChartLine}
         isLoading={isLoading}
       />

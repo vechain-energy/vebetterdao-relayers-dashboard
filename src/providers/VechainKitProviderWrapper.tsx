@@ -2,14 +2,13 @@
 
 import { useToken } from "@chakra-ui/react";
 import { useCurrentLanguage } from "@vechain/vechain-kit";
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { getConfig } from "@/config";
-import type { EnvConfig } from "@/config";
-import { toAppUrl } from "@/config/basePath";
-import dynamic from "next/dynamic";
 
 import { useColorMode } from "@/components/ui/color-mode";
+import { getConfig, type EnvConfig } from "@/config";
+import { toAppUrl } from "@/config/basePath";
 
 const VeChainKitProvider = dynamic(
   () => import("@vechain/vechain-kit").then((mod) => mod.VeChainKitProvider),

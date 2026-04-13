@@ -1,5 +1,12 @@
 export const DEFAULT_MAINNET_NODE_URL = "https://mainnet.vechain.org"
 export const DEFAULT_TESTNET_NODE_URL = "https://testnet.vechain.org"
+export const DEFAULT_MAINNET_NODE_URLS = [
+  DEFAULT_MAINNET_NODE_URL,
+  "https://vethor-node.vechain.com",
+  "https://node-mainnet.vechain.energy",
+  "https://mainnet.vecha.in",
+]
+export const DEFAULT_TESTNET_NODE_URLS = [DEFAULT_TESTNET_NODE_URL]
 
 function readConfiguredUrl(...keys: string[]): string | undefined {
   for (const key of keys) {
@@ -29,4 +36,14 @@ export function withPreferredNodeUrl(
   preferredUrl: string,
 ): string[] {
   return [preferredUrl, ...urls.filter((url) => url !== preferredUrl)]
+}
+
+export function getNodePoolForEnv(
+  env: "mainnet" | "testnet-staging",
+): string[] {
+  if (env === "mainnet") {
+    return withPreferredNodeUrl(DEFAULT_MAINNET_NODE_URLS, getMainnetNodeUrl())
+  }
+
+  return withPreferredNodeUrl(DEFAULT_TESTNET_NODE_URLS, getTestnetNodeUrl())
 }

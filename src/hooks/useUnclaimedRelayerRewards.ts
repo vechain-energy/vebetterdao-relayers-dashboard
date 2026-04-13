@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useThor } from "@vechain/vechain-kit";
+import { useMemo } from "react";
 import { encodeFunctionData, decodeFunctionResult } from "viem";
 
-import { relayerPoolAbi, relayerPoolAddress } from "./contracts";
 import type { RelayerAnalytics, RoundAnalytics } from "@/lib/types";
+
+import { relayerPoolAbi, relayerPoolAddress } from "./contracts";
 
 export interface UnclaimedRound {
   roundId: number;

@@ -1,20 +1,23 @@
-import { ThorClient } from "@vechain/sdk-network";
+import * as fs from "fs";
+import * as path from "path";
+
 import { ABIContract, Hex } from "@vechain/sdk-core";
+import { ThorClient } from "@vechain/sdk-network";
 import {
   XAllocationVoting__factory,
   VoterRewards__factory,
   RelayerRewardsPool__factory,
   Emissions__factory,
 } from "@vechain/vebetterdao-contracts/typechain-types";
-import * as fs from "fs";
-import * as path from "path";
 import type Database from "better-sqlite3";
+
 import { getMainnetNodeUrl } from "../src/config/nodeUrls";
 import {
   getFullRoundRange,
   selectRoundsToBuild,
   writeMirroredAggregateReport,
 } from "../src/lib/reporting/pipeline";
+
 import { openDatabase } from "./reportDb";
 
 const FIRST_AUTO_VOTING_ROUND = 69;
@@ -490,7 +493,7 @@ async function estimateRelayerRewards(
   return totalEstimatedFees;
 }
 
-function getDistinctRounds(db: Database.Database): number[] {
+function _getDistinctRounds(db: Database.Database): number[] {
   const rows = db
     .prepare(
       `
@@ -809,7 +812,7 @@ function buildRoundAnalytics(
   };
 }
 
-function getAllRelayers(db: Database.Database): string[] {
+function _getAllRelayers(db: Database.Database): string[] {
   const rows = db
     .prepare(
       `
@@ -1000,7 +1003,7 @@ function buildRoundRelayers(
   return out;
 }
 
-function buildRelayerAnalytics(
+function _buildRelayerAnalytics(
   db: Database.Database,
   relayer: string,
 ): RelayerAnalytics {

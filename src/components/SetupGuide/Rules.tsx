@@ -1,4 +1,5 @@
 import {
+  Card,
   Heading,
   Text,
   VStack,
@@ -8,7 +9,6 @@ import {
   Link,
   Button,
 } from "@chakra-ui/react";
-import { Card } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import {
   LuZap,

@@ -12,16 +12,18 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useGetAvatarOfAddress, useVechainDomain } from "@vechain/vechain-kit";
-
-import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
 import NextLink from "next/link";
 import { useTranslation } from "react-i18next";
 import { FaAngleRight } from "react-icons/fa6";
 
 import { useB3trToVthoRate } from "@/hooks/useB3trToVthoRate";
+import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
 import { formatNumber, formatToken } from "@/lib/format";
-import type { RelayerSummary } from "@/lib/relayer-utils";
-import { computeRelayerROI, isRelayerActive } from "@/lib/relayer-utils";
+import {
+  computeRelayerROI,
+  isRelayerActive,
+  type RelayerSummary,
+} from "@/lib/relayer-utils";
 
 function StatPill({
   label,

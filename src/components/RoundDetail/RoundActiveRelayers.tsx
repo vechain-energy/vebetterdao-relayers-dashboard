@@ -18,14 +18,14 @@ import { useTranslation } from "react-i18next";
 import { FaAngleRight } from "react-icons/fa6";
 import { LuRadar } from "react-icons/lu";
 
-import { useReportData } from "@/hooks/useReportData";
+import { useRelayerReportDerived } from "@/hooks/useRelayerReportDerived";
 import { formatNumber, formatToken } from "@/lib/format";
+import { computeRelayerRoundB3tr } from "@/lib/relayer-utils";
 import type { RelayerRoundBreakdown } from "@/lib/types";
 
 interface ActiveRelayer {
   address: string;
   breakdown: RelayerRoundBreakdown;
-  prevBreakdown?: RelayerRoundBreakdown;
 }
 
 function StatPill({
@@ -59,11 +59,13 @@ function StatPill({
 function ActiveRelayerRow({
   relayer,
   totalWeighted,
-  prevTotalWeighted,
+  b3trRaw,
+  isRoundEnded,
 }: {
   relayer: ActiveRelayer;
   totalWeighted: number;
-  prevTotalWeighted: number;
+  b3trRaw: string;
+  isRoundEnded: boolean;
 }) {
   const { data: domain } = useVechainDomain(relayer.address);
   const { data: avatarSrc } = useGetAvatarOfAddress(relayer.address);
@@ -73,17 +75,13 @@ function ActiveRelayerRow({
   const shortAddress = `${relayer.address.slice(0, 6)}...${relayer.address.slice(-4)}`;
   const href = `/relayer?address=${domain?.domain || relayer.address}`;
 
-  const { breakdown: rd, prevBreakdown } = relayer;
+  const { breakdown: rd } = relayer;
   const vthoSpentRaw = (
-    BigInt(rd.vthoSpentOnVotingRaw) +
-    BigInt(prevBreakdown?.vthoSpentOnClaimingRaw ?? "0")
+    BigInt(rd.vthoSpentOnVotingRaw) + BigInt(rd.vthoSpentOnClaimingRaw)
   ).toString();
-  const combinedWeighted =
-    rd.weightedActions + (prevBreakdown?.weightedActions ?? 0);
-  const combinedTotal = totalWeighted + prevTotalWeighted;
   const weightPct =
-    combinedTotal > 0
-      ? `${formatNumber(parseFloat(((combinedWeighted / combinedTotal) * 100).toFixed(2)))}%`
+    totalWeighted > 0
+      ? `${formatNumber(parseFloat(((rd.weightedActions / totalWeighted) * 100).toFixed(2)))}%`
       : "\u2014";
 
   return (
@@ -93,7 +91,7 @@ function ActiveRelayerRow({
           {/* Desktop */}
           <Box hideBelow="md">
             <HStack justify="space-between" w="full" gap="2">
-              <SimpleGrid columns={6} gap="4" w="full" alignItems="center">
+              <SimpleGrid columns={7} gap="4" w="full" alignItems="center">
                 <HStack gridColumn="span 2" gap="3" minW="0">
                   {avatarSrc && (
                     <Box flexShrink={0}>
@@ -124,12 +122,17 @@ function ActiveRelayerRow({
                 />
                 <StatPill
                   label={t("Claimed for")}
-                  value={formatNumber(prevBreakdown?.rewardsClaimedCount ?? 0)}
+                  value={formatNumber(rd.rewardsClaimedCount)}
                 />
                 <StatPill
                   label={t("VTHO spent")}
                   value={formatToken(vthoSpentRaw)}
                   unit="VTHO"
+                />
+                <StatPill
+                  label={isRoundEnded ? t("B3TR earned") : t("B3TR est.")}
+                  value={formatToken(b3trRaw)}
+                  unit="B3TR"
                 />
                 <StatPill label={t("Weight")} value={weightPct} />
               </SimpleGrid>
@@ -178,12 +181,17 @@ function ActiveRelayerRow({
                 />
                 <StatPill
                   label={t("Claimed for")}
-                  value={formatNumber(prevBreakdown?.rewardsClaimedCount ?? 0)}
+                  value={formatNumber(rd.rewardsClaimedCount)}
                 />
                 <StatPill
                   label={t("VTHO spent")}
                   value={formatToken(vthoSpentRaw)}
                   unit="VTHO"
+                />
+                <StatPill
+                  label={isRoundEnded ? t("B3TR earned") : t("B3TR est.")}
+                  value={formatToken(b3trRaw)}
+                  unit="B3TR"
                 />
                 <StatPill label={t("Weight")} value={weightPct} />
               </SimpleGrid>
@@ -201,61 +209,36 @@ interface RoundActiveRelayersProps {
 
 export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
   const { t } = useTranslation();
-  const { data: report } = useReportData();
+  const { report, roundCtx } = useRelayerReportDerived();
 
-  const { activeRelayers, totalWeighted, prevTotalWeighted } = useMemo(() => {
+  const { activeRelayers, totalWeighted, isRoundEnded } = useMemo(() => {
     if (!report?.relayers)
       return {
         activeRelayers: [] as ActiveRelayer[],
         totalWeighted: 0,
-        prevTotalWeighted: 0,
+        isRoundEnded: false,
       };
-    const prevRoundId = roundId - 1;
+
+    const round = report.rounds?.find((r) => r.roundId === roundId);
     const result: ActiveRelayer[] = [];
-    const emptyBreakdown: RelayerRoundBreakdown = {
-      roundId,
-      votedForCount: 0,
-      rewardsClaimedCount: 0,
-      weightedActions: 0,
-      actions: 0,
-      claimableRewardsRaw: "0",
-      relayerRewardsClaimedRaw: "0",
-      vthoSpentOnVotingRaw: "0",
-      vthoSpentOnClaimingRaw: "0",
-    };
+    let weighted = 0;
     for (const relayer of report.relayers) {
       const rd = relayer.rounds.find((r) => r.roundId === roundId);
-      const prevRd = relayer.rounds.find((r) => r.roundId === prevRoundId);
-      if (rd && (rd.votedForCount > 0 || (prevRd && prevRd.rewardsClaimedCount > 0))) {
+      if (rd && (rd.votedForCount > 0 || rd.rewardsClaimedCount > 0)) {
+        weighted += rd.weightedActions;
         result.push({
           address: relayer.address,
           breakdown: rd,
-          prevBreakdown: prevRd,
-        });
-      } else if (!rd && prevRd && prevRd.rewardsClaimedCount > 0) {
-        result.push({
-          address: relayer.address,
-          breakdown: emptyBreakdown,
-          prevBreakdown: prevRd,
         });
       }
     }
-    result.sort((a, b) => {
-      const wa =
-        a.breakdown.weightedActions + (a.prevBreakdown?.weightedActions ?? 0);
-      const wb =
-        b.breakdown.weightedActions + (b.prevBreakdown?.weightedActions ?? 0);
-      return wb - wa;
-    });
-    const roundExpected =
-      report.rounds.find((r) => r.roundId === roundId)?.expectedActions ?? 0;
-    const prevRoundExpected =
-      report.rounds.find((r) => r.roundId === roundId - 1)?.expectedActions ??
-      0;
+    result.sort(
+      (a, b) => b.breakdown.votedForCount - a.breakdown.votedForCount,
+    );
     return {
       activeRelayers: result,
-      totalWeighted: roundExpected,
-      prevTotalWeighted: prevRoundExpected,
+      totalWeighted: weighted,
+      isRoundEnded: round?.isRoundEnded ?? false,
     };
   }, [report, roundId]);
 
@@ -282,14 +265,26 @@ export function RoundActiveRelayers({ roundId }: RoundActiveRelayersProps) {
       </HStack>
 
       <VStack gap="3" align="stretch">
-        {activeRelayers.map((relayer) => (
-          <ActiveRelayerRow
-            key={relayer.address}
-            relayer={relayer}
-            totalWeighted={totalWeighted}
-            prevTotalWeighted={prevTotalWeighted}
-          />
-        ))}
+        {activeRelayers.map((relayer) => {
+          const ctx = roundCtx?.get(roundId);
+          const effectiveCtx =
+            !isRoundEnded && ctx
+              ? { poolRaw: ctx.estimatedPoolRaw, totalWeighted: ctx.totalWeighted }
+              : ctx;
+          const b3trRaw = effectiveCtx
+            ? computeRelayerRoundB3tr(relayer.breakdown.weightedActions, effectiveCtx).toString()
+            : relayer.breakdown.claimableRewardsRaw;
+
+          return (
+            <ActiveRelayerRow
+              key={relayer.address}
+              relayer={relayer}
+              totalWeighted={totalWeighted}
+              b3trRaw={b3trRaw}
+              isRoundEnded={isRoundEnded}
+            />
+          );
+        })}
       </VStack>
     </VStack>
   );
