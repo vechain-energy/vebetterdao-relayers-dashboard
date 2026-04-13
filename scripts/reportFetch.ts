@@ -1,4 +1,4 @@
-import { ThorClient, MAINNET_URL } from "@vechain/sdk-network";
+import { ThorClient } from "@vechain/sdk-network";
 import { ABIContract, Hex } from "@vechain/sdk-core";
 import {
   XAllocationVoting__factory,
@@ -7,8 +7,15 @@ import {
   Emissions__factory,
 } from "@vechain/vebetterdao-contracts/typechain-types";
 import type Database from "better-sqlite3";
+import { getMainnetNodeUrl } from "../src/config/nodeUrls";
+import {
+  getStoredActionRoundId,
+  getStoredClaimRoundId,
+  selectClaimableSnapshotRefreshRounds,
+} from "../src/lib/reporting/pipeline";
 import { openDatabase, getMeta, setMeta } from "./reportDb";
 
+const FIRST_AUTO_VOTING_ROUND = 69;
 const FINALITY_MARGIN = 10;
 const mainnetConfig = {
   xAllocationVotingContractAddress:
@@ -44,6 +51,24 @@ function ensureInteger(value: bigint | number | string | undefined): bigint {
 async function getLatestBlock(thor: ThorClient): Promise<number> {
   const best = await thor.blocks.getBestBlockCompressed();
   return Number(best?.number ?? 0);
+}
+
+async function getCurrentRoundId(
+  thor: ThorClient,
+  contractAddress: string,
+): Promise<number> {
+  const xAllocationVotingContract = ABIContract.ofAbi(
+    XAllocationVoting__factory.abi,
+  );
+  const result = await thor.contracts.executeCall(
+    contractAddress,
+    xAllocationVotingContract.getFunction("currentRoundId"),
+    [],
+  );
+  if (!result.success) {
+    throw new Error("Failed to get current round ID");
+  }
+  return Number(result.result?.array?.[0] ?? 0);
 }
 
 async function getRoundSnapshot(
@@ -138,6 +163,83 @@ async function getRoundSetupData(
     ),
     numRelayers: Number(decodedData.args.numRelayers ?? 0),
   };
+}
+
+function countActiveRelayersForRound(
+  db: Database.Database,
+  roundId: number,
+): number {
+  const row = db
+    .prepare(
+      `
+      SELECT COUNT(DISTINCT relayer) AS cnt
+      FROM relayer_actions
+      WHERE round_id = ?
+    `,
+    )
+    .get(roundId) as { cnt: bigint | number | string | undefined };
+
+  if (typeof row?.cnt === "bigint") return Number(row.cnt);
+  if (typeof row?.cnt === "number") return row.cnt;
+  if (typeof row?.cnt === "string") return Number(row.cnt);
+  return 0;
+}
+
+function getMutableRoundIds(db: Database.Database): number[] {
+  const rows = db
+    .prepare(
+      `
+      SELECT round_id
+      FROM rounds
+      WHERE round_id >= ?
+        AND (
+          COALESCE(is_round_ended, 0) = 0
+          OR COALESCE(rewards_snapshot_finalized, 0) = 0
+        )
+      ORDER BY round_id ASC
+    `,
+    )
+    .all(FIRST_AUTO_VOTING_ROUND) as { round_id: number }[]
+
+  return rows.map((row) => Number(row.round_id))
+}
+
+function getTouchedClaimRoundsByBlockRange(
+  db: Database.Database,
+  fromBlock: number,
+  toBlock: number,
+): number[] {
+  if (toBlock <= fromBlock) return []
+
+  const rows = db
+    .prepare(
+      `
+      SELECT DISTINCT ra.round_id AS round_id
+      FROM relayer_actions ra
+      JOIN transactions t ON t.tx_id = ra.tx_id
+      WHERE ra.weight = 1 AND t.block_number > ? AND t.block_number <= ?
+      UNION
+      SELECT DISTINCT c.round_id AS round_id
+      FROM claims c
+      JOIN transactions t ON t.tx_id = c.tx_id
+      WHERE t.block_number > ? AND t.block_number <= ?
+      UNION
+      SELECT DISTINCT rrc.round_id AS round_id
+      FROM relayer_rewards_claimed rrc
+      WHERE rrc.block_number IS NOT NULL AND rrc.block_number > ? AND rrc.block_number <= ?
+      ORDER BY round_id ASC
+    `,
+    )
+    .all(
+      fromBlock,
+      toBlock,
+      fromBlock,
+      toBlock,
+      fromBlock,
+      toBlock,
+    ) as { round_id: number }[]
+
+  return rows.map((row) => Number(row.round_id))
 }
 
 async function isCycleEnded(
@@ -423,7 +525,7 @@ async function fetchRelayerActions(
       const relayer = normalizeAddress(decoded.args.relayer as string);
       const actionCount = Number(decoded.args.actionCount ?? 0);
       const weight = Number(decoded.args.weight ?? 0);
-      const effectiveRoundId = weight === 1 ? roundId + 1 : roundId;
+      const effectiveRoundId = getStoredActionRoundId(roundId, weight);
 
       const meta: LogMeta = {
         txID: log.meta?.txID,
@@ -645,7 +747,7 @@ async function fetchClaims(
         });
 
         const claimedCycle = Number(decoded.args.cycle ?? 0);
-        const roundId = claimedCycle + 1;
+        const roundId = getStoredClaimRoundId(claimedCycle);
         const relayer = normalizeAddress(decoded.args.relayer as string);
         const voter = normalizeAddress(decoded.args.voter as string);
 
@@ -806,7 +908,7 @@ async function populateNewRounds(
       ended ? 1 : 0,
       0,
       null,
-      setup.numRelayers,
+      countActiveRelayersForRound(db, roundId),
       autoVotingUsersCount,
       setup.contractAutoVotingUsersCount,
       reducedUsers,
@@ -893,39 +995,21 @@ async function fetchRelayerRewardsClaimed(
 async function updateRelayerClaimableSnapshots(
   db: Database.Database,
   thor: ThorClient,
+  fromBlock: number,
+  toBlock: number,
+  currentRoundId: number,
 ): Promise<void> {
   const relayerPoolAbi = ABIContract.ofAbi(RelayerRewardsPool__factory.abi);
+  const roundsToRefresh = selectClaimableSnapshotRefreshRounds({
+    firstRoundId: FIRST_AUTO_VOTING_ROUND,
+    currentRoundId,
+    mutableRounds: getMutableRoundIds(db),
+    touchedClaimRounds: getTouchedClaimRoundsByBlockRange(db, fromBlock, toBlock),
+  });
 
-  const rounds = db
-    .prepare(
-      `
-      SELECT round_id, is_round_ended, rewards_snapshot_finalized
-      FROM rounds
-      WHERE round_id >= 69
-      ORDER BY round_id ASC
-    `,
-    )
-    .all() as {
-    round_id: number;
-    is_round_ended: number | bigint | null;
-    rewards_snapshot_finalized: number | bigint | null;
-  }[];
-
-  // If we see claim activity in round N (our accounting), we should also refresh round N-1
-  // because rewards for the previous round often become claimable during the next round.
-  const claimActivityRounds = db
-    .prepare(
-      `
-      SELECT DISTINCT round_id AS round_id
-      FROM relayer_actions
-      WHERE weight = 1
-    `,
-    )
-    .all() as { round_id: number }[];
-  const forceRefreshRounds = new Set<number>();
-  for (const r of claimActivityRounds) {
-    const prev = Number(r.round_id) - 1;
-    if (prev >= 69) forceRefreshRounds.add(prev);
+  if (roundsToRefresh.length === 0) {
+    console.log("No round snapshots need refreshing.")
+    return
   }
 
   const registeredRelayers = await thor.contracts.executeCall(
@@ -975,11 +1059,7 @@ async function updateRelayerClaimableSnapshots(
   `,
   );
 
-  for (const r of rounds) {
-    const roundId = Number(r.round_id);
-    const finalized = Number(r.rewards_snapshot_finalized ?? 0) === 1;
-    if (finalized && !forceRefreshRounds.has(roundId)) continue;
-
+  for (const roundId of roundsToRefresh) {
     // Only finalize once the pool says rewards are actually claimable.
     const claimableCheck = await thor.contracts.executeCall(
       mainnetConfig.relayerRewardsPoolContractAddress,
@@ -1018,7 +1098,7 @@ async function main(): Promise<void> {
   console.log("==================");
 
   const db = openDatabase();
-  const thor = ThorClient.at(MAINNET_URL, { isPollingEnabled: false });
+  const thor = ThorClient.at(getMainnetNodeUrl(), { isPollingEnabled: false });
 
   const lastProcessedBlockStr = getMeta(db, "last_processed_block");
   const lastProcessedBlock = lastProcessedBlockStr
@@ -1045,6 +1125,7 @@ async function main(): Promise<void> {
   const xAllocationVotingAddress =
     "0x89A00Bb0947a30FF95BEeF77a66AEdE3842Fe5B7";
   const voterRewardsAddress = "0x838A33AF756a6366f93e201423E1425f67eC0Fa7";
+  const currentRoundId = await getCurrentRoundId(thor, xAllocationVotingAddress);
 
   const relayerActionsCount = await fetchRelayerActions(
     db,
@@ -1081,16 +1162,13 @@ async function main(): Promise<void> {
   console.log(`Stored ${relayerRewardsClaimedCount} relayer reward claim logs.`);
 
   await populateNewRounds(db, thor);
-  const totalNewEvents =
-    relayerActionsCount +
-    votingEventsCount +
-    claimsCount +
-    relayerRewardsClaimedCount;
-  if (totalNewEvents > 0) {
-    await updateRelayerClaimableSnapshots(db, thor);
-  } else {
-    console.log("No new events; skipping claimable rewards snapshot update.");
-  }
+  await updateRelayerClaimableSnapshots(
+    db,
+    thor,
+    fromBlock,
+    toBlock,
+    currentRoundId,
+  );
 
   setMeta(db, "last_processed_block", String(toBlock));
   console.log(`Updated last_processed_block to ${toBlock}.`);
@@ -1100,4 +1178,3 @@ main().catch((error) => {
   console.error("Fetch script failed:", error);
   process.exit(1);
 });
-

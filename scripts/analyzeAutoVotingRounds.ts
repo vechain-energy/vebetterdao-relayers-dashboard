@@ -1,6 +1,9 @@
 /**
  * Auto-Voting Round Analytics Script
  *
+ * Manual fallback / backfill tool for report generation.
+ * The scheduled production pipeline uses `report:fetch` + `report:update`.
+ *
  * Analyzes auto-voting activity per round since the feature went live (Round 69).
  * Outputs data to console and saves to JSON file.
  *
@@ -14,7 +17,7 @@
  *   --output <path>      Write report to this path (e.g. apps/relayer-dashboard/public/data/report.json).
  */
 
-import { ThorClient, MAINNET_URL } from "@vechain/sdk-network";
+import { ThorClient } from "@vechain/sdk-network";
 import { ABIContract, Hex } from "@vechain/sdk-core";
 import {
   XAllocationVoting__factory,
@@ -24,6 +27,7 @@ import {
 } from "@vechain/vebetterdao-contracts/typechain-types";
 import * as fs from "fs";
 import * as path from "path";
+import { getMainnetNodeUrl } from "../src/config/nodeUrls";
 
 const mainnetConfig = {
   xAllocationVotingContractAddress:
@@ -942,6 +946,33 @@ async function getRelayerActionsForRound(
   return relayerMap;
 }
 
+function countActiveRelayers(
+  relayerActions: Map<
+    string,
+    {
+      votedForCount: number;
+      rewardsClaimedCount: number;
+      weightedActions: number;
+      actions: number;
+    }
+  >,
+): number {
+  let count = 0;
+
+  for (const breakdown of relayerActions.values()) {
+    if (
+      breakdown.actions > 0 ||
+      breakdown.weightedActions > 0 ||
+      breakdown.votedForCount > 0 ||
+      breakdown.rewardsClaimedCount > 0
+    ) {
+      count += 1;
+    }
+  }
+
+  return count;
+}
+
 /**
  * Get per-relayer VTHO spent on voting for a round.
  * Groups voting transaction receipts by tx.origin (relayer).
@@ -1232,8 +1263,6 @@ async function analyzeRound(
     roundSnapshot,
     roundDeadline,
   );
-  const numRelayers = roundSetup.numRelayers;
-
   // Get auto-voting users at round start via event scanning
   const autoVotingUsers = await getAllAutoVotingEnabledUsers(
     thor,
@@ -1308,7 +1337,16 @@ async function analyzeRound(
   console.log(
     `    - Estimated relayer rewards: ${formatB3TR(estimatedRelayerRewards)}`,
   );
-  console.log(`    - Number of relayers: ${numRelayers}`);
+
+  const relayerActions = await getRelayerActionsForRound(
+    thor,
+    CONFIG.relayerRewardsPoolContractAddress,
+    roundId,
+    roundSnapshot,
+    undefined,
+  );
+  const numRelayers = countActiveRelayers(relayerActions);
+  console.log(`    - Active relayers: ${numRelayers}`);
 
   // Get VTHO spent on voting transactions (voting for this round)
   const votingTxIds = await getVotingTransactionIds(
@@ -1580,6 +1618,15 @@ function saveReport(
   const filename = `auto-voting-report-${timestamp}.json`;
   const defaultDir = path.join(__dirname, "..", "output");
   const defaultFilepath = path.join(defaultDir, filename);
+  const primaryReportPath = path.join(process.cwd(), "public", "data", "report.json");
+  const legacyReportPath = path.join(
+    process.cwd(),
+    "apps",
+    "relayer-dashboard",
+    "public",
+    "data",
+    "report.json",
+  );
 
   const writeTo = (filepath: string) => {
     const dir = path.dirname(filepath);
@@ -1595,6 +1642,9 @@ function saveReport(
       ? outputPath
       : path.resolve(process.cwd(), outputPath);
     writeTo(resolved);
+    if (resolved === primaryReportPath) {
+      writeTo(legacyReportPath);
+    }
     return resolved;
   }
   return defaultFilepath;
@@ -1612,7 +1662,7 @@ async function main(): Promise<void> {
   if (checkpointPath) console.log(`Checkpoint: ${checkpointPath}`);
   if (outputPath) console.log(`Output: ${outputPath}`);
 
-  const thor = ThorClient.at(MAINNET_URL, { isPollingEnabled: false });
+  const thor = ThorClient.at(getMainnetNodeUrl(), { isPollingEnabled: false });
 
   const currentRoundId = await getCurrentRoundId(
     thor,
@@ -1800,22 +1850,22 @@ async function main(): Promise<void> {
       });
     }
 
-    // Attribute claiming VTHO to the round being claimed (prevRoundId)
+    // Attribute claiming VTHO to the round being claimed.
     // so it aligns with rewardsClaimedCount on the same round entry.
-    if (prevRoundId >= FIRST_AUTO_VOTING_ROUND) {
+    if (roundId >= FIRST_AUTO_VOTING_ROUND) {
       for (const [addr, vtho] of claimingVtho) {
         if (!checkpointRelayerMap.has(addr)) {
           checkpointRelayerMap.set(addr, new Map());
         }
         const roundMap = checkpointRelayerMap.get(addr)!;
-        const prevEntry = roundMap.get(prevRoundId);
+        const prevEntry = roundMap.get(roundId);
         if (prevEntry) {
           prevEntry.vthoSpentOnClaimingRaw = (
             BigInt(prevEntry.vthoSpentOnClaimingRaw) + vtho
           ).toString();
         } else {
-          roundMap.set(prevRoundId, {
-            roundId: prevRoundId,
+          roundMap.set(roundId, {
+            roundId,
             votedForCount: 0,
             rewardsClaimedCount: 0,
             weightedActions: 0,

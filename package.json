@@ -13,9 +13,11 @@
     "build:mainnet": "NEXT_PUBLIC_APP_ENV=mainnet yarn build",
     "start": "next start",
     "lint": "next lint",
-    "analyze-auto-voting": "ts-node scripts/analyzeAutoVotingRounds.ts",
-    "report:fetch": "ts-node scripts/reportFetch.ts",
-    "report:update": "ts-node scripts/reportUpdate.ts"
+    "test": "vitest run",
+    "analyze-auto-voting": "node --env-file-if-exists=.env ./node_modules/ts-node/dist/bin.js scripts/analyzeAutoVotingRounds.ts",
+    "report:fetch": "node --env-file-if-exists=.env ./node_modules/ts-node/dist/bin.js scripts/reportFetch.ts",
+    "report:update": "node --env-file-if-exists=.env ./node_modules/ts-node/dist/bin.js scripts/reportUpdate.ts",
+    "report:refresh": "yarn report:fetch && yarn report:update"
   },
   "dependencies": {
     "@chakra-ui/react": "3.30.0",
@@ -57,6 +59,7 @@
     "eslint-config-next": "14.2.25",
     "eslint-plugin-react-hooks": "^4.6.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

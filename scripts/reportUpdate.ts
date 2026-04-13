@@ -1,4 +1,4 @@
-import { ThorClient, MAINNET_URL } from "@vechain/sdk-network";
+import { ThorClient } from "@vechain/sdk-network";
 import { ABIContract, Hex } from "@vechain/sdk-core";
 import {
   XAllocationVoting__factory,
@@ -9,6 +9,12 @@ import {
 import * as fs from "fs";
 import * as path from "path";
 import type Database from "better-sqlite3";
+import { getMainnetNodeUrl } from "../src/config/nodeUrls";
+import {
+  getFullRoundRange,
+  selectRoundsToBuild,
+  writeMirroredAggregateReport,
+} from "../src/lib/reporting/pipeline";
 import { openDatabase } from "./reportDb";
 
 const FIRST_AUTO_VOTING_ROUND = 69;
@@ -285,6 +291,23 @@ async function getRoundSetupData(
     ),
     numRelayers: Number(decodedData.args.numRelayers ?? 0),
   };
+}
+
+function countActiveRelayersForRound(
+  db: Database.Database,
+  roundId: number,
+): number {
+  const row = db
+    .prepare(
+      `
+      SELECT COUNT(DISTINCT relayer) AS cnt
+      FROM relayer_actions
+      WHERE round_id = ?
+    `,
+    )
+    .get(roundId) as { cnt: unknown };
+
+  return coerceDbNumber(row?.cnt);
 }
 
 async function getActionVerificationData(
@@ -647,7 +670,7 @@ async function ensureRoundCached(
     snapshot_block: snapshot,
     deadline_block: deadline,
     is_round_ended: isEnded ? 1 : 0,
-    num_relayers: setup.numRelayers,
+    num_relayers: countActiveRelayersForRound(db, roundId),
     auto_voting_users_count: autoVotingUsersCount,
     contract_auto_voting_users_count: setup.contractAutoVotingUsersCount,
     reduced_users_count: reducedUsers,
@@ -769,7 +792,7 @@ function buildRoundAnalytics(
     totalRelayerRewardsRaw: totalRelayerRewardsRaw.toString(),
     estimatedRelayerRewards: formatB3TR(estimatedRelayerRewardsRaw),
     estimatedRelayerRewardsRaw: estimatedRelayerRewardsRaw.toString(),
-    numRelayers: coerceDbNumber(roundRow.num_relayers),
+    numRelayers: countActiveRelayersForRound(db, roundId),
     vthoSpentOnVoting: formatVTHO(vthoSpentOnVotingRaw),
     vthoSpentOnVotingRaw: vthoSpentOnVotingRaw.toString(),
     vthoSpentOnClaiming: formatVTHO(vthoSpentOnClaimingRaw),
@@ -836,6 +859,25 @@ function getAffectedRoundsByBlockRange(
     round_id: unknown;
   }[];
   return rows.map((r) => Number(r.round_id));
+}
+
+function getMutableRoundIds(db: Database.Database): number[] {
+  const rows = db
+    .prepare(
+      `
+      SELECT round_id
+      FROM rounds
+      WHERE round_id >= ?
+        AND (
+          COALESCE(is_round_ended, 0) = 0
+          OR COALESCE(rewards_snapshot_finalized, 0) = 0
+        )
+      ORDER BY round_id ASC
+    `,
+    )
+    .all(FIRST_AUTO_VOTING_ROUND) as { round_id: unknown }[]
+
+  return rows.map((row) => Number(row.round_id))
 }
 
 function buildRoundRelayers(
@@ -1103,19 +1145,11 @@ function buildRelayerAnalytics(
 }
 
 function saveReport(report: AnalyticsReport): void {
-  const outputPath = path.join(
-    process.cwd(),
-    "public",
-    "data",
-    "report.json",
-  );
-  const dir = path.dirname(outputPath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
+  const outputPaths = writeMirroredAggregateReport(process.cwd(), report)
+  for (const outputPath of outputPaths) {
+    // eslint-disable-next-line no-console
+    console.log(`Report written to ${outputPath}`)
   }
-  fs.writeFileSync(outputPath, JSON.stringify(report, null, 2));
-  // eslint-disable-next-line no-console
-  console.log(`Report written to ${outputPath}`);
 }
 
 function saveRoundReport(roundReport: RoundReport): void {
@@ -1139,7 +1173,7 @@ async function main(): Promise<void> {
   console.log("==========================");
 
   const db = openDatabase();
-  const thor = ThorClient.at(MAINNET_URL, { isPollingEnabled: false });
+  const thor = ThorClient.at(getMainnetNodeUrl(), { isPollingEnabled: false });
 
   const xAllocationVotingAddress =
     "0x89A00Bb0947a30FF95BEeF77a66AEdE3842Fe5B7";
@@ -1160,19 +1194,19 @@ async function main(): Promise<void> {
       .get() as { value?: string } | undefined)?.value ?? "0",
   );
 
-  const fullRounds = Array.from(
-    { length: Math.max(0, currentRoundId - FIRST_AUTO_VOTING_ROUND + 1) },
-    (_, i) => FIRST_AUTO_VOTING_ROUND + i,
-  );
+  const fullRounds = getFullRoundRange(FIRST_AUTO_VOTING_ROUND, currentRoundId)
 
   const affectedRounds =
     lastProcessedBlock > lastReportedBlock
       ? getAffectedRoundsByBlockRange(db, lastReportedBlock, lastProcessedBlock)
-      : [];
-
-  // If we have no prior report state, build everything.
-  const roundsToBuild =
-    lastReportedBlock === 0 ? fullRounds : affectedRounds;
+      : []
+  const roundsToBuild = selectRoundsToBuild({
+    firstRoundId: FIRST_AUTO_VOTING_ROUND,
+    currentRoundId,
+    lastReportedBlock,
+    affectedRounds,
+    mutableRounds: getMutableRoundIds(db),
+  })
 
   // Write per-round files (only affected rounds after first build).
   const generatedAt = new Date().toISOString();
@@ -1244,4 +1278,3 @@ main().catch((error) => {
   console.error("Report update script failed:", error);
   process.exit(1);
 });
-
