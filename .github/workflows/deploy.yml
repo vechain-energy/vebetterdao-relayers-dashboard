@@ -29,7 +29,6 @@ jobs:
     env:
       BUILD_BASE_PATH: /vebetterdao-relayers-dashboard
       NEXT_PUBLIC_REPORT_URL: https://raw.githubusercontent.com/vechain-energy/vebetterdao-relayers-dashboard/main/public/data/report.json
-      NEXT_CACHE_KEY_SUFFIX: ${{ hashFiles('src/**/*', 'public/assets/**/*', 'next.config.js', 'package.json', 'tsconfig.json') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -67,7 +66,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: .next/cache
-          key: ${{ runner.os }}-deploy-next-cache-${{ hashFiles('.nvmrc', 'yarn.lock') }}-${{ env.NEXT_CACHE_KEY_SUFFIX }}
+          key: ${{ runner.os }}-deploy-next-cache-${{ hashFiles('.nvmrc', 'yarn.lock') }}-${{ hashFiles('src/**/*', 'public/assets/**/*', 'next.config.js', 'package.json', 'tsconfig.json') }}
           restore-keys: |
             ${{ runner.os }}-deploy-next-cache-${{ hashFiles('.nvmrc', 'yarn.lock') }}-
             ${{ runner.os }}-deploy-next-cache-
