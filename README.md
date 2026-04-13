@@ -65,7 +65,7 @@ Static output goes to `out/` for both profiles.
 
 ## Data Updates
 
-Dashboard data (`public/data/report.json`) is updated by a [GitHub Action](.github/workflows/update-data.yml) that runs the incremental report pipeline (`yarn report:refresh`) against mainnet roughly every 10 minutes for about an hour after the weekly round rollover. As of 2026-04-13, that window is scheduled for Mondays around 09:00-10:00 in Germany (`07:00-08:00 UTC`).
+Dashboard data (`public/data/report.json`) is updated by a [GitHub Action](.github/workflows/update-data.yml) that runs the incremental report pipeline (`yarn report:refresh`) against mainnet every 30 minutes for the rest of Monday after the weekly round rollover starts, then once daily for the rest of the week. As of 2026-04-13, that means Mondays from 09:30 through 23:30 in Germany (`07:30-21:30 UTC`) and one daily refresh at 10:00 in Germany on Tuesday through Sunday (`08:00 UTC`).
 
 To keep the scheduled refresh fast, the workflow restores a `node_modules` cache keyed by `yarn.lock` and `.nvmrc`, so warm runs can skip reinstalling dependencies entirely.
 

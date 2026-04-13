@@ -3,10 +3,13 @@ name: Update Dashboard Data
 on:
   workflow_dispatch:
   schedule:
-    # GitHub Actions cron uses UTC. As of 2026-04-13, this window maps to
-    # roughly 09:00-10:00 in Germany (CEST) on Mondays for the post-round refresh.
-    - cron: "0,10,20,30,40,50 7 * * 1"
-    - cron: "0 8 * * 1"
+    # GitHub Actions cron uses UTC. As of 2026-04-13, the round rollover lands
+    # around 09:00 in Germany (CEST). Refresh every 30 minutes for the rest of
+    # Monday after that rollover window (07:30-21:30 UTC / 09:30-23:30 CEST),
+    # then run one daily refresh at 08:00 UTC on Tuesday through Sunday.
+    - cron: "30 7 * * 1"
+    - cron: "0,30 8-21 * * 1"
+    - cron: "0 8 * * 0,2-6"
 
 jobs:
   update-data:
