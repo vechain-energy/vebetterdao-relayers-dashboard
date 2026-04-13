@@ -4,6 +4,16 @@ on:
   push:
     branches:
       - main
+    paths:
+      - .github/workflows/deploy.yml
+      - .nvmrc
+      - next.config.js
+      - package.json
+      - yarn.lock
+      - tsconfig.json
+      - public/**
+      - '!public/data/**'
+      - src/**
   workflow_dispatch:
 
 concurrency:
@@ -11,45 +21,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  validate:
-    name: Validate (${{ matrix.profile.name }})
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        profile:
-          - name: root-domain
-            base_path: ""
-          - name: repo-subpath
-            base_path: "/vebetterdao-relayers-dashboard"
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "yarn"
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Build static export
-        run: yarn build:mainnet
-        env:
-          NEXT_PUBLIC_BASE_PATH: ${{ matrix.profile.base_path }}
-          NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
-          NODE_OPTIONS: "--max-old-space-size=4096"
-
   build:
-    name: Build Pages artifact
+    name: Build repo-subpath Pages artifact
     runs-on: ubuntu-latest
-    needs: validate
     permissions:
       contents: read
+    env:
+      BUILD_BASE_PATH: /vebetterdao-relayers-dashboard
+      NEXT_PUBLIC_REPORT_URL: https://raw.githubusercontent.com/vechain-energy/vebetterdao-relayers-dashboard/main/public/data/report.json
+      NEXT_CACHE_KEY_SUFFIX: ${{ hashFiles('src/**/*', 'public/assets/**/*', 'next.config.js', 'package.json', 'tsconfig.json') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,18 +40,55 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: .nvmrc
           cache: "yarn"
+          cache-dependency-path: yarn.lock
+
+      - name: Restore node_modules cache
+        id: node-modules-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-deploy-node-modules-${{ hashFiles('.nvmrc', 'yarn.lock') }}
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        run: yarn install --frozen-lockfile --prefer-offline
+
+      - name: Save node_modules cache
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: node_modules
+          key: ${{ steps.node-modules-cache.outputs.cache-primary-key }}
+
+      - name: Restore Next.js build cache
+        id: next-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .next/cache
+          key: ${{ runner.os }}-deploy-next-cache-${{ hashFiles('.nvmrc', 'yarn.lock') }}-${{ env.NEXT_CACHE_KEY_SUFFIX }}
+          restore-keys: |
+            ${{ runner.os }}-deploy-next-cache-${{ hashFiles('.nvmrc', 'yarn.lock') }}-
+            ${{ runner.os }}-deploy-next-cache-
 
       - name: Build repo-subpath static export
         run: yarn build:mainnet
         env:
-          NEXT_PUBLIC_BASE_PATH: "/vebetterdao-relayers-dashboard"
+          NEXT_PUBLIC_BASE_PATH: ${{ env.BUILD_BASE_PATH }}
           NEXT_PUBLIC_GA_ID: ${{ vars.NEXT_PUBLIC_GA_ID }}
+          NEXT_PUBLIC_REPORT_URL: ${{ env.NEXT_PUBLIC_REPORT_URL }}
           NODE_OPTIONS: "--max-old-space-size=4096"
+
+      - name: Save Next.js build cache
+        if: steps.next-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .next/cache
+          key: ${{ steps.next-cache.outputs.cache-primary-key }}
+
+      - name: Remove bundled report data from the Pages artifact
+        run: rm -rf out/data
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

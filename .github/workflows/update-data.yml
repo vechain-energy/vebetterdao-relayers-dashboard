@@ -60,6 +60,6 @@ jobs:
           if git diff --staged --quiet; then
             echo "No incremental report changes"
           else
-            git commit -m "chore: update auto-voting report [skip ci]"
+            git commit -m "chore: update auto-voting report"
             git push
           fi

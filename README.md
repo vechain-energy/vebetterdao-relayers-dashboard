@@ -4,7 +4,6 @@ Dashboard for VeBetterDAO's auto-voting relayer system. Tracks relayer analytics
 
 ## Deployments
 
-- Custom-domain build profile: [relayers.vebetterdao.org](https://relayers.vebetterdao.org)
 - GitHub Pages project-site build profile: `https://vechain-energy.github.io/vebetterdao-relayers-dashboard/`
 
 ## What are Relayers?
@@ -42,6 +41,8 @@ cp .env.example .env
 
 ```bash
 MAINNET_NODE_URL=http://mainnet.vechain.host3.builder.eco
+# Optional: point the UI at a runtime-hosted report instead of the bundled file.
+# NEXT_PUBLIC_REPORT_URL=https://raw.githubusercontent.com/vechain-energy/vebetterdao-relayers-dashboard/main/public/data/report.json
 ```
 
 Next.js reads this automatically for the dashboard UI, and the report scripts load `.env` as well.
@@ -57,8 +58,8 @@ NEXT_PUBLIC_BASE_PATH="/vebetterdao-relayers-dashboard" yarn build:staging
 
 Build profiles:
 
-- Root-domain profile: use `NEXT_PUBLIC_BASE_PATH=""` for custom-domain deployments such as `relayers.vebetterdao.org`
-- GitHub Pages project-site profile: use `NEXT_PUBLIC_BASE_PATH="/vebetterdao-relayers-dashboard"` for the default repository Pages deployment
+- Root-domain profile: use `NEXT_PUBLIC_BASE_PATH=""` for ad-hoc local or external builds
+- GitHub Pages project-site profile: use `NEXT_PUBLIC_BASE_PATH="/vebetterdao-relayers-dashboard"` for the published deployment from this repository
 
 Static output goes to `out/` for both profiles.
 
@@ -67,6 +68,8 @@ Static output goes to `out/` for both profiles.
 Dashboard data (`public/data/report.json`) is updated by a [GitHub Action](.github/workflows/update-data.yml) that runs the incremental report pipeline (`yarn report:refresh`) against mainnet roughly every 10 minutes for about an hour after the weekly round rollover. As of 2026-04-13, that window is scheduled for Mondays around 09:00-10:00 in Germany (`07:00-08:00 UTC`).
 
 To keep the scheduled refresh fast, the workflow restores a `node_modules` cache keyed by `yarn.lock` and `.nvmrc`, so warm runs can skip reinstalling dependencies entirely.
+
+The published GitHub Pages build reads the aggregate report from `main` at runtime through `NEXT_PUBLIC_REPORT_URL`, so refreshed JSON becomes visible as soon as the update workflow pushes the new report commit. Local development and ad-hoc builds still fall back to the bundled `/data/report.json` file when `NEXT_PUBLIC_REPORT_URL` is unset.
 
 The pipeline:
 - stores fetched chain state in the tracked SQLite database at `state/actions.sqlite`
@@ -104,9 +107,11 @@ yarn analyze-auto-voting --checkpoint public/data/report.json --output public/da
 
 The GitHub Pages workflow in [deploy.yml](.github/workflows/deploy.yml):
 
-- validates both supported static-export profiles on every run
-- publishes only the repo-subpath Pages artifact on push to `main`
-- keeps the root-domain profile available as a separate supported build mode for non-Pages deployments
+- builds and publishes only the repo-subpath Pages artifact used by this repository
+- uses `NEXT_PUBLIC_REPORT_URL` so production reads report updates from the repository at runtime instead of bundling them into each Pages artifact
+- removes `out/data` before upload so the deployed artifact cannot serve stale bundled report files
+- restores both `node_modules` and `.next/cache` caches to speed up repeated builds
+- runs automatically on pushes that affect the deployed app, while data-only report refresh commits no longer need a Pages rebuild
 
 ## License
 
