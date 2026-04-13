@@ -56,6 +56,8 @@ Static output goes to `out/` (Next.js static export for GitHub Pages).
 
 Dashboard data (`public/data/report.json`) is updated by a [GitHub Action](.github/workflows/update-data.yml) that runs the incremental report pipeline (`yarn report:refresh`) against mainnet roughly every 10 minutes for about an hour after the weekly round rollover. As of 2026-04-13, that window is scheduled for Mondays around 09:00-10:00 in Germany (`07:00-08:00 UTC`).
 
+To keep the scheduled refresh fast, the workflow restores a `node_modules` cache keyed by `yarn.lock` and `.nvmrc`, so warm runs can skip reinstalling dependencies entirely.
+
 The pipeline:
 - stores fetched chain state in the tracked SQLite database at `state/actions.sqlite`
 - rebuilds only affected or still-mutable round reports in `public/data/report.<round>.json`
