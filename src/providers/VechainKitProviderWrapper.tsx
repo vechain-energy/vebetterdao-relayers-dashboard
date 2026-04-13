@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { getConfig } from "@/config";
 import type { EnvConfig } from "@/config";
+import { toAppUrl } from "@/config/basePath";
 import dynamic from "next/dynamic";
 
 import { useColorMode } from "@/components/ui/color-mode";
@@ -63,6 +64,10 @@ export function VechainKitProviderWrapper({ children }: Props) {
   const env = (process.env.NEXT_PUBLIC_APP_ENV ?? "mainnet") as EnvConfig;
   const config = getConfig(env);
   const networkType = config.network.type;
+  const appUrl =
+    typeof window !== "undefined"
+      ? toAppUrl("/", undefined, { origin: window.location.origin })
+      : "";
 
   return (
     <VeChainKitProvider
@@ -94,8 +99,7 @@ export function VechainKitProviderWrapper({ children }: Props) {
               metadata: {
                 name: "VeBetter Relayers",
                 description: "VeBetterDAO Auto-Voting VeBetter Relayers",
-                url:
-                  typeof window !== "undefined" ? window.location.origin : "",
+                url: appUrl,
                 icons: [],
               },
             }
