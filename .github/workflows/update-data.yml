@@ -3,7 +3,10 @@ name: Update Dashboard Data
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 * * * *"
+    # GitHub Actions cron uses UTC. As of 2026-04-13, this window maps to
+    # roughly 09:00-10:00 in Germany (CEST) on Mondays for the post-round refresh.
+    - cron: "0,10,20,30,40,50 7 * * 1"
+    - cron: "0 8 * * 1"
 
 jobs:
   update-data:

@@ -25,7 +25,7 @@ yarn dev           # mainnet, port 3001
 yarn dev:staging   # testnet-staging, port 3001
 ```
 
-The project expects the Node version pinned in [`.nvmrc`](.nvmrc), which the hourly report workflow also uses so the tracked `better-sqlite3` state stays compatible.
+The project expects the Node version pinned in [`.nvmrc`](.nvmrc), which the scheduled report workflow also uses so the tracked `better-sqlite3` state stays compatible.
 
 The default mainnet node is `https://mainnet.vechain.org`.
 
@@ -54,7 +54,7 @@ Static output goes to `out/` (Next.js static export for GitHub Pages).
 
 ## Data Updates
 
-Dashboard data (`public/data/report.json`) is updated hourly by a [GitHub Action](.github/workflows/update-data.yml) that runs the incremental report pipeline (`yarn report:refresh`) against mainnet.
+Dashboard data (`public/data/report.json`) is updated by a [GitHub Action](.github/workflows/update-data.yml) that runs the incremental report pipeline (`yarn report:refresh`) against mainnet roughly every 10 minutes for about an hour after the weekly round rollover. As of 2026-04-13, that window is scheduled for Mondays around 09:00-10:00 in Germany (`07:00-08:00 UTC`).
 
 The pipeline:
 - stores fetched chain state in the tracked SQLite database at `state/actions.sqlite`
