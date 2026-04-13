@@ -2,6 +2,8 @@ export interface RoundAnalytics {
   roundId: number;
   autoVotingUsersCount: number;
   votedForCount: number;
+  /** Existing fork-generated reports may omit this field. */
+  invalidVotesCount?: number;
   rewardsClaimedCount: number;
   totalRelayerRewards: string;
   totalRelayerRewardsRaw: string;

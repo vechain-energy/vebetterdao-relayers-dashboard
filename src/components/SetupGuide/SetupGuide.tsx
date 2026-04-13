@@ -1,47 +1,39 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslation } from "react-i18next";
 import {
   Grid,
   Button,
   Card,
   Heading,
   HStack,
-  Link,
   Text,
   VStack,
   Box,
-  Image,
 } from "@chakra-ui/react";
-import NextLink from "next/link";
-import {
-  LuArrowLeft,
-  LuCoins,
-  LuExternalLink,
-  LuScale,
-  LuServer,
-  LuZap,
-  LuCheck,
-  LuWallet,
-  LuUserPlus,
-  LuPencil,
-  LuPlay,
-  LuShare2,
-  LuRadar,
-} from "react-icons/lu";
 import {
   useWallet,
   useConnectModal,
   useVechainDomain,
   useAccountCustomizationModal,
 } from "@vechain/vechain-kit";
+import NextLink from "next/link";
+import { useRouter } from "next/navigation";
+import { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  LuArrowLeft,
+  LuCheck,
+  LuWallet,
+  LuUserPlus,
+  LuPencil,
+  LuShare2,
+  LuRadar,
+} from "react-icons/lu";
 
 import { RegisterRelayerModal } from "./RegisterRelayerModal";
-import { ShareRelayerModal } from "./ShareRelayerModal";
-import { RunOptions } from "./RunOptions";
 import { Rules } from "./Rules";
+import { RunOptions } from "./RunOptions";
+import { ShareRelayerModal } from "./ShareRelayerModal";
 
 function Step({
   number,

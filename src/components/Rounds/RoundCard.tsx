@@ -20,6 +20,7 @@ import type { RoundAnalytics } from "@/lib/types";
 
 interface RoundCardProps {
   round: RoundAnalytics;
+  currentRoundId: number;
   roi: number | null;
   expectedRoi: number | null;
 }
@@ -61,12 +62,17 @@ function StatPill({
   );
 }
 
-export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
+export function RoundCard({
+  round,
+  currentRoundId,
+  roi,
+  expectedRoi,
+}: RoundCardProps) {
   const { t } = useTranslation();
   const isActive = !round.isRoundEnded;
   const displayRoi = isActive ? expectedRoi : roi;
   const roiLabel = isActive ? t("Expected ROI") : t("ROI");
-  const status = parseRoundStatus(round);
+  const status = parseRoundStatus(round, currentRoundId);
 
   const roundLabel = (
     <HStack gap="2">
@@ -74,18 +80,14 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
         {"#"}
         {round.roundId}
       </Text>
-      {isActive && (
-        <Badge size="sm" variant="solid" colorPalette="blue">
-          {t("Active")}
-        </Badge>
-      )}
     </HStack>
   );
 
   const stats = (
     <>
+      <StatPill label={t("Round")} value={`#${round.roundId}`} />
       <StatPill
-        label={t("Users")}
+        label={t("Users to serve")}
         value={formatNumber(round.autoVotingUsersCount)}
       />
       <StatPill label={t("Relayers")} value={round.numRelayers} />
@@ -124,7 +126,6 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
           <Box hideBelow="md">
             <HStack justify="space-between" w="full" gap="2">
               <SimpleGrid columns={7} gap="4" w="full" alignItems="center">
-                <Box>{roundLabel}</Box>
                 {stats}
                 <VStack gap="0" align="start" minW="0" justifyContent="center">
                   <Text textStyle="xxs" color="text.subtle" lineClamp={1}>
@@ -139,7 +140,11 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
                   </Badge>
                 </VStack>
               </SimpleGrid>
-              <IconButton aria-label={t("Go to round")} variant="ghost" size="sm">
+              <IconButton
+                aria-label={t("Go to round")}
+                variant="ghost"
+                size="sm"
+              >
                 <FaAngleRight />
               </IconButton>
             </HStack>
@@ -150,7 +155,11 @@ export function RoundCard({ round, roi, expectedRoi }: RoundCardProps) {
             <VStack gap="2" align="stretch" w="full">
               <HStack justify="space-between" w="full">
                 {roundLabel}
-                <IconButton aria-label={t("Go to round")} variant="ghost" size="sm">
+                <IconButton
+                  aria-label={t("Go to round")}
+                  variant="ghost"
+                  size="sm"
+                >
                   <FaAngleRight />
                 </IconButton>
               </HStack>

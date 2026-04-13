@@ -17,16 +17,19 @@
  *   --output <path>      Write report to this path (e.g. apps/relayer-dashboard/public/data/report.json).
  */
 
-import { ThorClient } from "@vechain/sdk-network";
+import * as fs from "fs";
+import * as path from "path";
+
 import { ABIContract, Hex } from "@vechain/sdk-core";
+import { ThorClient } from "@vechain/sdk-network";
 import {
   XAllocationVoting__factory,
   VoterRewards__factory,
   RelayerRewardsPool__factory,
   Emissions__factory,
 } from "@vechain/vebetterdao-contracts/typechain-types";
-import * as fs from "fs";
-import * as path from "path";
+
+
 import { getMainnetNodeUrl } from "../src/config/nodeUrls";
 
 const mainnetConfig = {

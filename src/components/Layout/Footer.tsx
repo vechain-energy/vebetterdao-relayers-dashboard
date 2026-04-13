@@ -17,7 +17,9 @@ import NextLink from "next/link";
 import { useTranslation } from "react-i18next";
 
 import { basePath } from "@/config/basePath";
+
 import { ColorModeToggle, useColorModeValue } from "../ui/color-mode";
+
 import { LanguageSelector } from "./components/LanguageSelector";
 
 const RESOURCES = [
@@ -46,7 +48,7 @@ const GITHUB_REPOS = [
 
 const NAVIGATION = [
   { labelKey: "Home", href: "/" },
-  { labelKey: "Rounds", href: "/round" },
+  { labelKey: "Rounds", href: "/rounds" },
   { labelKey: "Relayers", href: "/relayers" },
   { labelKey: "My Relayer", href: "/relayer" },
   { labelKey: "Become a Relayer", href: "/new-relayer" },

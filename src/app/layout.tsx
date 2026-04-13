@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 
 import { basePath } from "@/config/basePath";

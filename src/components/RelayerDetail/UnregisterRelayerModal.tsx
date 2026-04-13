@@ -1,8 +1,8 @@
 "use client"
 
 import { Button, Heading, HStack, Text, VStack } from "@chakra-ui/react"
-import { useSendTransaction, useWallet } from "@vechain/vechain-kit"
 import { useQueryClient } from "@tanstack/react-query"
+import { useSendTransaction, useWallet } from "@vechain/vechain-kit"
 import { useTranslation } from "react-i18next"
 import { LuTriangleAlert } from "react-icons/lu"
 import { encodeFunctionData } from "viem"

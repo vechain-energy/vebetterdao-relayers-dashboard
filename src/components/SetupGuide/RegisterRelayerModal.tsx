@@ -1,6 +1,5 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import {
   Button,
   HStack,
@@ -9,16 +8,16 @@ import {
   VStack,
   Box,
 } from "@chakra-ui/react"
+import { useQueryClient } from "@tanstack/react-query"
 import {
   useWallet,
   useSendTransaction,
   useVechainDomain,
 } from "@vechain/vechain-kit"
+import { useState, useEffect } from "react"
 import { useTranslation } from "react-i18next"
-import { encodeFunctionData } from "viem"
 import { LuCircleCheck, LuCircleAlert, LuLoaderCircle } from "react-icons/lu"
-
-import { useQueryClient } from "@tanstack/react-query"
+import { encodeFunctionData } from "viem"
 
 import { BaseModal } from "@/components/Base/BaseModal"
 import { relayerPoolAbi, relayerPoolAddress } from "@/hooks/contracts"

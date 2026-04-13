@@ -3,9 +3,9 @@
 import { Button, Icon } from "@chakra-ui/react";
 import Script from "next/script";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useColorMode } from "@/components/ui/color-mode";
-import { useTranslation } from "react-i18next";
 
 declare global {
   interface Window {

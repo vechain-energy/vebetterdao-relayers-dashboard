@@ -1,7 +1,7 @@
 {
   "extends": ["next"],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "react-hooks"],
+  "plugins": ["@typescript-eslint"],
   "rules": {
     "@next/next/no-html-link-for-pages": "off",
     "react/display-name": "off",
@@ -48,5 +48,12 @@
     ],
     "no-multiple-empty-lines": ["error", { "max": 2, "maxEOF": 0 }]
   },
-  "overrides": []
+  "overrides": [
+    {
+      "files": ["scripts/**/*.ts"],
+      "rules": {
+        "no-console": "off"
+      }
+    }
+  ]
 }

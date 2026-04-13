@@ -40,12 +40,18 @@ cp .env.example .env
 `.env` example:
 
 ```bash
+# Node-side report / backfill scripts
 MAINNET_NODE_URL=http://mainnet.vechain.host3.builder.eco
+
+# Optional browser-side override for the in-app `/run` relayer flow
+# NEXT_PUBLIC_MAINNET_NODE_URL=http://mainnet.vechain.host3.builder.eco
+# NEXT_PUBLIC_TESTNET_NODE_URL=https://testnet.vechain.org
+
 # Optional: point the UI at a runtime-hosted report instead of the bundled file.
 # NEXT_PUBLIC_REPORT_URL=https://raw.githubusercontent.com/vechain-energy/vebetterdao-relayers-dashboard/main/public/data/report.json
 ```
 
-Next.js reads this automatically for the dashboard UI, and the report scripts load `.env` as well.
+Next.js reads this automatically for the dashboard UI. The report scripts use `MAINNET_NODE_URL`, and the in-browser `/run` flow uses `NEXT_PUBLIC_MAINNET_NODE_URL` / `NEXT_PUBLIC_TESTNET_NODE_URL` when they are set.
 
 ## Building
 

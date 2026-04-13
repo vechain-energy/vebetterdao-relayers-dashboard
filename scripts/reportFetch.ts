@@ -1,5 +1,5 @@
-import { ThorClient } from "@vechain/sdk-network";
 import { ABIContract, Hex } from "@vechain/sdk-core";
+import { ThorClient } from "@vechain/sdk-network";
 import {
   XAllocationVoting__factory,
   VoterRewards__factory,
@@ -7,12 +7,14 @@ import {
   Emissions__factory,
 } from "@vechain/vebetterdao-contracts/typechain-types";
 import type Database from "better-sqlite3";
+
 import { getMainnetNodeUrl } from "../src/config/nodeUrls";
 import {
   getStoredActionRoundId,
   getStoredClaimRoundId,
   selectClaimableSnapshotRefreshRounds,
 } from "../src/lib/reporting/pipeline";
+
 import { openDatabase, getMeta, setMeta } from "./reportDb";
 
 const FIRST_AUTO_VOTING_ROUND = 69;

@@ -2,7 +2,8 @@
 
 import { formatEther } from "viem"
 
-import type { AnalyticsReport, RelayerAnalytics } from "./types"
+import { isRoundRewardsLocked } from "./round-utils"
+import type { AnalyticsReport, RelayerAnalytics, RoundAnalytics } from "./types"
 
 export interface RelayerSummary {
   address: string
@@ -17,13 +18,22 @@ export interface RelayerSummary {
   activeRoundsCount: number
 }
 
+export interface RoundRewardsContextEntry {
+  poolRaw: bigint
+  estimatedPoolRaw: bigint
+  totalWeighted: number
+  locked: boolean
+}
+
 /**
  * Build a context needed for proportional B3TR share calculation.
  * Uses each round's expectedActions as the denominator to match the on-chain
  * RelayerRewardsPool formula: reward = pool * relayerWeighted / totalWeightedActions.
  */
-export function buildRoundRewardsContext(report: AnalyticsReport): Map<number, { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number; locked: boolean }> {
-  const ctx = new Map<number, { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number; locked: boolean }>()
+export function buildRoundRewardsContext(
+  report: AnalyticsReport,
+): Map<number, RoundRewardsContextEntry> {
+  const ctx = new Map<number, RoundRewardsContextEntry>()
 
   for (const rd of report.rounds) {
     ctx.set(rd.roundId, {
@@ -46,12 +56,25 @@ export function computeRelayerRoundB3tr(
   return (roundCtx.poolRaw * BigInt(relayerWeighted)) / BigInt(roundCtx.totalWeighted)
 }
 
-type RoundCtxEntry = { poolRaw: bigint; estimatedPoolRaw: bigint; totalWeighted: number; locked: boolean }
+export function getLockedRoundIds(
+  rounds: RoundAnalytics[],
+  currentRoundId?: number,
+): Set<number> {
+  const set = new Set<number>()
+
+  for (const round of rounds) {
+    if (isRoundRewardsLocked(round, currentRoundId)) {
+      set.add(round.roundId)
+    }
+  }
+
+  return set
+}
 
 /** Compute summary stats for a single relayer from their round breakdowns. */
 export function computeRelayerSummary(
   relayer: RelayerAnalytics,
-  roundCtx?: Map<number, RoundCtxEntry>,
+  roundCtx?: Map<number, RoundRewardsContextEntry>,
   currentRound?: number,
 ): RelayerSummary {
   let totalActions = 0
@@ -68,11 +91,10 @@ export function computeRelayerSummary(
     totalVotedFor += rd.votedForCount
     totalRewardsClaimed += rd.rewardsClaimedCount
     totalWeightedActions += rd.weightedActions
-    const isClaimOnly = rd.votedForCount === 0 && rd.rewardsClaimedCount > 0
-    const operationalRound = isClaimOnly ? rd.roundId + 1 : rd.roundId
-    const isEstimated = currentRound != null && operationalRound === currentRound
+    const isEstimated = currentRound != null && rd.roundId === currentRound
     const useEstimatedPool = currentRound != null && rd.roundId === currentRound
     const isLocked = roundCtx?.get(rd.roundId)?.locked ?? false
+
     if (!isLocked) {
       if (roundCtx) {
         const ctx = roundCtx.get(rd.roundId)
@@ -96,6 +118,7 @@ export function computeRelayerSummary(
         }
       }
     }
+
     totalVthoSpent += BigInt(rd.vthoSpentOnVotingRaw) + BigInt(rd.vthoSpentOnClaimingRaw)
     if (rd.actions > 0 && (lastActiveRound == null || rd.roundId > lastActiveRound)) {
       lastActiveRound = rd.roundId
@@ -112,14 +135,7 @@ export function computeRelayerSummary(
     estimatedB3trRaw: estimatedB3tr.toString(),
     totalVthoSpentRaw: totalVthoSpent.toString(),
     lastActiveRound,
-    activeRoundsCount: new Set(
-      relayer.rounds
-        .filter(rd => rd.actions > 0)
-        .map(rd => {
-          const claimOnly = rd.votedForCount === 0 && rd.rewardsClaimedCount > 0
-          return claimOnly ? rd.roundId + 1 : rd.roundId
-        }),
-    ).size,
+    activeRoundsCount: new Set(relayer.rounds.filter(rd => rd.actions > 0).map(rd => rd.roundId)).size,
   }
 }
 

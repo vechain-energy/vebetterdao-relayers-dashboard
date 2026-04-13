@@ -19,11 +19,11 @@ import { useWallet, WalletButton } from "@vechain/vechain-kit";
 import Image from "next/image";
 import NextLink from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import {
   LuHouse,
   LuInfo,
   LuMenu,
-  LuPlay,
   LuRadar,
   LuTimer,
   LuUsers,
@@ -32,7 +32,6 @@ import {
 import { ColorModeButton, useColorModeValue } from "@/components/ui/color-mode";
 import { basePath } from "@/config/basePath";
 import { useRelayerRegistration } from "@/hooks/useRelayerRegistration";
-import { useTranslation } from "react-i18next";
 
 type NavPage = "home" | "relayers" | "rounds" | "manage" | "learn";
 
@@ -46,7 +45,7 @@ type NavRoute = {
 const BASE_ROUTES: NavRoute[] = [
   { value: "home", labelKey: "Home", href: "/", icon: LuHouse },
   { value: "relayers", labelKey: "Relayers", href: "/relayers", icon: LuUsers },
-  { value: "rounds", labelKey: "Rounds", href: "/round", icon: LuTimer },
+  { value: "rounds", labelKey: "Rounds", href: "/rounds", icon: LuTimer },
   { value: "learn", labelKey: "Learn", href: "/learn", icon: LuInfo },
 ];
 

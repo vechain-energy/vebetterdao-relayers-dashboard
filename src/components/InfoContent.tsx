@@ -24,6 +24,7 @@ import {
   LuPlay,
   LuRadar,
 } from "react-icons/lu";
+
 import { AiSkillBanner } from "./Banners";
 
 function B3trIcon(props: React.SVGProps<SVGSVGElement>) {

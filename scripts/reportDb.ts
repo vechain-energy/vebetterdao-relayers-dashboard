@@ -1,6 +1,7 @@
-import Database from "better-sqlite3";
 import * as fs from "fs";
 import * as path from "path";
+
+import Database from "better-sqlite3";
 
 const DB_RELATIVE_PATH = path.join("state", "actions.sqlite");
 
@@ -136,4 +137,3 @@ export function setMeta(
     "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)",
   ).run(key, value);
 }
-
