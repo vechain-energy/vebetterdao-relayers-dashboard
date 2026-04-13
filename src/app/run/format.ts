@@ -1,4 +1,17 @@
-import type { RelayerSummary, CycleResult } from "@vechain/vebetterdao-relayer-node/dist/types"
+import type {
+  RelayerSummary as NodeRelayerSummary,
+  CycleResult,
+} from "@vechain/vebetterdao-relayer-node/dist/types"
+
+type RelayerSummary = NodeRelayerSummary & {
+  preferredUsersCount?: number
+  previousCompletedWeighted?: bigint
+  previousMissedUsers?: bigint
+  previousRelayerActions?: bigint
+  previousRelayerWeighted?: bigint
+  previousRoundDeadline?: number
+  previousTotalWeighted?: bigint
+}
 
 const RELAYER_NODE_VERSION = "1.1.0"
 
@@ -154,8 +167,9 @@ export function renderSummaryText(s: RelayerSummary): string[] {
   if (!s.isRegistered) {
     out.push(`  ${c.red}${c.italic}  Go to relayer.vebetterdao.org/new-relayer to register as a relayer${c.reset}`)
   }
-  const prefCount = s.preferredUsersCount > 0
-    ? `${c.cyan}${c.bold}${s.preferredUsersCount}${c.reset}${c.dim} users chose you as default${c.reset}`
+  const preferredUsersCount = s.preferredUsersCount ?? 0
+  const prefCount = preferredUsersCount > 0
+    ? `${c.cyan}${c.bold}${preferredUsersCount}${c.reset}${c.dim} users chose you as default${c.reset}`
     : `${c.dim}no users yet${c.reset}`
   out.push(`  ${c.dim}Preferred${c.reset} ${prefCount}`)
 
