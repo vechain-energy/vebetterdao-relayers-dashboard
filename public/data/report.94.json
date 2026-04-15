@@ -1,29 +1,29 @@
 {
-  "generatedAt": "2026-04-14T09:12:40.985Z",
+  "generatedAt": "2026-04-15T09:13:44.730Z",
   "network": "mainnet",
   "roundId": 94,
   "round": {
     "roundId": 94,
     "autoVotingUsersCount": 1155,
-    "votedForCount": 1121,
-    "rewardsClaimedCount": 1142,
+    "votedForCount": 1123,
+    "rewardsClaimedCount": 1144,
     "totalRelayerRewards": "0.00 B3TR",
     "totalRelayerRewardsRaw": "0",
     "estimatedRelayerRewards": "9266.84 B3TR",
     "estimatedRelayerRewardsRaw": "9266849389027000000000",
-    "numRelayers": 10,
-    "vthoSpentOnVoting": "21824.38 VTHO",
-    "vthoSpentOnVotingRaw": "21824385879301000000000",
-    "vthoSpentOnClaiming": "6280.66 VTHO",
-    "vthoSpentOnClaimingRaw": "6280661867333000000000",
-    "vthoSpentTotal": "28105.04 VTHO",
-    "vthoSpentTotalRaw": "28105047746634000000000",
+    "numRelayers": 11,
+    "vthoSpentOnVoting": "21835.42 VTHO",
+    "vthoSpentOnVotingRaw": "21835424400981000000000",
+    "vthoSpentOnClaiming": "6284.51 VTHO",
+    "vthoSpentOnClaimingRaw": "6284515854333000000000",
+    "vthoSpentTotal": "28119.94 VTHO",
+    "vthoSpentTotalRaw": "28119940255314000000000",
     "expectedActions": 4504,
     "completedActions": 3363,
     "reducedUsersCount": 29,
     "missedUsersCount": 285,
     "allActionsOk": false,
-    "actionStatus": "⚠ 5 not voted",
+    "actionStatus": "⚠ 3 not voted",
     "isRoundEnded": false
   },
   "relayers": [
@@ -95,6 +95,20 @@
         "relayerRewardsClaimedRaw": "0",
         "vthoSpentOnVotingRaw": "9538898942024000000000",
         "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0xc69179c8efa85787274c2920e791dd344f0297c1",
+      "round": {
+        "roundId": 94,
+        "votedForCount": 2,
+        "rewardsClaimedCount": 2,
+        "weightedActions": 8,
+        "actions": 6,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "11038521680000000000",
+        "vthoSpentOnClaimingRaw": "3853987000000000000"
       }
     },
     {
