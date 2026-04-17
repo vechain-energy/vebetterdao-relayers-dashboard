@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-16T09:14:53.941Z",
+  "generatedAt": "2026-04-17T09:11:39.407Z",
   "network": "mainnet",
   "firstRound": 69,
   "currentRound": 94,
@@ -607,25 +607,25 @@
     {
       "roundId": 94,
       "autoVotingUsersCount": 1155,
-      "votedForCount": 1123,
-      "rewardsClaimedCount": 1144,
+      "votedForCount": 1124,
+      "rewardsClaimedCount": 1145,
       "totalRelayerRewards": "0.00 B3TR",
       "totalRelayerRewardsRaw": "0",
       "estimatedRelayerRewards": "9266.84 B3TR",
       "estimatedRelayerRewardsRaw": "9266849389027000000000",
-      "numRelayers": 11,
-      "vthoSpentOnVoting": "21835.42 VTHO",
-      "vthoSpentOnVotingRaw": "21835424400981000000000",
-      "vthoSpentOnClaiming": "6284.51 VTHO",
-      "vthoSpentOnClaimingRaw": "6284515854333000000000",
-      "vthoSpentTotal": "28119.94 VTHO",
-      "vthoSpentTotalRaw": "28119940255314000000000",
+      "numRelayers": 12,
+      "vthoSpentOnVoting": "21840.61 VTHO",
+      "vthoSpentOnVotingRaw": "21840617550401000000000",
+      "vthoSpentOnClaiming": "6286.40 VTHO",
+      "vthoSpentOnClaimingRaw": "6286403622833000000000",
+      "vthoSpentTotal": "28127.02 VTHO",
+      "vthoSpentTotalRaw": "28127021173234000000000",
       "expectedActions": 4504,
       "completedActions": 3363,
       "reducedUsersCount": 29,
       "missedUsersCount": 285,
       "allActionsOk": false,
-      "actionStatus": "⚠ 3 not voted",
+      "actionStatus": "⚠ 2 not voted",
       "isRoundEnded": false
     }
   ],
@@ -1149,6 +1149,17 @@
           "claimableRewardsRaw": "0",
           "relayerRewardsClaimedRaw": "0",
           "vthoSpentOnVotingRaw": "7070960000000000000",
+          "vthoSpentOnClaimingRaw": "1887768500000000000"
+        },
+        {
+          "roundId": 94,
+          "votedForCount": 1,
+          "rewardsClaimedCount": 1,
+          "weightedActions": 4,
+          "actions": 2,
+          "claimableRewardsRaw": "0",
+          "relayerRewardsClaimedRaw": "0",
+          "vthoSpentOnVotingRaw": "5193149420000000000",
           "vthoSpentOnClaimingRaw": "1887768500000000000"
         }
       ]
