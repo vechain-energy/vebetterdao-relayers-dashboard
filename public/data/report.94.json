@@ -1,29 +1,29 @@
 {
-  "generatedAt": "2026-04-17T09:11:39.407Z",
+  "generatedAt": "2026-04-18T07:00:01.698Z",
   "network": "mainnet",
   "roundId": 94,
   "round": {
     "roundId": 94,
     "autoVotingUsersCount": 1155,
-    "votedForCount": 1124,
-    "rewardsClaimedCount": 1145,
+    "votedForCount": 1126,
+    "rewardsClaimedCount": 1146,
     "totalRelayerRewards": "0.00 B3TR",
     "totalRelayerRewardsRaw": "0",
     "estimatedRelayerRewards": "9266.84 B3TR",
     "estimatedRelayerRewardsRaw": "9266849389027000000000",
     "numRelayers": 12,
-    "vthoSpentOnVoting": "21840.61 VTHO",
-    "vthoSpentOnVotingRaw": "21840617550401000000000",
-    "vthoSpentOnClaiming": "6286.40 VTHO",
-    "vthoSpentOnClaimingRaw": "6286403622833000000000",
-    "vthoSpentTotal": "28127.02 VTHO",
-    "vthoSpentTotalRaw": "28127021173234000000000",
+    "vthoSpentOnVoting": "21904.71 VTHO",
+    "vthoSpentOnVotingRaw": "21904718115401000000000",
+    "vthoSpentOnClaiming": "6289.69 VTHO",
+    "vthoSpentOnClaimingRaw": "6289690727833000000000",
+    "vthoSpentTotal": "28194.40 VTHO",
+    "vthoSpentTotalRaw": "28194408843234000000000",
     "expectedActions": 4504,
     "completedActions": 3363,
     "reducedUsersCount": 29,
     "missedUsersCount": 285,
-    "allActionsOk": false,
-    "actionStatus": "⚠ 2 not voted",
+    "allActionsOk": true,
+    "actionStatus": "✓ OK (29 skips)",
     "isRoundEnded": false
   },
   "relayers": [
@@ -45,13 +45,13 @@
       "address": "0x6541ba5f80aafbe264a98215984a92dea0238835",
       "round": {
         "roundId": 94,
-        "votedForCount": 99,
+        "votedForCount": 101,
         "rewardsClaimedCount": 0,
-        "weightedActions": 297,
-        "actions": 99,
+        "weightedActions": 303,
+        "actions": 101,
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "0",
-        "vthoSpentOnVotingRaw": "2817805781518000000000",
+        "vthoSpentOnVotingRaw": "2881906346518000000000",
         "vthoSpentOnClaimingRaw": "0"
       }
     },
@@ -158,13 +158,13 @@
       "round": {
         "roundId": 94,
         "votedForCount": 0,
-        "rewardsClaimedCount": 619,
-        "weightedActions": 619,
-        "actions": 619,
+        "rewardsClaimedCount": 620,
+        "weightedActions": 620,
+        "actions": 620,
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "0",
         "vthoSpentOnVotingRaw": "0",
-        "vthoSpentOnClaimingRaw": "3348415867309000000000"
+        "vthoSpentOnClaimingRaw": "3351702972309000000000"
       }
     },
     {
