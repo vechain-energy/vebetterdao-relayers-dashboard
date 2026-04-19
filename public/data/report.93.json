@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-18T07:00:01.698Z",
+  "generatedAt": "2026-04-19T08:45:57.585Z",
   "network": "mainnet",
   "roundId": 93,
   "round": {
@@ -77,8 +77,8 @@
         "rewardsClaimedCount": 1,
         "weightedActions": 4,
         "actions": 2,
-        "claimableRewardsRaw": "6368283650000000000",
-        "relayerRewardsClaimedRaw": "0",
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "6368283650000000000",
         "vthoSpentOnVotingRaw": "3878728098000000000",
         "vthoSpentOnClaimingRaw": "1853372522000000000"
       }
@@ -133,8 +133,8 @@
         "rewardsClaimedCount": 1,
         "weightedActions": 490,
         "actions": 163,
-        "claimableRewardsRaw": "624091797790000000000",
-        "relayerRewardsClaimedRaw": "0",
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "624091797790000000000",
         "vthoSpentOnVotingRaw": "1415291739933000000000",
         "vthoSpentOnClaimingRaw": "1874693500000000000"
       }
@@ -161,8 +161,8 @@
         "rewardsClaimedCount": 1,
         "weightedActions": 7,
         "actions": 2,
-        "claimableRewardsRaw": "10189253841000000000",
-        "relayerRewardsClaimedRaw": "0",
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "10189253841000000000",
         "vthoSpentOnVotingRaw": "17248085665000000000",
         "vthoSpentOnClaimingRaw": "1877444480000000000"
       }
