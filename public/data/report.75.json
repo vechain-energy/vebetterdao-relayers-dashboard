@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-17T09:06:26.167Z",
+  "generatedAt": "2026-04-20T07:49:58.364Z",
   "network": "mainnet",
   "roundId": 75,
   "round": {
@@ -14,10 +14,10 @@
     "numRelayers": 1,
     "vthoSpentOnVoting": "29.18 VTHO",
     "vthoSpentOnVotingRaw": "29182251575000000000",
-    "vthoSpentOnClaiming": "9.23 VTHO",
-    "vthoSpentOnClaimingRaw": "9233635430000000000",
-    "vthoSpentTotal": "38.41 VTHO",
-    "vthoSpentTotalRaw": "38415887005000000000",
+    "vthoSpentOnClaiming": "9.42 VTHO",
+    "vthoSpentOnClaimingRaw": "9420678165000000000",
+    "vthoSpentTotal": "38.60 VTHO",
+    "vthoSpentTotalRaw": "38602929740000000000",
     "expectedActions": 20,
     "completedActions": 20,
     "reducedUsersCount": 0,
@@ -38,7 +38,7 @@
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "30084600800000000000",
         "vthoSpentOnVotingRaw": "29182251575000000000",
-        "vthoSpentOnClaimingRaw": "9233635430000000000"
+        "vthoSpentOnClaimingRaw": "9420678165000000000"
       }
     }
   ]

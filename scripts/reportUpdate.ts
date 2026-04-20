@@ -15,6 +15,7 @@ import { getMainnetNodeUrl } from "../src/config/nodeUrls";
 import {
   getFullRoundRange,
   selectRoundsToBuild,
+  shouldRefreshRoundCache,
   writeMirroredAggregateReport,
 } from "../src/lib/reporting/pipeline";
 
@@ -576,21 +577,28 @@ async function ensureRoundCached(
   db: Database.Database,
   thor: ThorClient,
   roundId: number,
+  forceRefresh = false,
 ): Promise<RoundRow> {
   const existing = getCachedRoundRow(db, roundId);
-  const needsRefresh =
-    !existing ||
-    existing.snapshot_block === null ||
-    existing.deadline_block === null ||
-    existing.is_round_ended === null ||
-    existing.num_relayers === null ||
-    existing.auto_voting_users_count === null ||
-    existing.reduced_users_count === null ||
-    existing.expected_actions === null ||
-    existing.completed_actions === null ||
-    existing.missed_users_count === null ||
-    existing.total_relayer_rewards_raw === null ||
-    existing.estimated_relayer_rewards_raw === null;
+  const needsRefresh = shouldRefreshRoundCache(
+    existing
+      ? {
+          snapshotBlock: existing.snapshot_block,
+          deadlineBlock: existing.deadline_block,
+          isRoundEnded: existing.is_round_ended,
+          numRelayers: existing.num_relayers,
+          autoVotingUsersCount: existing.auto_voting_users_count,
+          contractAutoVotingUsersCount: existing.contract_auto_voting_users_count,
+          reducedUsersCount: existing.reduced_users_count,
+          expectedActions: existing.expected_actions,
+          completedActions: existing.completed_actions,
+          missedUsersCount: existing.missed_users_count,
+          totalRelayerRewardsRaw: existing.total_relayer_rewards_raw,
+          estimatedRelayerRewardsRaw: existing.estimated_relayer_rewards_raw,
+        }
+      : null,
+    forceRefresh,
+  );
   if (!needsRefresh && existing) return existing;
 
   const xAllocationVotingAddress =
@@ -1216,7 +1224,7 @@ async function main(): Promise<void> {
   for (const roundId of roundsToBuild) {
     // eslint-disable-next-line no-console
     console.log(`Building analytics for round ${roundId}...`);
-    const cached = await ensureRoundCached(db, thor, roundId);
+    const cached = await ensureRoundCached(db, thor, roundId, true);
     const round = buildRoundAnalytics(db, cached);
     const relayersForRound = buildRoundRelayers(db, roundId);
     const rr: RoundReport = {

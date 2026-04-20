@@ -10,6 +10,7 @@ import {
   getStoredClaimRoundId,
   selectClaimableSnapshotRefreshRounds,
   selectRoundsToBuild,
+  shouldRefreshRoundCache,
   writeMirroredAggregateReport,
 } from "./pipeline"
 
@@ -57,16 +58,28 @@ describe("selectRoundsToBuild", () => {
       }),
     ).toEqual([95])
   })
+
+  it("rebuilds the previous round when late claims land in the next round", () => {
+    expect(
+      selectRoundsToBuild({
+        firstRoundId: 69,
+        currentRoundId: 95,
+        lastReportedBlock: 789,
+        affectedRounds: [94],
+        mutableRounds: [95],
+      }),
+    ).toEqual([94, 95])
+  })
 })
 
 describe("claim round attribution", () => {
   it("attributes weight-1 actions to the claimed round", () => {
-    expect(getStoredActionRoundId(93, 1)).toBe(94)
+    expect(getStoredActionRoundId(93, 1)).toBe(93)
     expect(getStoredActionRoundId(93, 3)).toBe(93)
   })
 
   it("attributes claim events to the claimed round", () => {
-    expect(getStoredClaimRoundId(93)).toBe(94)
+    expect(getStoredClaimRoundId(93)).toBe(93)
   })
 
   it("refreshes mutable rounds and touched claimed rounds only", () => {
@@ -78,6 +91,40 @@ describe("claim round attribution", () => {
         touchedClaimRounds: [90, 94],
       }),
     ).toEqual([90, 94, 95])
+  })
+})
+
+describe("shouldRefreshRoundCache", () => {
+  const completeRound = {
+    snapshotBlock: 1,
+    deadlineBlock: 2,
+    isRoundEnded: 1,
+    numRelayers: 3,
+    autoVotingUsersCount: 4,
+    contractAutoVotingUsersCount: 4,
+    reducedUsersCount: 0,
+    expectedActions: 12,
+    completedActions: 12,
+    missedUsersCount: 0,
+    totalRelayerRewardsRaw: 100,
+    estimatedRelayerRewardsRaw: 100,
+  }
+
+  it("refreshes stale rows when forced even if every field is populated", () => {
+    expect(shouldRefreshRoundCache(completeRound, true)).toBe(true)
+  })
+
+  it("keeps complete cached rows when refresh is not forced", () => {
+    expect(shouldRefreshRoundCache(completeRound)).toBe(false)
+  })
+
+  it("refreshes incomplete cached rows", () => {
+    expect(
+      shouldRefreshRoundCache({
+        ...completeRound,
+        isRoundEnded: null,
+      }),
+    ).toBe(true)
   })
 })
 

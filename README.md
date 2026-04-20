@@ -81,6 +81,9 @@ The pipeline:
 - stores fetched chain state in the tracked SQLite database at `state/actions.sqlite`
 - rebuilds only affected or still-mutable round reports in `public/data/report.<round>.json`
 - rewrites the aggregate report to both `public/data/report.json` and `apps/relayer-dashboard/public/data/report.json`
+- stores claim activity on the actual claimed round, so late claims refresh the previous round instead of the new live round
+
+If you change the round-attribution storage semantics or need a full repair, delete `state/actions.sqlite` and rerun the refresh once from a clean checkout so the tracked DB and generated reports are rebuilt from scratch.
 
 To run manually:
 

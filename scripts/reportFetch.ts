@@ -527,6 +527,8 @@ async function fetchRelayerActions(
       const relayer = normalizeAddress(decoded.args.relayer as string);
       const actionCount = Number(decoded.args.actionCount ?? 0);
       const weight = Number(decoded.args.weight ?? 0);
+      // Weight-1 actions are emitted for the round being claimed, so keep them
+      // on that round instead of shifting them into the next live round.
       const effectiveRoundId = getStoredActionRoundId(roundId, weight);
 
       const meta: LogMeta = {
@@ -749,6 +751,7 @@ async function fetchClaims(
         });
 
         const claimedCycle = Number(decoded.args.cycle ?? 0);
+        // The emitted cycle is the actual round whose voter rewards were claimed.
         const roundId = getStoredClaimRoundId(claimedCycle);
         const relayer = normalizeAddress(decoded.args.relayer as string);
         const voter = normalizeAddress(decoded.args.voter as string);

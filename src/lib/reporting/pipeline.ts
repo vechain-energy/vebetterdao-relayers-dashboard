@@ -25,6 +25,21 @@ export interface SnapshotRefreshSelectionInput {
   touchedClaimRounds: number[]
 }
 
+export interface CachedRoundState {
+  snapshotBlock: number | null
+  deadlineBlock: number | null
+  isRoundEnded: number | null
+  numRelayers: number | null
+  autoVotingUsersCount: number | null
+  contractAutoVotingUsersCount: number | null
+  reducedUsersCount: number | null
+  expectedActions: number | null
+  completedActions: number | null
+  missedUsersCount: number | null
+  totalRelayerRewardsRaw: number | null
+  estimatedRelayerRewardsRaw: number | null
+}
+
 function normalizeRoundIds(
   roundIds: Iterable<number>,
   firstRoundId: number,
@@ -49,13 +64,36 @@ export function getFullRoundRange(
 
 export function getStoredActionRoundId(
   roundId: number,
-  weight: number,
+  _weight: number,
 ): number {
-  return weight === 1 ? roundId + 1 : roundId
+  return roundId
 }
 
 export function getStoredClaimRoundId(claimedCycle: number): number {
-  return claimedCycle + 1
+  return claimedCycle
+}
+
+export function shouldRefreshRoundCache(
+  cachedRound: CachedRoundState | null,
+  forceRefresh = false,
+): boolean {
+  if (forceRefresh) return true
+  if (!cachedRound) return true
+
+  return [
+    cachedRound.snapshotBlock,
+    cachedRound.deadlineBlock,
+    cachedRound.isRoundEnded,
+    cachedRound.numRelayers,
+    cachedRound.autoVotingUsersCount,
+    cachedRound.contractAutoVotingUsersCount,
+    cachedRound.reducedUsersCount,
+    cachedRound.expectedActions,
+    cachedRound.completedActions,
+    cachedRound.missedUsersCount,
+    cachedRound.totalRelayerRewardsRaw,
+    cachedRound.estimatedRelayerRewardsRaw,
+  ].some((value) => value === null)
 }
 
 export function selectClaimableSnapshotRefreshRounds(
