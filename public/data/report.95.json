@@ -1,29 +1,29 @@
 {
-  "generatedAt": "2026-04-21T09:20:54.615Z",
+  "generatedAt": "2026-04-22T09:15:59.541Z",
   "network": "mainnet",
   "roundId": 95,
   "round": {
     "roundId": 95,
     "autoVotingUsersCount": 1158,
-    "votedForCount": 1122,
+    "votedForCount": 1123,
     "rewardsClaimedCount": 0,
     "totalRelayerRewards": "0.00 B3TR",
     "totalRelayerRewardsRaw": "0",
-    "estimatedRelayerRewards": "7126.61 B3TR",
-    "estimatedRelayerRewardsRaw": "7126618631563000000000",
-    "numRelayers": 12,
-    "vthoSpentOnVoting": "21403.39 VTHO",
-    "vthoSpentOnVotingRaw": "21403390431884000000000",
+    "estimatedRelayerRewards": "6729.29 B3TR",
+    "estimatedRelayerRewardsRaw": "6729298833403000000000",
+    "numRelayers": 13,
+    "vthoSpentOnVoting": "21553.82 VTHO",
+    "vthoSpentOnVotingRaw": "21553823616884000000000",
     "vthoSpentOnClaiming": "0.00 VTHO",
     "vthoSpentOnClaimingRaw": "0",
-    "vthoSpentTotal": "21403.39 VTHO",
-    "vthoSpentTotalRaw": "21403390431884000000000",
+    "vthoSpentTotal": "21553.82 VTHO",
+    "vthoSpentTotalRaw": "21553823616884000000000",
     "expectedActions": 4492,
-    "completedActions": 3366,
+    "completedActions": 3369,
     "reducedUsersCount": 35,
-    "missedUsersCount": 281,
-    "allActionsOk": false,
-    "actionStatus": "⚠ 1 not voted",
+    "missedUsersCount": 280,
+    "allActionsOk": true,
+    "actionStatus": "✓ OK (35 skips)",
     "isRoundEnded": false
   },
   "relayers": [
@@ -150,6 +150,20 @@
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "0",
         "vthoSpentOnVotingRaw": "5193149420000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0xdcd54fedbd66831a4dcc3a9019f000a3fe1ae0eb",
+      "round": {
+        "roundId": 95,
+        "votedForCount": 1,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 3,
+        "actions": 1,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "150433185000000000000",
         "vthoSpentOnClaimingRaw": "0"
       }
     },
