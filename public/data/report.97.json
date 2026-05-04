@@ -1,0 +1,171 @@
+{
+  "generatedAt": "2026-05-04T09:43:05.195Z",
+  "network": "mainnet",
+  "roundId": 97,
+  "round": {
+    "roundId": 97,
+    "autoVotingUsersCount": 1263,
+    "votedForCount": 1184,
+    "rewardsClaimedCount": 0,
+    "totalRelayerRewards": "0.00 B3TR",
+    "totalRelayerRewardsRaw": "0",
+    "estimatedRelayerRewards": "9047.58 B3TR",
+    "estimatedRelayerRewardsRaw": "9047582927102000000000",
+    "numRelayers": 10,
+    "vthoSpentOnVoting": "29772.88 VTHO",
+    "vthoSpentOnVotingRaw": "29772880573215000000000",
+    "vthoSpentOnClaiming": "0.00 VTHO",
+    "vthoSpentOnClaimingRaw": "0",
+    "vthoSpentTotal": "29772.88 VTHO",
+    "vthoSpentTotalRaw": "29772880573215000000000",
+    "expectedActions": 4784,
+    "completedActions": 3552,
+    "reducedUsersCount": 67,
+    "missedUsersCount": 308,
+    "allActionsOk": false,
+    "actionStatus": "⚠ 12 not voted",
+    "isRoundEnded": false
+  },
+  "relayers": [
+    {
+      "address": "0x5e80c1a43e57501d0faebf0b41f3addcdeb43be4",
+      "round": {
+        "roundId": 97,
+        "votedForCount": 3,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 9,
+        "actions": 3,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "136387649410000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0x6541ba5f80aafbe264a98215984a92dea0238835",
+      "round": {
+        "roundId": 97,
+        "votedForCount": 262,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 786,
+        "actions": 262,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "4709562816025000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0x8c9391184e98d7ebfb3dc5d28962755c0a3cf6db",
+      "round": {
+        "roundId": 97,
+        "votedForCount": 1,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 3,
+        "actions": 1,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "11998355680000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0x925c4197367171f106a3674cf49d1915b82a53e9",
+      "round": {
+        "roundId": 97,
+        "votedForCount": 3,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 9,
+        "actions": 3,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "12579708540000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0x99eed8b1c63ec787130fc74942f86e409b8feb7f",
+      "round": {
+        "roundId": 97,
+        "votedForCount": 8,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 24,
+        "actions": 8,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "53638973339000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0xc0a5967da7b4e00e6b4f2474112b95f1fb8d37f7",
+      "round": {
+        "roundId": 97,
+        "votedForCount": 413,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 1239,
+        "actions": 413,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "11983503075248000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0xcbba3561f9c27784cfbff337235c7b1dbdb0f336",
+      "round": {
+        "roundId": 97,
+        "votedForCount": 1,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 3,
+        "actions": 1,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "5184170249000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0xdf32104e4e5ec8f6969184c48e164823c8761bf3",
+      "round": {
+        "roundId": 97,
+        "votedForCount": 1,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 3,
+        "actions": 1,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "9992380000000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0xe7c01247ae5fd907a012d22ec6becd8a84f5b8a9",
+      "round": {
+        "roundId": 97,
+        "votedForCount": 2,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 6,
+        "actions": 2,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "21591779450000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    },
+    {
+      "address": "0xf81df88760cbfdec5a1298b5e79fe7b7738a1a05",
+      "round": {
+        "roundId": 97,
+        "votedForCount": 490,
+        "rewardsClaimedCount": 0,
+        "weightedActions": 1470,
+        "actions": 490,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "12828441665274000000000",
+        "vthoSpentOnClaimingRaw": "0"
+      }
+    }
+  ]
+}
