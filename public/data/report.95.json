@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-04T14:40:28.059Z",
+  "generatedAt": "2026-05-04T16:51:19.533Z",
   "network": "mainnet",
   "roundId": 95,
   "round": {
@@ -77,8 +77,8 @@
         "rewardsClaimedCount": 5,
         "weightedActions": 14,
         "actions": 8,
-        "claimableRewardsRaw": "17683082373000000000",
-        "relayerRewardsClaimedRaw": "0",
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "17683082373000000000",
         "vthoSpentOnVotingRaw": "21883536327000000000",
         "vthoSpentOnClaimingRaw": "8422350160000000000"
       }
