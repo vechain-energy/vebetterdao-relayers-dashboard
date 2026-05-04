@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-04T18:19:12.644Z",
+  "generatedAt": "2026-05-04T20:04:10.045Z",
   "network": "mainnet",
   "firstRound": 69,
   "currentRound": 97,
@@ -683,8 +683,8 @@
       "rewardsClaimedCount": 0,
       "totalRelayerRewards": "0.00 B3TR",
       "totalRelayerRewardsRaw": "0",
-      "estimatedRelayerRewards": "8351.86 B3TR",
-      "estimatedRelayerRewardsRaw": "8351862656748000000000",
+      "estimatedRelayerRewards": "8245.47 B3TR",
+      "estimatedRelayerRewardsRaw": "8245471611363000000000",
       "numRelayers": 11,
       "vthoSpentOnVoting": "29859.16 VTHO",
       "vthoSpentOnVotingRaw": "29859163756760000000000",
