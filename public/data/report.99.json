@@ -1,30 +1,30 @@
 {
-  "generatedAt": "2026-05-24T09:51:12.603Z",
+  "generatedAt": "2026-05-25T11:42:30.610Z",
   "network": "mainnet",
   "roundId": 99,
   "round": {
     "roundId": 99,
     "autoVotingUsersCount": 1370,
     "votedForCount": 1282,
-    "rewardsClaimedCount": 0,
-    "totalRelayerRewards": "0.00 B3TR",
-    "totalRelayerRewardsRaw": "0",
-    "estimatedRelayerRewards": "4971.01 B3TR",
-    "estimatedRelayerRewardsRaw": "4971017302279000000000",
-    "numRelayers": 12,
+    "rewardsClaimedCount": 1320,
+    "totalRelayerRewards": "6499.78 B3TR",
+    "totalRelayerRewardsRaw": "6499789606030000000000",
+    "estimatedRelayerRewards": "0.12 B3TR",
+    "estimatedRelayerRewardsRaw": "120559311000000000",
+    "numRelayers": 14,
     "vthoSpentOnVoting": "58414.87 VTHO",
     "vthoSpentOnVotingRaw": "58414876690005000000000",
-    "vthoSpentOnClaiming": "0.00 VTHO",
-    "vthoSpentOnClaimingRaw": "0",
-    "vthoSpentTotal": "58414.87 VTHO",
-    "vthoSpentTotalRaw": "58414876690005000000000",
+    "vthoSpentOnClaiming": "25347.38 VTHO",
+    "vthoSpentOnClaimingRaw": "25347387476705000000000",
+    "vthoSpentTotal": "83762.26 VTHO",
+    "vthoSpentTotalRaw": "83762264166710000000000",
     "expectedActions": 5304,
-    "completedActions": 3978,
+    "completedActions": 5298,
     "reducedUsersCount": 88,
-    "missedUsersCount": 331,
-    "allActionsOk": true,
-    "actionStatus": "✓ OK (88 skips)",
-    "isRoundEnded": false
+    "missedUsersCount": 1,
+    "allActionsOk": false,
+    "actionStatus": "⚠ 0 claims missing",
+    "isRoundEnded": true
   },
   "relayers": [
     {
@@ -32,13 +32,13 @@
       "round": {
         "roundId": 99,
         "votedForCount": 5,
-        "rewardsClaimedCount": 0,
-        "weightedActions": 15,
-        "actions": 5,
+        "rewardsClaimedCount": 1,
+        "weightedActions": 16,
+        "actions": 6,
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "0",
         "vthoSpentOnVotingRaw": "52909252720000000000",
-        "vthoSpentOnClaimingRaw": "0"
+        "vthoSpentOnClaimingRaw": "3561748489000000000"
       }
     },
     {
@@ -60,13 +60,13 @@
       "round": {
         "roundId": 99,
         "votedForCount": 1,
-        "rewardsClaimedCount": 0,
-        "weightedActions": 3,
-        "actions": 1,
+        "rewardsClaimedCount": 91,
+        "weightedActions": 94,
+        "actions": 92,
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "0",
         "vthoSpentOnVotingRaw": "834708876160000000000",
-        "vthoSpentOnClaimingRaw": "0"
+        "vthoSpentOnClaimingRaw": "3899933966899000000000"
       }
     },
     {
@@ -88,13 +88,13 @@
       "round": {
         "roundId": 99,
         "votedForCount": 9,
-        "rewardsClaimedCount": 0,
-        "weightedActions": 27,
-        "actions": 9,
+        "rewardsClaimedCount": 8,
+        "weightedActions": 35,
+        "actions": 17,
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "0",
         "vthoSpentOnVotingRaw": "129756342194000000000",
-        "vthoSpentOnClaimingRaw": "0"
+        "vthoSpentOnClaimingRaw": "29775494944000000000"
       }
     },
     {
@@ -116,13 +116,13 @@
       "round": {
         "roundId": 99,
         "votedForCount": 7,
-        "rewardsClaimedCount": 0,
-        "weightedActions": 21,
-        "actions": 7,
+        "rewardsClaimedCount": 7,
+        "weightedActions": 28,
+        "actions": 14,
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "0",
         "vthoSpentOnVotingRaw": "47402763975000000000",
-        "vthoSpentOnClaimingRaw": "0"
+        "vthoSpentOnClaimingRaw": "40934912424000000000"
       }
     },
     {
@@ -158,13 +158,41 @@
       "round": {
         "roundId": 99,
         "votedForCount": 2,
-        "rewardsClaimedCount": 0,
-        "weightedActions": 6,
-        "actions": 2,
+        "rewardsClaimedCount": 2,
+        "weightedActions": 8,
+        "actions": 4,
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "0",
         "vthoSpentOnVotingRaw": "39335177722000000000",
-        "vthoSpentOnClaimingRaw": "0"
+        "vthoSpentOnClaimingRaw": "8902691176000000000"
+      }
+    },
+    {
+      "address": "0xd7c07641a70d1c9216b5345f357b7ba501f16c6e",
+      "round": {
+        "roundId": 99,
+        "votedForCount": 0,
+        "rewardsClaimedCount": 938,
+        "weightedActions": 938,
+        "actions": 938,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "0",
+        "vthoSpentOnClaimingRaw": "17213588781804000000000"
+      }
+    },
+    {
+      "address": "0xe32693f36cb95223223b5dbda3744de4739c687b",
+      "round": {
+        "roundId": 99,
+        "votedForCount": 0,
+        "rewardsClaimedCount": 122,
+        "weightedActions": 122,
+        "actions": 122,
+        "claimableRewardsRaw": "0",
+        "relayerRewardsClaimedRaw": "0",
+        "vthoSpentOnVotingRaw": "0",
+        "vthoSpentOnClaimingRaw": "1835799717488000000000"
       }
     },
     {
@@ -172,13 +200,13 @@
       "round": {
         "roundId": 99,
         "votedForCount": 2,
-        "rewardsClaimedCount": 0,
-        "weightedActions": 6,
-        "actions": 2,
+        "rewardsClaimedCount": 2,
+        "weightedActions": 8,
+        "actions": 4,
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "0",
         "vthoSpentOnVotingRaw": "35493561952000000000",
-        "vthoSpentOnClaimingRaw": "0"
+        "vthoSpentOnClaimingRaw": "15647583450000000000"
       }
     },
     {
@@ -186,13 +214,13 @@
       "round": {
         "roundId": 99,
         "votedForCount": 408,
-        "rewardsClaimedCount": 0,
-        "weightedActions": 1224,
-        "actions": 408,
+        "rewardsClaimedCount": 149,
+        "weightedActions": 1373,
+        "actions": 557,
         "claimableRewardsRaw": "0",
         "relayerRewardsClaimedRaw": "0",
         "vthoSpentOnVotingRaw": "17639246125176000000000",
-        "vthoSpentOnClaimingRaw": "0"
+        "vthoSpentOnClaimingRaw": "2299242580031000000000"
       }
     }
   ]
